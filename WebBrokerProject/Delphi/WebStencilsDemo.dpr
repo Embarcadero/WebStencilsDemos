@@ -12,6 +12,9 @@ uses
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
   {$ENDIF }
+  {$IFDEF LINUX}
+  Posix.Signal,
+  {$ENDIF}
   MainWebModuleU in 'MainWebModuleU.pas' {MainWebModule: TWebModule},
   ServerConst1 in 'ServerConst1.pas',
   Helpers.WebModule in 'Helpers.WebModule.pas',
@@ -20,9 +23,60 @@ uses
   Controllers.Customers in 'Controllers.Customers.pas',
   Helpers.FDQuery in 'Helpers.FDQuery.pas',
   Models.PaginationParams in 'Models.PaginationParams.pas',
-  CodeExamplesU in 'CodeExamplesU.pas';
+  CodeExamplesU in 'CodeExamplesU.pas',
+  LoggerU in 'LoggerU.pas';
 
 {$R *.res}
+
+var
+  GServer: TIdHTTPWebBrokerBridge;  // Global server reference for signal handler
+  GShouldExit: Boolean = False;     // Flag to control the main loop
+
+{$IFDEF LINUX}
+// Linux signal handler
+procedure SignalHandler(SigNum: Integer); cdecl;
+begin
+  if (SigNum = SIGTERM) and (GServer <> nil) then
+  begin
+    Logger.Info('Received SIGTERM signal, stopping server...');
+    if GServer.Active then
+    begin
+      GServer.Active := False;
+      GServer.Bindings.Clear;
+      Logger.Info('Server stopped gracefully');
+    end;
+    GShouldExit := True;  // Set the exit flag
+  end;
+end;
+{$ENDIF}
+
+{$IFDEF MSWINDOWS}
+// Windows console handler
+function ConsoleHandler(CtrlType: DWORD): BOOL; stdcall;
+begin
+  Result := True;
+  case CtrlType of
+    CTRL_C_EVENT,
+    CTRL_BREAK_EVENT,
+    CTRL_CLOSE_EVENT,
+    CTRL_SHUTDOWN_EVENT:
+    begin
+      if GServer <> nil then
+      begin
+        Logger.Info('Received shutdown signal, stopping server...');
+        if GServer.Active then
+        begin
+          GServer.Active := False;
+          GServer.Bindings.Clear;
+          Logger.Info('Server stopped gracefully');
+        end;
+      end;
+      GShouldExit := True;  // Set the exit flag
+      Result := False; // Allow the system to continue processing the signal
+    end;
+  end;
+end;
+{$ENDIF}
 
 function BindPort(APort: Integer): Boolean;
 var
@@ -111,47 +165,108 @@ begin
 end;
 
 procedure RunServer(APort: Integer);
+  {$IFDEF LINUX}
 var
-  LServer: TIdHTTPWebBrokerBridge;
-  LResponse: string;
+  OldAct: sigaction_t;
+  NewAct: sigaction_t;
+  {$ENDIF}
 begin
-  LServer := TIdHTTPWebBrokerBridge.Create(nil);
+  Logger.Info('Starting server...');
+  Writeln(sWelcomeText);
+  {$IFDEF CONTAINER}
+  Logger.Info('Running in container mode');
+  {$ELSE}
+  Logger.Info('Running in interactive mode');
+  WriteCommands;
+  {$ENDIF}
+  
+  GServer := TIdHTTPWebBrokerBridge.Create(nil);
   try
-    Writeln(sWelcomeText);
-    LServer.DefaultPort := APort;
-    StartServer(LServer);
-    Writeln(Format(sServerReady, [APort]) + #10);
-    WriteCommands;
-    while True do
+    {$IFDEF LINUX}
+    // Set up Linux signal handler
+    FillChar(NewAct, SizeOf(NewAct), 0);
+    NewAct._u.sa_handler := SignalHandler;
+    NewAct.sa_flags := 0;
+    sigemptyset(NewAct.sa_mask);
+    if sigaction(SIGTERM, @NewAct, @OldAct) = 0 then
+      Logger.Info('Signal handler installed successfully')
+    else
+      Logger.Error('Failed to install signal handler');
+    {$ENDIF}
+
+    {$IFDEF MSWINDOWS}
+    // Set up Windows console handler
+    if SetConsoleCtrlHandler(@ConsoleHandler, True) then
+      Logger.Info('Console handler installed successfully')
+    else
+      Logger.Error('Failed to install console handler');
+    {$ENDIF}
+
+    GServer.DefaultPort := APort;
+    StartServer(GServer);
+    Logger.Info(Format('Server started on port %d', [APort]));
+    
+    while not GShouldExit do
     begin
+      if not GServer.Active then
+      begin
+        Logger.Info('Server is no longer active, exiting...');
+        Break;
+      end;
+      
+      {$IFNDEF CONTAINER}
+      if Eof then
+      begin
+        Logger.Info('End of input stream detected, exiting...');
+        Break;
+      end;
+        
       Readln(LResponse);
-      LResponse := LowerCase(LResponse);
+      LResponse := Trim(LowerCase(LResponse));
+      
+      // Skip empty input
+      if LResponse = '' then
+        Continue;
+        
       if LResponse.StartsWith(cCommandSetPort) then
-        SetPort(LServer, LResponse)
+        SetPort(GServer, LResponse)
       else if sametext(LResponse, cCommandStart) then
-        StartServer(LServer)
+        StartServer(GServer)
       else if sametext(LResponse, cCommandStatus) then
-        WriteStatus(LServer)
+        WriteStatus(GServer)
       else if sametext(LResponse, cCommandStop) then
-        StopServer(LServer)
+        StopServer(GServer)
       else if sametext(LResponse, cCommandHelp) then
         WriteCommands
       else if sametext(LResponse, cCommandExit) then
-        if LServer.Active then
+        if GServer.Active then
         begin
-          StopServer(LServer);
+          StopServer(GServer);
           break
         end
         else
           break
       else
       begin
+        Logger.Info(Format('Received invalid command: %s', [LResponse]));
         Writeln(sInvalidCommand);
         Write(cArrow);
       end;
+      {$ELSE}
+      // In container mode, just keep the server running
+      Sleep(1000); // Sleep for 1 second to prevent CPU spinning
+      {$ENDIF}
     end;
   finally
-    LServer.Free;
+    if GServer.Active then
+    begin
+      Logger.Info('Cleaning up server...');
+      GServer.Active := False;
+      GServer.Bindings.Clear;
+    end;
+    GServer.Free;
+    GServer := nil;
+    Logger.Info('Server cleanup completed');
   end;
 end;
 
@@ -160,12 +275,16 @@ begin
   SetConsoleOutputCP(CP_UTF8);
   {$ENDIF}
   try
+    Logger.Info('Application starting...');
     if WebRequestHandler <> nil then
       WebRequestHandler.WebModuleClass := WebModuleClass;
     RunServer(8080);
   except
     on E: Exception do
+    begin
+      Logger.Error(Format('Unhandled exception: %s', [E.Message]));
       Writeln(E.ClassName, ': ', E.Message);
-  end
-
+    end;
+  end;
+  Logger.Info('Application shutting down...');
 end.

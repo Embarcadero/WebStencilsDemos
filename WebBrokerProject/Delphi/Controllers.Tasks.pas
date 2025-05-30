@@ -76,7 +76,7 @@ procedure TTasksController.CreateTask(Sender: TObject; Request: TWebRequest; Res
 begin
   var lTask := Request.ContentFields.Values['task'];
   lTask := TNetEncoding.HTML.Encode(lTask);
-  var lNewTaskItem := FTasks.AddTask(lTask);
+  FTasks.AddTask(lTask);
   Response.Content := RenderTemplate('card');
   Handled := True;
 end;
@@ -109,7 +109,7 @@ end;
 procedure TTasksController.TogglecompletedTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   var lId := Request.QueryFields.Values['id'];
-  var lTask := FTasks.TogglecompletedTask(lId.ToInteger);
+  FTasks.TogglecompletedTask(lId.ToInteger);
   Response.Content := RenderTemplate('card');
   Handled := True;
 end;

@@ -8,6 +8,7 @@ uses
   System.Generics.Collections,
   System.IOUtils,
   System.SysUtils,
+  System.DateUtils,
 
   // Data units
   Data.DB,
@@ -82,6 +83,8 @@ type
     procedure WebStencilsEngineValue(Sender: TObject;
       const AObjectName, APropName: string; var AReplaceText: string;
       var AHandled: Boolean);
+    procedure WebModule1ActHealthAction(Sender: TObject;
+      Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -111,7 +114,10 @@ begin
   // Initialize properties
   FAppVersion := '1.0.0';
   FAppName := 'WebStencils demo';
-  FAppEdition := 'WebBroker Delphi';
+  FAppEdition := ' WebBroker Delphi';
+  {$IFDEF CONTAINER}
+  FAppEdition := FAppEdition + ' in Docker';
+  {$ENDIF}
   FCompanyName := 'Embarcadero Inc.';
   // This RESOURCE env is required to make the WebStencils templates reusable for RAD Server
   FResource := '';
@@ -151,17 +157,38 @@ begin
 end;
 
 procedure TMainWebModule.InitRequiredData;
+var
+  BinaryPath: string;
+  EnvResourcesPath: string;
+  EnvDbPath: string;
 begin
+  // Try to get paths from environment variables
+  EnvResourcesPath := GetEnvironmentVariable('APP_RESOURCES_PATH');
+  EnvDbPath := GetEnvironmentVariable('APP_DB_PATH');
+
   // Set the path for resources based on the platform and build configuration
-  var BinaryPath := TPath.GetDirectoryName(ParamStr(0));
+  BinaryPath := TPath.GetDirectoryName(ParamStr(0));
 {$IFDEF MSWINDOWS}
-  FResourcesPath := TPath.Combine(BinaryPath, '../../../../resources');
+  if EnvResourcesPath = '' then
+    FResourcesPath := TPath.Combine(BinaryPath, '../../../../resources')
+  else
+    FResourcesPath := EnvResourcesPath;
 {$ELSE}
-  FResourcesPath := BinaryPath;
+  if EnvResourcesPath = '' then
+    FResourcesPath := BinaryPath
+  else
+    FResourcesPath := EnvResourcesPath;
 {$ENDIF}
+
   WebStencilsEngine.RootDirectory := TPath.Combine(FResourcesPath, 'html');
   WebFileDispatcher.RootDirectory := WebStencilsEngine.RootDirectory;
-  Connection.Params.Database := TPath.Combine(FResourcesPath, 'data/database.sqlite3');
+
+  // Set database path
+  if EnvDbPath = '' then
+    Connection.Params.Database := TPath.Combine(FResourcesPath, 'data/database.sqlite3')
+  else
+    Connection.Params.Database := EnvDbPath;
+
   FCodeExamples := TCodeExamples.Create(WebStencilsEngine);
 
   // Create the environment settings object
@@ -169,6 +196,7 @@ begin
   // Add the settings object itself to the engine under the name 'env'
   WebStencilsEngine.AddVar('env', FEnvironmentSettings);
 end;
+
 
 procedure TMainWebModule.WebStencilsEngineValue(Sender: TObject;
   const AObjectName, APropName: string; var AReplaceText: string;
@@ -198,8 +226,41 @@ begin
     TRoute.Create(mtPut, '/tasks', FTasksController.EditTask),
     // Customers routes
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
-    TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers)
+    TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
+    // Add health check endpoint
+    TRoute.Create(mtGet, '/health', WebModule1ActHealthAction)
     ]);
+end;
+
+procedure TMainWebModule.WebModule1ActHealthAction(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  HealthData: string;
+begin
+  Response.ContentType := 'application/json';
+  HealthData := Format('''
+    {
+      "status": "healthy",
+      "timestamp": "%s",
+      "uptime": "%s",
+      "version": "%s",
+      "environment": "%s",
+      "container": %s,
+      "resources_path": "%s",
+      "database_path": "%s"
+    }
+  ''', [
+    FormatDateTime('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', TTimeZone.Local.ToUniversalTime(Now)),
+    TimeToStr(Now),
+    FEnvironmentSettings.AppVersion,
+    {$IFDEF LINUX}'Linux'{$ELSE}'Windows'{$ENDIF},
+    {$IFDEF CONTAINER}'true'{$ELSE}'false'{$ENDIF},
+    FResourcesPath,
+    Connection.Params.Database
+  ]);
+  
+  Response.Content := HealthData;
+  Handled := True;
 end;
 
 end.
