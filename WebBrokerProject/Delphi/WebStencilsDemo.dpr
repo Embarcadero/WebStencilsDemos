@@ -165,8 +165,9 @@ begin
 end;
 
 procedure RunServer(APort: Integer);
-  {$IFDEF LINUX}
 var
+  LResponse: string;
+  {$IFDEF LINUX}
   OldAct: sigaction_t;
   NewAct: sigaction_t;
   {$ENDIF}

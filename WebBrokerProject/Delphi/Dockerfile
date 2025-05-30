@@ -9,8 +9,8 @@ COPY Linux64/Docker/WebStencilsDemo /app/WebStencilsDemo
 # Copy required resources
 COPY resources /app/resources
 
-# Copy the initial database to the data directory
-COPY resources/data/database.sqlite3 /app/data/database.sqlite3
+# Create backup directory and copy initial database
+COPY resources/data/database.sqlite3 /app/backup/database.sqlite3
 
 # Expose the port the application runs on
 EXPOSE 8080

@@ -12,6 +12,53 @@ On Windows, nothing needs to be done. Run and off you go. The default behavior i
 
 To deploy on Linux change the `Build configuration` to `Release`. The `resources` folder needs to be copied to the same location where the binary is deployed. It needs PAServer running on a Linux machine (it also works with PAServer docker image).
 
+## 🐳 Docker Deployment
+The project includes Docker support for easy deployment and containerization. The Docker setup includes automatic database initialization, logging, and health monitoring.
+
+### Prerequisites
+- WSL2 active in your system
+- Docker installed on WSL
+
+### Building the Docker Image
+1. Open the project in Delphi
+2. Select the `Docker` build configuration and `Linux` platform
+3. Build the project
+4. The post-build event will automatically using the `build_docker_image.ps1` powershell:
+   - Create a Docker image
+   - Set up necessary directories
+   - Configure the application for containerized operation
+
+### Running the Container
+Basic run command:
+```bash
+docker run -d -p 8080:8080 --name=webstencils-demo webstencils-demo:latest
+```
+
+With persistent storage:
+```bash
+docker run -d -p 8080:8080 \
+  -v /host/path/to/logs:/app/logs \
+  -v /host/path/to/data:/app/data \
+  --name=webstencils-demo \
+  webstencils-demo:latest
+```
+
+### Data Persistence
+- The application uses SQLite for data storage
+- On first run, it automatically initializes the database with demo data
+- Subsequent runs will use the existing database from the volume
+- Database location: `/app/data/database.sqlite3`
+
+### Logging
+- Logs are written to `/app/logs/app.log`
+- Logs are persisted through Docker volumes
+
+### Health Monitoring
+The application includes a health check endpoint:
+```bash
+curl http://localhost:8080/health
+```
+
 ## 📚 Examples
 ### Docs
 Most of the menus explain the general use of WebStencils as well as some suggested ideas for templating patterns. 
