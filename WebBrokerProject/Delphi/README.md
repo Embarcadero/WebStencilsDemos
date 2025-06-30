@@ -18,22 +18,25 @@ The project includes Docker support for easy deployment and containerization. Th
 ### Prerequisites
 - WSL2 active in your system
 - Docker installed on WSL
+- Delphi IDE with Linux platform configured
+- Valid Linux platform target configured in Delphi project settings
 
-### Building the Docker Image
-1. Open the project in Delphi
-2. Under `Release`, select the `Docker` build configuration and `Linux` platform
-3. Build the project
-4. The post-build event will automatically using the `build_docker_image.ps1` powershell:
-   - Create a Docker image
-   - Set up necessary directories
-   - Configure the application for containerized operation
+### Building and Running with Docker
+1. Ensure all prerequisites are met
+2. Open the project in Delphi
+3. Select `Release` → `Docker` build configuration with `Linux` platform
+4. Build the project (Ctrl+Shift+F9)
+   - The post-build event will automatically execute the `build_docker_image.ps1` PowerShell script which:
+     - Cleans up old Docker containers and images
+     - Creates a temporary build context
+     - Copies the Linux executable and resources to the build context
+     - Sets proper file permissions
+     - Builds the Docker image using the Dockerfile
+     - Cleans up temporary files
+5. Run the container: `docker run -d -p 8080:8080 --name=webstencils-demo webstencils-demo:latest`
+6. Access the application at `http://localhost:8080`
 
-### Running the Container
-Basic run command:
-```bash
-docker run -d -p 8080:8080 --name=webstencils-demo webstencils-demo:latest
-```
-
+**Advanced run options:**
 With persistent storage:
 ```bash
 docker run -d -p 8080:8080 \
@@ -58,6 +61,14 @@ The application includes a health check endpoint:
 ```bash
 curl http://localhost:8080/health
 ```
+
+### Troubleshooting
+**Common issues:**
+- **WSL not found**: Ensure WSL2 is properly installed and enabled
+- **Docker not accessible**: Verify Docker is running in WSL with `wsl docker ps`
+- **Build fails**: Check that the Linux platform is configured in Delphi project settings
+- **Port already in use**: Change the port mapping in the docker run command (e.g., `-p 8081:8080`)
+- **Permission denied**: Ensure the PowerShell script has execution permissions
 
 ## 📚 Examples
 ### Docs

@@ -4,11 +4,12 @@
         <ProjectVersion>20.3</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Docker</Config>
-        <Platform Condition="'$(Platform)'==''">Linux64</Platform>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>131</TargetedPlatforms>
         <AppType>Console</AppType>
         <MainSource>WebStencilsDemo.dpr</MainSource>
+        <ProjectName Condition="'$(ProjectName)'==''">WebStencilsDemo</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
