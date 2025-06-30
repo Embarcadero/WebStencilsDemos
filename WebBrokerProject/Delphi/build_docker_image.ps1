@@ -13,18 +13,6 @@ wsl docker volume prune -f
 # Get the directory where the script is located
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Create logs directory if it doesn't exist
-$logsPath = Join-Path $scriptPath "logs"
-if (-not (Test-Path $logsPath)) {
-    New-Item -ItemType Directory -Path $logsPath | Out-Null
-}
-
-# Create data directory if it doesn't exist
-$dataPath = Join-Path $scriptPath "data"
-if (-not (Test-Path $dataPath)) {
-    New-Item -ItemType Directory -Path $dataPath | Out-Null
-}
-
 # Verify Linux64 directory exists
 $linux64Path = Join-Path $scriptPath "Linux64"
 if (-not (Test-Path $linux64Path)) {
@@ -86,11 +74,6 @@ Remove-Item -Path $buildContextPath -Recurse -Force
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Docker image built successfully"
-    Write-Host "To run the container, use:"
-    Write-Host "docker run -d -p 8080:8080 -v $($logsPath -replace '\\', '/'):/app/logs -v $($dataPath -replace '\\', '/'):/app/data --name=webstencils-demo $imageName`:$imageTag"
-    Write-Host ""
-    Write-Host "Note: The database will be initialized with demo data on first run."
-    Write-Host "      Subsequent runs will use the persistent database from the data volume."
 } else {
     Write-Error "Failed to build Docker image"
     exit 1

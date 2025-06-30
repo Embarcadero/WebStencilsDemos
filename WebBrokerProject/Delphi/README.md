@@ -21,7 +21,7 @@ The project includes Docker support for easy deployment and containerization. Th
 
 ### Building the Docker Image
 1. Open the project in Delphi
-2. Select the `Docker` build configuration and `Linux` platform
+2. Under `Release`, select the `Docker` build configuration and `Linux` platform
 3. Build the project
 4. The post-build event will automatically using the `build_docker_image.ps1` powershell:
    - Create a Docker image
