@@ -70,6 +70,9 @@ curl http://localhost:8080/health
 - **Port already in use**: Change the port mapping in the docker run command (e.g., `-p 8081:8080`)
 - **Permission denied**: Ensure the PowerShell script has execution permissions
 
+> [!CAUTION]
+> This demo has been developed using Docker CLI installed directly inside WSL2 and not Docker Desktop. If you have Docker Desktop installed or previously installed, you may experience issues. Several users have reported fixing these issues by following the potential solutions [listed here](https://github.com/docker/for-win/issues/7039).
+
 ## 📚 Examples
 ### Docs
 Most of the menus explain the general use of WebStencils as well as some suggested ideas for templating patterns. 
