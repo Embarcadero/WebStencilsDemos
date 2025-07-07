@@ -205,6 +205,24 @@ begin
           }
       </div>
       ''');
+  Add('codeSessionProperties',
+      '''
+      @session.Id
+      @session.Authenticated
+      @session.UserName
+      @session.UserRoles
+      @session.CreatedTime
+      @session.AccessedTime
+      @session.AccessedCount
+      @session.Timeout
+      ''');
+  Add('codeSessionInformation',
+      '''
+      @session.LastURL
+      @session.IP
+      @session.LastReferer
+      @session.LastUserAgent
+      ''');
 end;
 
 end.

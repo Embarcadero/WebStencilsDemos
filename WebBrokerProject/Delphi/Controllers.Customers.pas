@@ -68,6 +68,7 @@ begin
     FCustomers.PageNumber := LPaginationParams.PageNumber;
     FCustomers.ApplyPagination;
     LPaginationParams.TotalPages := FCustomers.TotalPages;
+    FWebStencilsProcessor.WebRequest := Request;
     Response.Content := RenderTemplate('pagination', LPaginationParams);
     Handled := True;
   finally
@@ -79,6 +80,7 @@ procedure TCustomersController.GetAllCustomers(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   FCustomers.CancelPagination;
+  FWebStencilsProcessor.WebRequest := Request;
   Response.Content := RenderTemplate('bigtable', nil);
   Handled := True;
 end;

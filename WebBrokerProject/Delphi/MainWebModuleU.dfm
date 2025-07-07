@@ -1,4 +1,5 @@
 object MainWebModule: TMainWebModule
+  OnCreate = WebModuleCreate
   Actions = <>
   Height = 361
   Width = 429
@@ -78,5 +79,71 @@ object MainWebModule: TMainWebModule
     LoginPrompt = False
     Left = 253
     Top = 24
+  end
+  object WebSessionManager: TWebSessionManager
+    OnCreated = WebSessionManagerCreated
+    Left = 64
+    Top = 152
+  end
+  object WebFormsAuthenticator: TWebFormsAuthenticator
+    LoginURL = '/login'
+    HomeURL = '/'
+    LogoutURL = '/logout'
+    OnAuthenticate = WebFormsAuthenticatorAuthenticate
+    Left = 64
+    Top = 216
+  end
+  object WebAuthorizer: TWebAuthorizer
+    UnauthorizedURL = '/forbidden'
+    Zones = <
+      item
+        PathInfo = '/static/*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/basics*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/keywords*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/components*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/templates*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/sessionInfo*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/forbidden*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/health*'
+        Kind = zkFree
+      end
+      item
+        PathInfo = '/tasks*'
+      end
+      item
+        PathInfo = '/bigtable*'
+        Roles = 'admin'
+      end
+      item
+        PathInfo = '/pagination*'
+        Roles = 'admin'
+      end>
+    Left = 176
+    Top = 152
   end
 end

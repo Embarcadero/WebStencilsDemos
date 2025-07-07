@@ -3,14 +3,55 @@
 		<img class="d-block mx-auto mb-4" src="@env.Resource/static/img/logo.png" alt="WebStencils">
 		<h1 class="display-3 fw-bold my-text-gradient">WebStencils</h1>
 		<h2 class="display-6">@env.AppEdition Demo</h2>		
-		<div class="col-lg-6 mx-auto">
-			<p class="lead mb-4">Welcome to the WebStencils demo project. Feel free to navigate through the multiple
-				menu options as well as analize the code that involves the creation of this website.</p>
-			<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-				<a href="@env.Resource/basics" class="btn btn-primary btn-lg px-4 gap-3" tabindex="-1" role="button">See Docs</a>
-				<a href="@env.Resource/tasks" class="btn btn-outline-secondary btn-lg px-4" tabindex="-1" role="button">HTMX
-					demo</a>
+		
+		@if (query.logged_out = '1') {
+			<div class="alert alert-success mx-auto mb-4" style="max-width: 500px;">
+				<i class="bi bi-check-circle me-2"></i>
+				You have been successfully logged out.
 			</div>
+		}
+		
+		<div class="col-lg-6 mx-auto">
+
+				<p class="lead mb-4">Welcome to the WebStencils demo project with <strong>session management</strong>! 
+					Sign in to explore protected features, role-based access control, and analyze the authentication implementation.</p>
+				<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+					@if (session.Authenticated) {
+						<a href="@env.Resource/logout" class="btn btn-primary btn-lg px-4 gap-3" tabindex="-1" role="button">
+							<i class="bi bi-box-arrow-right me-2"></i>Sign Out
+						</a>					
+					} @else {
+						<a href="@env.Resource/login.html" class="btn btn-primary btn-lg px-4 gap-3" tabindex="-1" role="button">
+							<i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+						</a>
+					}
+					<a href="@env.Resource/basics" class="btn btn-outline-secondary btn-lg px-4" tabindex="-1" role="button">
+						See Docs
+					</a>
+				</div>
+				
+				<div class="mt-4 p-3 bg-body-secondary rounded">
+					<h6 class="fw-bold mb-2">
+						<i class="bi bi-info-circle me-2"></i>Demo Features
+					</h6>
+					<div class="row text-start">
+						<div class="col-md-6">
+							<small>
+								<i class="bi bi-shield-check text-success me-2"></i><strong>Session Management</strong><br>
+								<i class="bi bi-person-check text-primary me-2"></i><strong>Role-based Access</strong><br>
+								<i class="bi bi-lock text-warning me-2"></i><strong>Protected Routes</strong>
+							</small>
+						</div>
+						<div class="col-md-6">
+							<small>
+								<i class="bi bi-check2-square text-info me-2"></i><strong>HTMX Integration</strong><br>
+								<i class="bi bi-table text-danger me-2"></i><strong>Admin Features</strong><br>
+								<i class="bi bi-code-square text-secondary me-2"></i><strong>WebStencils Templates</strong>
+							</small>
+						</div>
+					</div>
+				</div>
+
 		</div>
 	</div>
 </div>

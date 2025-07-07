@@ -1177,7 +1177,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent>powershell -ExecutionPolicy Bypass -File $(PROJECTDIR)\build_docker_image.ps1</PostBuildEvent>
+        <PostBuildEvent>powershell -ExecutionPolicy Bypass -File $(PROJECTDIR)\build_docker_image.ps1</PostBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
 </Project>

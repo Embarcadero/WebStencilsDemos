@@ -18,21 +18,46 @@
         <a class="nav-link @if (page.pagename = 'keywords') { active }" aria-current="page" href="@env.Resource/keywords">Keywords</a>
         <a class="nav-link @if (page.pagename = 'components') { active }" aria-current="page" href="@env.Resource/components">Components</a>
         <a class="nav-link @if (page.pagename = 'templates') { active }" aria-current="page" href="@env.Resource/templates">Templates</a>
+        <a class="nav-link @if (page.pagename = 'sessionInfo') { active }" aria-current="page" href="@env.Resource/sessionInfo">Session Info</a>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Examples
           </a>
           <div class="dropdown-menu">
-            <a class="dropdown-item @if (page.pagename = 'tasks') { active }" href="@env.Resource/tasks">HTMX - Tasks</a>
-            <a class="dropdown-item @if (page.pagename = 'customers') { active }" href="@env.Resource/bigtable">Big table</a>
-			      <a class="dropdown-item @if (page.pagename = 'customers') { active }" href="@env.Resource/pagination">Pagination</a>			
+            @if (session.Authenticated) {
+              <a class="dropdown-item @if (page.pagename = 'tasks') { active }" href="@env.Resource/tasks">
+                <i class="bi bi-check2-square me-2"></i>HTMX - Tasks
+              </a>
+              <hr class="dropdown-divider">
+              <h6 class="dropdown-header">
+                <i class="bi bi-shield-fill-check me-2"></i>Admin Only
+              </h6>
+              <a class="dropdown-item @if (page.pagename = 'customers') { active }" href="@env.Resource/bigtable">
+                <i class="bi bi-table me-2"></i>Big table
+              </a>
+              <a class="dropdown-item @if (page.pagename = 'customers') { active }" href="@env.Resource/pagination">
+                <i class="bi bi-list-ol me-2"></i>Pagination
+              </a>			           
+            } @else {
+              <span class="dropdown-item-text text-muted">
+                <i class="bi bi-lock me-2"></i>Sign in to view examples
+              </span>
+              <hr class="dropdown-divider">
+              <a class="dropdown-item" href="@env.Resource/login.html">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+              </a>
+            }
           </div>
         </li>
       </div>
-      <!-- Button to toggle theme -->
-      <button id="theme-toggle-btn" class="btn btn-link text-decoration-none text-body">
-        <i id="theme-icon" class="bi bi-moon-stars fs-5"></i>
-      </button>
+           
+      <div class="d-flex align-items-center">
+        @Import layouts/authMenu        
+        <!-- Button to toggle theme -->
+        <button id="theme-toggle-btn" class="btn btn-link text-decoration-none text-body">
+          <i id="theme-icon" class="bi bi-moon-stars fs-5"></i>
+        </button>
+      </div>
     </div>
   </div>
 </nav>

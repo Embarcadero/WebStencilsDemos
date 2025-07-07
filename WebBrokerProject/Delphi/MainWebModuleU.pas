@@ -9,6 +9,7 @@ uses
   System.IOUtils,
   System.SysUtils,
   System.DateUtils,
+  System.StrUtils,
 
   // Data units
   Data.DB,
@@ -39,6 +40,7 @@ uses
   FireDAC.Comp.Client,
   FireDAC.Comp.DataSet,
   FireDAC.UI.Intf,
+  FireDAC.VCLUI.Wait,
 
   // Own units
   Helpers.WebModule,
@@ -72,6 +74,8 @@ type
     property IsRadServer: Boolean read FIsRadServer;
   end;
 
+
+
   TMainWebModule = class(TWebModule)
     WebStencilsEngine: TWebStencilsEngine;
     // Adding to WebStencils an object/component using attributes
@@ -79,13 +83,21 @@ type
     [WebStencilsVar('customers', false)]
     Customers: TFDQuery;
     Connection: TFDConnection;
+    WebSessionManager: TWebSessionManager;
+    WebFormsAuthenticator: TWebFormsAuthenticator;
+    WebAuthorizer: TWebAuthorizer;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure WebModuleCreate(Sender: TObject);
     procedure WebStencilsEngineValue(Sender: TObject;
       const AObjectName, APropName: string; var AReplaceText: string;
       var AHandled: Boolean);
     procedure WebModule1ActHealthAction(Sender: TObject;
       Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebSessionManagerCreated(Sender: TCustomWebSessionManager;
+      Request: TWebRequest; Session: TWebSession);
+    procedure WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
+      const UserName, Password: string; var Roles: string; var Success: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -104,7 +116,7 @@ var
 
 implementation
 
-{%CLASSGROUP 'System.Classes.TPersistent'}
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
 
 { TEnvironmentSettings }
@@ -113,7 +125,7 @@ constructor TEnvironmentSettings.Create;
 begin
   inherited Create;
   // Initialize properties
-  FAppVersion := '1.0.0';
+  FAppVersion := '1.5.2';
   FAppName := 'WebStencils demo';
   FAppEdition := ' WebBroker Delphi';
   {$IFDEF CONTAINER}
@@ -130,12 +142,19 @@ begin
   FIsRadServer := False;
 end;
 
+
+
 { TMainWebModule }
 
 constructor TMainWebModule.Create(AOwner: TComponent);
 begin
   inherited;
-  Logger.Info('Initializing WebStencils demo module...');
+  Logger.Info('WebStencils demo module constructor called');
+end;
+
+procedure TMainWebModule.WebModuleCreate(Sender: TObject);
+begin
+  Logger.Info('Initializing WebStencils demo module in OnCreate event...');
   InitControllers;
   InitRequiredData;
   DefineRoutes;
@@ -251,7 +270,7 @@ begin
       AReplaceText := FormatDateTime('yyyy', Now)
     else
       AReplaceText := Format('SYSTEM_%s_NOT_FOUND', [APropName.ToUpper]);
-  AHandled := True;      
+    AHandled := True;      
   end;
 end;
 
@@ -260,15 +279,17 @@ begin
   Logger.Info('Defining application routes...');
   // Define the application's routes using a declarative approach.
   // This class helper maps HTTP methods and paths to their respective handler methods.
-  AddRoutes([TRoute.Create(mtDelete, '/tasks', FTasksController.DeleteTask),
+  AddRoutes([
+    // Task routes (protected)
+    TRoute.Create(mtDelete, '/tasks', FTasksController.DeleteTask),
     TRoute.Create(mtPost, '/tasks/add', FTasksController.CreateTask),
     TRoute.Create(mtGet, '/tasks/edit', FTasksController.GetEditTask),
     TRoute.Create(mtPut, '/tasks/toggleCompleted', FTasksController.TogglecompletedTask),
     TRoute.Create(mtPut, '/tasks', FTasksController.EditTask),
-    // Customers routes
+    // Customers routes (admin only)
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
     TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
-    // Add health check endpoint
+    // System routes
     TRoute.Create(mtGet, '/health', WebModule1ActHealthAction)
     ]);
   Logger.Info('Application routes defined successfully');
@@ -304,5 +325,51 @@ begin
   Response.Content := HealthData;
   Handled := True;
 end;
+
+procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;
+  Request: TWebRequest; Session: TWebSession);
+begin
+  Logger.Info(Format('New session created: %s', [Session.Id]));
+  Logger.Info(Format('Request Path: %s', [Request.PathInfo]));
+  Logger.Info(Format('Request Method: %s', [Request.Method]));
+  
+  // Add session creation timestamp for demo purposes
+  Session.DataVars.Values['created'] := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+  Session.DataVars.Values['test'] := 'session_is_working';
+  
+  if Assigned(Session.User) then
+    Logger.Info(Format('Session created for authenticated user: %s', [Session.User.UserName]))
+  else
+    Logger.Info('Session created for anonymous user');
+end;
+
+procedure TMainWebModule.WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
+  const UserName, Password: string; var Roles: string; var Success: Boolean);
+begin
+  Logger.Info(Format('Authentication attempt for user: %s', [UserName]));
+
+  // Demo hardcoded credentials
+  Success := False;
+  Roles := '';
+
+  if SameText(UserName, 'demo') and SameText(Password, 'demo123') then
+  begin
+    Success := True;
+    Roles := 'user';
+    Logger.Info(Format('User %s authenticated successfully with role: %s', [UserName, Roles]));
+  end
+  else if SameText(UserName, 'admin') and SameText(Password, 'admin123') then
+  begin
+    Success := True;
+    Roles := 'admin';
+    Logger.Info(Format('User %s authenticated successfully with role: %s', [UserName, Roles]));
+  end
+  else
+  begin
+    Logger.Info(Format('Authentication failed for user: %s', [UserName]));
+  end;
+end;
+
+
 
 end.
