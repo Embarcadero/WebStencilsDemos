@@ -1,6 +1,7 @@
 object MainWebModule: TMainWebModule
   OnCreate = WebModuleCreate
   Actions = <>
+  AfterDispatch = WebModuleAfterDispatch
   Height = 361
   Width = 429
   object WebStencilsEngine: TWebStencilsEngine
@@ -69,12 +70,89 @@ object MainWebModule: TMainWebModule
       'FROM customers')
     Left = 341
     Top = 24
+    object CustomersID: TFDAutoIncField
+      DisplayLabel = 'Id'
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = False
+      Required = True
+    end
+    object CustomersCOMPANY: TStringField
+      DisplayLabel = 'Company'
+      FieldName = 'COMPANY'
+      Origin = 'COMPANY'
+      Required = True
+      Size = 13
+    end
+    object CustomersFIRST_NAME: TStringField
+      DisplayLabel = 'First Name'
+      FieldName = 'FIRST_NAME'
+      Origin = 'FIRST_NAME'
+      Required = True
+      Size = 12
+    end
+    object CustomersLAST_NAME: TStringField
+      DisplayLabel = 'Last Name'
+      FieldName = 'LAST_NAME'
+      Origin = 'LAST_NAME'
+      Size = 15
+    end
+    object CustomersGENDER: TStringField
+      DisplayLabel = 'Gender'
+      FieldName = 'GENDER'
+      Origin = 'GENDER'
+      Size = 11
+    end
+    object CustomersPOSTAL_CODE: TStringField
+      DisplayLabel = 'Postal Code'
+      FieldName = 'POSTAL_CODE'
+      Origin = 'POSTAL_CODE'
+      Size = 14
+    end
+    object CustomersADDRESS: TStringField
+      DisplayLabel = 'Address'
+      FieldName = 'ADDRESS'
+      Origin = 'ADDRESS'
+      Size = 27
+    end
+    object CustomersCITY: TStringField
+      DisplayLabel = 'City'
+      FieldName = 'CITY'
+      Origin = 'CITY'
+      Size = 40
+    end
+    object CustomersCOUNTRY: TStringField
+      DisplayLabel = 'Country'
+      FieldName = 'COUNTRY'
+      Origin = 'COUNTRY'
+      Size = 34
+    end
+    object CustomersPHONE: TStringField
+      DisplayLabel = 'Phone'
+      FieldName = 'PHONE'
+      Origin = 'PHONE'
+      Size = 17
+    end
+    object CustomersEMAIL: TStringField
+      DisplayLabel = 'e-mail'
+      FieldName = 'EMAIL'
+      Origin = 'EMAIL'
+      Required = True
+      Size = 34
+    end
+    object CustomersIP_ADDRESS: TStringField
+      DisplayLabel = 'IP Address'
+      FieldName = 'IP_ADDRESS'
+      Origin = 'IP_ADDRESS'
+      Size = 15
+    end
   end
   object Connection: TFDConnection
     Params.Strings = (
       
-        'Database=C:\Users\azapater\Documents\GitHub\WebStencilsDemos\Web' +
-        'StencilsDemoProject\resources\data\database.sqlite3'
+        'Database=C:\Users\antonio\Documents\GitHub\WebStencilsDemos\reso' +
+        'urces\data\database.sqlite3'
       'DriverID=SQLite')
     LoginPrompt = False
     Left = 253
@@ -141,6 +219,10 @@ object MainWebModule: TMainWebModule
       end
       item
         PathInfo = '/pagination*'
+        Roles = 'admin'
+      end
+      item
+        PathInfo = '/customers*'
         Roles = 'admin'
       end>
     Left = 176

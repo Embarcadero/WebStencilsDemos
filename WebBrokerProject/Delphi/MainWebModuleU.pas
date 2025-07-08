@@ -86,6 +86,18 @@ type
     WebSessionManager: TWebSessionManager;
     WebFormsAuthenticator: TWebFormsAuthenticator;
     WebAuthorizer: TWebAuthorizer;
+    CustomersID: TFDAutoIncField;
+    CustomersCOMPANY: TStringField;
+    CustomersFIRST_NAME: TStringField;
+    CustomersLAST_NAME: TStringField;
+    CustomersGENDER: TStringField;
+    CustomersEMAIL: TStringField;
+    CustomersPHONE: TStringField;
+    CustomersADDRESS: TStringField;
+    CustomersPOSTAL_CODE: TStringField;
+    CustomersCITY: TStringField;
+    CustomersCOUNTRY: TStringField;
+    CustomersIP_ADDRESS: TStringField;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure WebModuleCreate(Sender: TObject);
@@ -98,6 +110,8 @@ type
       Request: TWebRequest; Session: TWebSession);
     procedure WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
       const UserName, Password: string; var Roles: string; var Success: Boolean);
+    procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest;
+      Response: TWebResponse; var Handled: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -289,6 +303,9 @@ begin
     // Customers routes (admin only)
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
     TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
+    TRoute.Create(mtGet, '/customers/edit', FCustomersController.GetEditCustomer),
+    TRoute.Create(mtPost, '/customers/update', FCustomersController.UpdateCustomer),
+    TRoute.Create(mtPost, '/customers/delete', FCustomersController.DeleteCustomer),
     // System routes
     TRoute.Create(mtGet, '/health', WebModule1ActHealthAction)
     ]);
@@ -321,9 +338,16 @@ begin
     FResourcesPath,
     Connection.Params.Database
   ]);
-  
+
   Response.Content := HealthData;
   Handled := True;
+end;
+
+procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+ var n := 1;
+ inc(n);
 end;
 
 procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;
