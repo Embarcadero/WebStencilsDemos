@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
   FireDAC.Comp.Client,
   FireDAC.Stan.Param,
   FireDAC.Stan.Option;
@@ -21,7 +22,6 @@ type
     procedure SetPageNumber(const Value: Integer);
     function GetTotalPages: Integer;
     function GetTotalRecords: Integer;
-    procedure RecalculateSkipCount;
     function GetActualSkipCount: Integer;
   public
     property PageSize: Integer read GetPageSize write SetPageSize;
@@ -88,11 +88,6 @@ begin
   FetchOptions.RecsSkip := (Value - 1) * PageSize;
 end;
 
-procedure TFDQueryHelper.RecalculateSkipCount;
-begin
-  FetchOptions.RecsSkip := (PageNumber - 1) * PageSize;
-end;
-
 function TFDQueryHelper.GetTotalRecords: Integer;
 var
   LCloneQuery: TFDQuery;
@@ -108,7 +103,7 @@ begin
     LCloneQuery.Connection := Self.Connection;
     LCloneQuery.SQL.Text := Self.SQL.Text;
 
-    if Self.Params.Count > 0 then
+    if Params.Count > 0 then
       LCloneQuery.Params.AssignValues(Self.Params);
 
     // Let FireDAC optimize the count operation

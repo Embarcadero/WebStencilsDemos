@@ -8,6 +8,7 @@ uses
   System.Generics.Collections,
   System.IOUtils,
   System.SysUtils,
+  System.DateUtils,
 
   // Data units
   Data.DB,
@@ -45,7 +46,8 @@ uses
   Controllers.Tasks,
   Models.Tasks,
   Controllers.Customers,
-  CodeExamplesU;
+  CodeExamplesU,
+  LoggerU;
 
 type
   { TEnvironmentSettings: Class to hold environment/application settings for WebStencils }
@@ -59,7 +61,7 @@ type
     FDebugMode: Boolean;
     FIsRadServer: Boolean;
   public
-    constructor Create;    
+    constructor Create;
   published
     property AppVersion: string read FAppVersion;
     property AppName: string read FAppName;
@@ -82,6 +84,8 @@ type
     procedure WebStencilsEngineValue(Sender: TObject;
       const AObjectName, APropName: string; var AReplaceText: string;
       var AHandled: Boolean);
+    procedure WebModule1ActHealthAction(Sender: TObject;
+      Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -111,7 +115,10 @@ begin
   // Initialize properties
   FAppVersion := '1.0.0';
   FAppName := 'WebStencils demo';
-  FAppEdition := 'WebBroker Delphi';
+  FAppEdition := ' WebBroker Delphi';
+  {$IFDEF CONTAINER}
+  FAppEdition := FAppEdition + ' in Docker';
+  {$ENDIF}
   FCompanyName := 'Embarcadero Inc.';
   // This RESOURCE env is required to make the WebStencils templates reusable for RAD Server
   FResource := '';
@@ -128,46 +135,107 @@ end;
 constructor TMainWebModule.Create(AOwner: TComponent);
 begin
   inherited;
+  Logger.Info('Initializing WebStencils demo module...');
   InitControllers;
   InitRequiredData;
   DefineRoutes;
+  Logger.Info('WebStencils demo module initialized successfully');
 end;
 
 destructor TMainWebModule.Destroy;
 begin
+  Logger.Info('Shutting down WebStencils demo module...');
   Customers.Active := false;
   FTasksController.Free;
   FCustomersController.Free;
   FCodeExamples.Free;
-  FEnvironmentSettings.Free; // Free the settings object
+  FEnvironmentSettings.Free;
   inherited;
+  Logger.Info('WebStencils demo module shutdown complete');
 end;
 
 procedure TMainWebModule.InitControllers;
 begin
+  Logger.Info('Initializing controllers...');
   FTasksController := TTasksController.Create(WebStencilsEngine);
   FCustomersController := TCustomersController.Create(WebStencilsEngine, Customers);
-  // More Controllers can be initialized here
+  Logger.Info('Controllers initialized successfully');
 end;
 
 procedure TMainWebModule.InitRequiredData;
+var
+  BinaryPath: string;
+  EnvResourcesPath: string;
+  EnvDbPath: string;
+  DataDir: string;
+  BackupDbPath: string;
 begin
+  Logger.Info('Initializing required data...');
+  // Try to get paths from environment variables
+  EnvResourcesPath := GetEnvironmentVariable('APP_RESOURCES_PATH');
+  EnvDbPath := GetEnvironmentVariable('APP_DB_PATH');
+
   // Set the path for resources based on the platform and build configuration
-  var BinaryPath := TPath.GetDirectoryName(ParamStr(0));
+  BinaryPath := TPath.GetDirectoryName(ParamStr(0));
 {$IFDEF MSWINDOWS}
-  FResourcesPath := TPath.Combine(BinaryPath, '../../../../resources');
+  if EnvResourcesPath = '' then
+    FResourcesPath := TPath.Combine(BinaryPath, '../../../../resources')
+  else
+    FResourcesPath := EnvResourcesPath;
 {$ELSE}
-  FResourcesPath := BinaryPath;
+  if EnvResourcesPath = '' then
+    FResourcesPath := BinaryPath
+  else
+    FResourcesPath := EnvResourcesPath;
 {$ENDIF}
+
+  Logger.Info(Format('Resources path set to: %s', [FResourcesPath]));
   WebStencilsEngine.RootDirectory := TPath.Combine(FResourcesPath, 'html');
   WebFileDispatcher.RootDirectory := WebStencilsEngine.RootDirectory;
-  Connection.Params.Database := TPath.Combine(FResourcesPath, 'data/database.sqlite3');
-  FCodeExamples := TCodeExamples.Create(WebStencilsEngine);
 
-  // Create the environment settings object
+  // Set database path
+  if EnvDbPath = '' then
+    Connection.Params.Database := TPath.Combine(FResourcesPath, 'data/database.sqlite3')
+  else
+    Connection.Params.Database := EnvDbPath;
+
+  // Check if database exists in data directory
+  DataDir := ExtractFilePath(Connection.Params.Database);
+  if not DirectoryExists(DataDir) then
+  begin
+    Logger.Info(Format('Creating data directory: %s', [DataDir]));
+    ForceDirectories(DataDir);
+  end;
+
+  // If database doesn't exist in data directory, copy it from the backup location in the container
+  if not FileExists(Connection.Params.Database) then
+  begin
+    // The backup database is stored in /app/backup/database.sqlite3 in the container
+    BackupDbPath := '/app/backup/database.sqlite3';
+    if FileExists(BackupDbPath) then
+    begin
+      Logger.Info(Format('Initializing database from backup: %s', [BackupDbPath]));
+      TFile.Copy(BackupDbPath, Connection.Params.Database);
+      Logger.Info(Format('Database initialized at: %s', [Connection.Params.Database]));
+    end
+    else
+      Logger.Error(Format('Backup database not found at: %s', [BackupDbPath]));
+  end
+  else
+    Logger.Info(Format('Using existing database at: %s', [Connection.Params.Database]));
+
+  try
+    Connection.Connected := True;
+    Logger.Info('Database connection established successfully');
+  except
+    on E: Exception do
+      Logger.Error(Format('Failed to connect to database: %s', [E.Message]));
+  end;
+
+  FCodeExamples := TCodeExamples.Create(WebStencilsEngine);
   FEnvironmentSettings := TEnvironmentSettings.Create;
-  // Add the settings object itself to the engine under the name 'env'
   WebStencilsEngine.AddVar('env', FEnvironmentSettings);
+  Logger.Info('Required data initialization complete');
 end;
 
 procedure TMainWebModule.WebStencilsEngineValue(Sender: TObject;
@@ -189,6 +257,7 @@ end;
 
 procedure TMainWebModule.DefineRoutes;
 begin
+  Logger.Info('Defining application routes...');
   // Define the application's routes using a declarative approach.
   // This class helper maps HTTP methods and paths to their respective handler methods.
   AddRoutes([TRoute.Create(mtDelete, '/tasks', FTasksController.DeleteTask),
@@ -198,8 +267,42 @@ begin
     TRoute.Create(mtPut, '/tasks', FTasksController.EditTask),
     // Customers routes
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
-    TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers)
+    TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
+    // Add health check endpoint
+    TRoute.Create(mtGet, '/health', WebModule1ActHealthAction)
     ]);
+  Logger.Info('Application routes defined successfully');
+end;
+
+procedure TMainWebModule.WebModule1ActHealthAction(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  HealthData: string;
+begin
+  Response.ContentType := 'application/json';
+  HealthData := Format('''
+    {
+      "status": "healthy",
+      "timestamp": "%s",
+      "uptime": "%s",
+      "version": "%s",
+      "environment": "%s",
+      "container": %s,
+      "resources_path": "%s",
+      "database_path": "%s"
+    }
+  ''', [
+    FormatDateTime('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', TTimeZone.Local.ToUniversalTime(Now)),
+    TimeToStr(Now),
+    FEnvironmentSettings.AppVersion,
+    {$IFDEF LINUX}'Linux'{$ELSE}'Windows'{$ENDIF},
+    {$IFDEF CONTAINER}'true'{$ELSE}'false'{$ENDIF},
+    FResourcesPath,
+    Connection.Params.Database
+  ]);
+  
+  Response.Content := HealthData;
+  Handled := True;
 end;
 
 end.
