@@ -11,16 +11,15 @@ uses
   Data.DB,
 
   Helpers.FDQuery,
-  Models.PaginationParams;
+  Models.PaginationParams,
+  Controllers.Base;
 
 type
 
-  TCustomersController = class
+  TCustomersController = class(TBaseController)
   private
     FCustomers: TFDQuery;
-    FWebStencilsProcessor: TWebStencilsProcessor;
-    FWebStencilsEngine: TWebStencilsEngine;
-    function RenderTemplate(ATemplate: string; APaginationParams: TPaginationParams = nil): string;
+    function RenderCustomerTemplate(ATemplate: string; ARequest: TWebRequest; APaginationParams: TPaginationParams = nil): string;
   public
     procedure GetCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure GetAllCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
@@ -33,23 +32,21 @@ type
 
 implementation
 
-function TCustomersController.RenderTemplate(ATemplate: string; APaginationParams: TPaginationParams = nil): string;
+function TCustomersController.RenderCustomerTemplate(ATemplate: string; ARequest: TWebRequest; APaginationParams: TPaginationParams = nil): string;
 begin
-  FWebStencilsProcessor.InputFileName := TPath.Combine(FWebStencilsEngine.rootDirectory, 'customers/' + ATemplate + '.html');
   if Assigned(APaginationParams) then
     FWebStencilsProcessor.AddVar('customersPagination', APaginationParams, False);
-  Result := FWebStencilsProcessor.Content;
+  
+  Result := RenderTemplate('customers/' + ATemplate + '.html', ARequest);
+  
   if Assigned(APaginationParams) then
     FWebStencilsProcessor.DataVars.Remove('customersPagination');
 end;
 
 constructor TCustomersController.Create(AWebStencilsEngine: TWebStencilsEngine; ACustomers: TFDQuery);
 begin
-  inherited Create;
+  inherited Create(AWebStencilsEngine);
   try
-    FWebStencilsEngine := AWebStencilsEngine;
-    FWebStencilsProcessor := TWebStencilsProcessor.Create(nil);
-    FWebStencilsProcessor.Engine := FWebStencilsEngine;
     FCustomers := ACustomers;
   except
     on E: Exception do
@@ -59,7 +56,6 @@ end;
 
 destructor TCustomersController.Destroy;
 begin
-  FWebStencilsProcessor.Free;
   inherited;
 end;
 
@@ -72,8 +68,7 @@ begin
     FCustomers.PageNumber := LPaginationParams.PageNumber;
     FCustomers.ApplyPagination;
     LPaginationParams.TotalPages := FCustomers.TotalPages;
-    FWebStencilsProcessor.WebRequest := Request;
-    Response.Content := RenderTemplate('pagination', LPaginationParams);
+    Response.Content := RenderCustomerTemplate('pagination', Request, LPaginationParams);
     Handled := True;
   finally
     LPaginationParams.Free;
@@ -84,8 +79,7 @@ procedure TCustomersController.GetAllCustomers(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   FCustomers.CancelPagination;
-  FWebStencilsProcessor.WebRequest := Request;
-  Response.Content := RenderTemplate('bigtable', nil);
+  Response.Content := RenderCustomerTemplate('bigtable', Request);
   Handled := True;
 end;
 
@@ -97,8 +91,8 @@ begin
   LCustomerId := Request.QueryFields.Values['id'];
   if LCustomerId = '' then
   begin
-    Response.StatusCode := 400;
-    Response.Content := 'Customer ID is required';
+    AddErrorMessage(Request, 'Customer ID is required');
+    RedirectWithMessage(Response, '/pagination');
     Handled := True;
     Exit;
   end;
@@ -109,14 +103,13 @@ begin
   try
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
-      Response.StatusCode := 404;
-      Response.Content := 'Customer not found';
+      AddErrorMessage(Request, 'Customer not found');
+      RedirectWithMessage(Response, '/pagination');
       Handled := True;
       Exit;
     end;
 
-    FWebStencilsProcessor.WebRequest := Request;
-    Response.Content := RenderTemplate('edit', nil);
+    Response.Content := RenderCustomerTemplate('edit', Request);
     Handled := True;
   finally
     FCustomers.Active := False;
@@ -130,23 +123,25 @@ var
   LField: TField;
   LFieldName: string;
   LFieldValue: string;
+  LRedirectUrl: string;
 begin
   LCustomerId := Request.ContentFields.Values['id'];
   if LCustomerId = '' then
   begin
-    Response.StatusCode := 400;
-    Response.Content := 'Customer ID is required';
+    AddErrorMessage(Request, 'Customer ID is required');
+    RedirectWithMessage(Response, '/pagination');
     Handled := True;
     Exit;
   end;
+  
   FCustomers.Active := True;
   try
     // Navigate to the specific customer record
     FCustomers.CancelPagination;
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
-      Response.StatusCode := 404;
-      Response.Content := 'Customer not found';
+      AddErrorMessage(Request, 'Customer not found');
+      RedirectWithMessage(Response, '/pagination');
       Handled := True;
       Exit;
     end;
@@ -178,19 +173,21 @@ begin
     // Save changes
     FCustomers.Post;
     
+    // Add success message
+    AddSuccessMessage(Request, 'Customer updated successfully');
+    
     // Redirect back to pagination view
-    Response.StatusCode := 302;
-    Response.Location := Request.GetFieldByName('HTTP_REFERER');
-    if Response.Location = '' then
-      Response.Location := '/pagination';
-    Response.Content := 'Customer updated successfully';
+    LRedirectUrl := Request.GetFieldByName('HTTP_REFERER');
+    if LRedirectUrl = '' then
+      LRedirectUrl := '/pagination';
+    RedirectWithMessage(Response, LRedirectUrl);
     
   except
     on E: Exception do
     begin
       FCustomers.Cancel;
-      Response.StatusCode := 500;
-      Response.Content := 'Error updating customer: ' + E.Message;
+      AddErrorMessage(Request, 'Error updating customer: ' + E.Message);
+      RedirectWithMessage(Response, '/customers/edit?id=' + LCustomerId);
     end;
   end;
   
@@ -205,8 +202,8 @@ begin
   LCustomerId := Request.ContentFields.Values['id'];
   if LCustomerId = '' then
   begin
-    Response.StatusCode := 400;
-    Response.Content := 'Customer ID is required';
+    AddErrorMessage(Request, 'Customer ID is required');
+    RedirectWithMessage(Response, '/pagination');
     Handled := True;
     Exit;
   end;
@@ -216,8 +213,8 @@ begin
     FCustomers.CancelPagination;
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
-      Response.StatusCode := 404;
-      Response.Content := 'Customer not found';
+      AddErrorMessage(Request, 'Customer not found');
+      RedirectWithMessage(Response, '/pagination');
       Handled := True;
       Exit;
     end;
@@ -225,16 +222,17 @@ begin
     // Delete the record
     FCustomers.Delete;
     
+    // Add success message
+    AddSuccessMessage(Request, 'Customer deleted successfully');
+    
     // Redirect back to pagination view
-    Response.StatusCode := 302;
-    Response.Location := '/customers/pagination';
-    Response.Content := 'Customer deleted successfully';
+    RedirectWithMessage(Response, '/pagination');
     
   except
     on E: Exception do
     begin
-      Response.StatusCode := 500;
-      Response.Content := 'Error deleting customer: ' + E.Message;
+      AddErrorMessage(Request, 'Error deleting customer: ' + E.Message);
+      RedirectWithMessage(Response, '/pagination');
     end;
   end;
   

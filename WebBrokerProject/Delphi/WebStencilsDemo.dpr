@@ -24,7 +24,9 @@ uses
   Helpers.FDQuery in 'Helpers.FDQuery.pas',
   Models.PaginationParams in 'Models.PaginationParams.pas',
   CodeExamplesU in 'CodeExamplesU.pas',
-  LoggerU in 'LoggerU.pas';
+  LoggerU in 'LoggerU.pas',
+  Helpers.Messages in 'Helpers.Messages.pas',
+  Controllers.Base in 'Controllers.Base.pas';
 
 {$R *.res}
 

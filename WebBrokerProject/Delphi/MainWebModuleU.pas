@@ -45,6 +45,7 @@ uses
   // Own units
   Helpers.WebModule,
   Helpers.FDQuery,
+  Controllers.Base,
   Controllers.Tasks,
   Models.Tasks,
   Controllers.Customers,

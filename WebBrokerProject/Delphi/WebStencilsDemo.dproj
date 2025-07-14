@@ -172,6 +172,8 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="Models.PaginationParams.pas"/>
         <DCCReference Include="CodeExamplesU.pas"/>
         <DCCReference Include="LoggerU.pas"/>
+        <DCCReference Include="Helpers.Messages.pas"/>
+        <DCCReference Include="Controllers.Base.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
