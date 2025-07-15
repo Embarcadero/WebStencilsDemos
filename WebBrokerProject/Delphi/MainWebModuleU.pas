@@ -45,6 +45,7 @@ uses
   // Own units
   Helpers.WebModule,
   Helpers.FDQuery,
+  Helpers.Messages,
   Controllers.Base,
   Controllers.Tasks,
   Models.Tasks,
@@ -113,6 +114,10 @@ type
       const UserName, Password: string; var Roles: string; var Success: Boolean);
     procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest;
       Response: TWebResponse; var Handled: Boolean);
+    procedure WebSessionManagerAcquire(Sender: TCustomWebSessionManager;
+      Request: TWebRequest; Session: TWebSession);
+    procedure WebSessionManagerRemoved(Sender: TCustomWebSessionManager;
+      Request: TWebRequest; Session: TWebSession);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -347,8 +352,17 @@ end;
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
- var n := 1;
- inc(n);
+  // Message clearing - only when not redirecting
+  var IsRedirect := (Response.StatusCode >= 300) and (Response.StatusCode < 400);
+  if not (IsRedirect) and Assigned(Request.Session) then
+    TMessageManager.ClearMessages(Request.Session);
+end;
+
+procedure TMainWebModule.WebSessionManagerAcquire(
+  Sender: TCustomWebSessionManager; Request: TWebRequest; Session: TWebSession);
+begin
+//  if Assigned(Session.User) then
+//    TMessageManager.AddMessage(Session, mtInfo, Format('Welcome %s!', [Session.UserName]));
 end;
 
 procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;
@@ -360,12 +374,17 @@ begin
   
   // Add session creation timestamp for demo purposes
   Session.DataVars.Values['created'] := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
-  Session.DataVars.Values['test'] := 'session_is_working';
-  
+  TMessageManager.EnsureMessageProvider(Session);
   if Assigned(Session.User) then
     Logger.Info(Format('Session created for authenticated user: %s', [Session.User.UserName]))
   else
     Logger.Info('Session created for anonymous user');
+end;
+
+procedure TMainWebModule.WebSessionManagerRemoved(
+  Sender: TCustomWebSessionManager; Request: TWebRequest; Session: TWebSession);
+begin
+//  TMessageManager.AddMessage(Request.Session, mtInfo, 'You have been logged out successfully');
 end;
 
 procedure TMainWebModule.WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;

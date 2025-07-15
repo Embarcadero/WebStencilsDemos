@@ -16,8 +16,7 @@ type
   protected
     FWebStencilsEngine: TWebStencilsEngine;
     FWebStencilsProcessor: TWebStencilsProcessor;
-    FMessageManager: TMessageManager;
-    
+
     function RenderTemplate(const ATemplatePath: string; ARequest: TWebRequest = nil): string;
     function GetCurrentSession(ARequest: TWebRequest): TWebSession;
     procedure AddSuccessMessage(ARequest: TWebRequest; const AMessage: string);
@@ -40,13 +39,10 @@ begin
   FWebStencilsEngine := AWebStencilsEngine;
   FWebStencilsProcessor := TWebStencilsProcessor.Create(nil);
   FWebStencilsProcessor.Engine := FWebStencilsEngine;
-  FMessageManager := TMessageManager.Create;
-
 end;
 
 destructor TBaseController.Destroy;
 begin
-  FMessageManager.Free;
   FWebStencilsProcessor.Free;
   inherited;
 end;
@@ -57,8 +53,6 @@ begin
   if Assigned(ARequest) then
   begin
     FWebStencilsProcessor.WebRequest := ARequest;
-    // Add messages to the template context
-    FMessageManager.AddMessagesToTemplate(FWebStencilsProcessor, GetCurrentSession(ARequest));
   end;
   Result := FWebStencilsProcessor.Content;
 end;
@@ -76,7 +70,7 @@ var
 begin
   LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
-    FMessageManager.AddMessage(LSession, mtSuccess, AMessage);
+    TMessageManager.AddMessage(LSession, mtSuccess, AMessage);
 end;
 
 procedure TBaseController.AddWarningMessage(ARequest: TWebRequest; const AMessage: string);
@@ -85,7 +79,7 @@ var
 begin
   LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
-    FMessageManager.AddMessage(LSession, mtWarning, AMessage);
+    TMessageManager.AddMessage(LSession, mtWarning, AMessage);
 end;
 
 procedure TBaseController.AddErrorMessage(ARequest: TWebRequest; const AMessage: string);
@@ -94,7 +88,7 @@ var
 begin
   LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
-    FMessageManager.AddMessage(LSession, mtError, AMessage);
+    TMessageManager.AddMessage(LSession, mtError, AMessage);
 end;
 
 procedure TBaseController.AddInfoMessage(ARequest: TWebRequest; const AMessage: string);
@@ -103,7 +97,7 @@ var
 begin
   LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
-    FMessageManager.AddMessage(LSession, mtInfo, AMessage);
+    TMessageManager.AddMessage(LSession, mtInfo, AMessage);
 end;
 
 procedure TBaseController.RedirectWithMessage(AResponse: TWebResponse; const ALocation: string);

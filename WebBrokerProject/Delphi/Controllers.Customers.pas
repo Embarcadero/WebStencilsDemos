@@ -210,6 +210,7 @@ begin
 
   try
     // Navigate to the specific customer record
+    FCustomers.Active := True;
     FCustomers.CancelPagination;
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin

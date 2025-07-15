@@ -20,8 +20,6 @@ type
     function GetIcon: string;
   public
     constructor Create(AMessageType: TMessageType; const AMessage: string);
-    function ToString: string; override;
-    class function FromString(const AString: string): TFlashMessage; static;
     property MessageType: TMessageType read FMessageType write FMessageType;
     property Message: string read FMessage write FMessage;
     property CssClass: string read GetCssClass;
@@ -32,34 +30,26 @@ type
 
   TMessageProvider = class
   private
-    FMessages: TObjectList<TFlashMessage>;
+    FMessages: TMessagesObjectList;
     FHasMessages: Boolean;
+    function GetHasMessages: Boolean;
   public
-    constructor Create(const AMessages: TObjectList<TFlashMessage>; AOwnsMessages: Boolean = True);
+    constructor Create;
     destructor Destroy; override;
-    property HasMessages: Boolean read FHasMessages;
-    property Messages: TObjectList<TFlashMessage> read FMessages;
-    function HasSuccess: Boolean;
-    function HasWarning: Boolean;
-    function HasError: Boolean;
-    function HasInfo: Boolean;
-    function GetSuccessMessages: TObjectList<TFlashMessage>;
-    function GetWarningMessages: TObjectList<TFlashMessage>;
-    function GetErrorMessages: TObjectList<TFlashMessage>;
-    function GetInfoMessages: TObjectList<TFlashMessage>;
+    procedure Clear;
+    property HasMessages: Boolean read GetHasMessages;
+    property Messages: TMessagesObjectList read FMessages;
   end;
 
   TMessageManager = class
   private
-    const SESSION_KEY = 'flash_messages';
-    function MessagesToString(const AMessages: TObjectList<TFlashMessage>): string;
-    function StringToMessages(const AString: string): TObjectList<TFlashMessage>;
+    const SESSION_KEY = 'messages';
+    class function GetMessageProvider(ASession: TWebSession): TMessageProvider;
   public
-    procedure AddMessage(ASession: TWebSession; AMessageType: TMessageType; const AMessage: string);
-    function GetMessages(ASession: TWebSession): TObjectList<TFlashMessage>;
-    procedure ClearMessages(ASession: TWebSession);
-    function HasMessages(ASession: TWebSession): Boolean;
-    procedure AddMessagesToTemplate(AProcessor: TWebStencilsProcessor; ASession: TWebSession);
+    class procedure EnsureMessageProvider(ASession: TWebSession);
+    class procedure AddMessage(ASession: TWebSession; AMessageType: TMessageType; const AMessage: string);
+    class procedure ClearMessages(ASession: TWebSession);
+    class function HasMessages(ASession: TWebSession): Boolean;
   end;
 
 implementation
@@ -71,31 +61,6 @@ begin
   inherited Create;
   FMessageType := AMessageType;
   FMessage := AMessage;
-end;
-
-function TFlashMessage.ToString: string;
-begin
-  // Format: "MessageType|Message" (using pipe as delimiter)
-  Result := IntToStr(Ord(FMessageType)) + '|' + FMessage;
-end;
-
-class function TFlashMessage.FromString(const AString: string): TFlashMessage;
-var
-  LPipePos: Integer;
-begin
-  Result := TFlashMessage.Create(mtInfo, '');
-  LPipePos := Pos('|', AString);
-  if LPipePos > 0 then
-  begin
-    Result.FMessageType := TMessageType(StrToIntDef(Copy(AString, 1, LPipePos - 1), 0));
-    Result.FMessage := Copy(AString, LPipePos + 1, Length(AString));
-  end
-  else
-  begin
-    // Fallback if format is invalid
-    Result.FMessageType := mtInfo;
-    Result.FMessage := AString;
-  end;
 end;
 
 function TFlashMessage.GetCssClass: string;
@@ -124,19 +89,11 @@ end;
 
 { TMessageProvider }
 
-constructor TMessageProvider.Create(const AMessages: TObjectList<TFlashMessage>; AOwnsMessages: Boolean = True);
+constructor TMessageProvider.Create;
 begin
   inherited Create;
-  if AOwnsMessages then
-    FMessages := AMessages
-  else
-  begin
-    // Create a copy if we don't own the original
-    FMessages := TObjectList<TFlashMessage>.Create(True);
-    for var LMessage in AMessages do
-      FMessages.Add(TFlashMessage.Create(LMessage.MessageType, LMessage.Message));
-  end;
-  FHasMessages := FMessages.Count > 0;
+  FMessages := TMessagesObjectList.Create(True);
+  FHasMessages := False;
 end;
 
 destructor TMessageProvider.Destroy;
@@ -145,194 +102,84 @@ begin
   inherited;
 end;
 
-function TMessageProvider.HasSuccess: Boolean;
-var
-  LMessage: TFlashMessage;
+procedure TMessageProvider.Clear;
 begin
-  Result := False;
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtSuccess then
-      Exit(True);
+  FMessages.Clear;
+  FHasMessages := False;
 end;
 
-function TMessageProvider.HasWarning: Boolean;
-var
-  LMessage: TFlashMessage;
+function TMessageProvider.GetHasMessages: Boolean;
 begin
-  Result := False;
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtWarning then
-      Exit(True);
-end;
-
-function TMessageProvider.HasError: Boolean;
-var
-  LMessage: TFlashMessage;
-begin
-  Result := False;
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtError then
-      Exit(True);
-end;
-
-function TMessageProvider.HasInfo: Boolean;
-var
-  LMessage: TFlashMessage;
-begin
-  Result := False;
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtInfo then
-      Exit(True);
-end;
-
-function TMessageProvider.GetSuccessMessages: TObjectList<TFlashMessage>;
-var
-  LMessage: TFlashMessage;
-begin
-  Result := TObjectList<TFlashMessage>.Create(False); // Don't own objects
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtSuccess then
-      Result.Add(LMessage);
-end;
-
-function TMessageProvider.GetWarningMessages: TObjectList<TFlashMessage>;
-var
-  LMessage: TFlashMessage;
-begin
-  Result := TObjectList<TFlashMessage>.Create(False); // Don't own objects
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtWarning then
-      Result.Add(LMessage);
-end;
-
-function TMessageProvider.GetErrorMessages: TObjectList<TFlashMessage>;
-var
-  LMessage: TFlashMessage;
-begin
-  Result := TObjectList<TFlashMessage>.Create(False); // Don't own objects
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtError then
-      Result.Add(LMessage);
-end;
-
-function TMessageProvider.GetInfoMessages: TObjectList<TFlashMessage>;
-var
-  LMessage: TFlashMessage;
-begin
-  Result := TObjectList<TFlashMessage>.Create(False); // Don't own objects
-  for LMessage in FMessages do
-    if LMessage.MessageType = mtInfo then
-      Result.Add(LMessage);
+  Result := FMessages.Count > 0;
 end;
 
 { TMessageManager }
 
-procedure TMessageManager.AddMessage(ASession: TWebSession; AMessageType: TMessageType; const AMessage: string);
+class procedure TMessageManager.AddMessage(ASession: TWebSession; AMessageType: TMessageType; const AMessage: string);
 var
-  LCurrentMessages: TObjectList<TFlashMessage>;
+  LMessageProvider: TMessageProvider;
   LNewMessage: TFlashMessage;
 begin
   if not Assigned(ASession) then
     Exit;
-    
-  LCurrentMessages := GetMessages(ASession);
-  try
-    LNewMessage := TFlashMessage.Create(AMessageType, AMessage);
-    LCurrentMessages.Add(LNewMessage);
-    
-    ASession.DataVars.Values[SESSION_KEY] := MessagesToString(LCurrentMessages);
-  finally
-    LCurrentMessages.Free;
-  end;
+
+  EnsureMessageProvider(ASession);
+  LMessageProvider := GetMessageProvider(ASession);
+
+  LNewMessage := TFlashMessage.Create(AMessageType, AMessage);
+  LMessageProvider.Messages.Add(LNewMessage);
 end;
 
-function TMessageManager.GetMessages(ASession: TWebSession): TObjectList<TFlashMessage>;
+class function TMessageManager.GetMessageProvider(ASession: TWebSession): TMessageProvider;
 var
-  LMessagesString: string;
+  LIndex: Integer;
 begin
-  Result := TObjectList<TFlashMessage>.Create(True); // Own objects
+  Result := nil;
   if not Assigned(ASession) then
     Exit;
     
-  LMessagesString := ASession.DataVars.Values[SESSION_KEY];
-  if LMessagesString <> '' then
+  LIndex := ASession.DataVars.IndexOf(SESSION_KEY);
+  if LIndex >= 0 then
+    Result := TMessageProvider(ASession.DataVars.Objects[LIndex]);
+end;
+
+class procedure TMessageManager.EnsureMessageProvider(ASession: TWebSession);
+var
+  LIndex: Integer;
+begin
+  if not Assigned(ASession) then
+    Exit;
+    
+  LIndex := ASession.DataVars.IndexOf(SESSION_KEY);
+  if (LIndex < 0) or (ASession.DataVars.Objects[LIndex] = nil) then
   begin
-    Result.Free;
-    Result := StringToMessages(LMessagesString);
+    ASession.DataVars.AddObject(SESSION_KEY, TMessageProvider.Create);
   end;
 end;
 
-procedure TMessageManager.ClearMessages(ASession: TWebSession);
-begin
-  if Assigned(ASession) then
-    ASession.DataVars.Values[SESSION_KEY] := '';
-end;
-
-function TMessageManager.HasMessages(ASession: TWebSession): Boolean;
+class procedure TMessageManager.ClearMessages(ASession: TWebSession);
 var
-  LMessages: TObjectList<TFlashMessage>;
-begin
-  LMessages := GetMessages(ASession);
-  try
-    Result := LMessages.Count > 0;
-  finally
-    LMessages.Free;
-  end;
-end;
-
-procedure TMessageManager.AddMessagesToTemplate(AProcessor: TWebStencilsProcessor; ASession: TWebSession);
-var
-  LMessages: TObjectList<TFlashMessage>;
   LMessageProvider: TMessageProvider;
 begin
   if not Assigned(ASession) then
     Exit;
     
-  LMessages := GetMessages(ASession);
-  LMessageProvider := TMessageProvider.Create(LMessages, True); // Transfer ownership
-  
-  // Add to template context
-  AProcessor.AddVar('messages', LMessageProvider, True);
-  
-  // Clear messages after adding to template (flash behavior)
-  ClearMessages(ASession);
+  LMessageProvider := GetMessageProvider(ASession);
+  if Assigned(LMessageProvider) then
+    LMessageProvider.Clear;
 end;
 
-function TMessageManager.MessagesToString(const AMessages: TObjectList<TFlashMessage>): string;
+class function TMessageManager.HasMessages(ASession: TWebSession): Boolean;
 var
-  LStringList: TStringList;
-  LMessage: TFlashMessage;
+  LMessageProvider: TMessageProvider;
 begin
-  LStringList := TStringList.Create;
-  try
-    for LMessage in AMessages do
-      LStringList.Add(LMessage.ToString);
-    Result := LStringList.Text;
-  finally
-    LStringList.Free;
-  end;
-end;
-
-function TMessageManager.StringToMessages(const AString: string): TObjectList<TFlashMessage>;
-var
-  LStringList: TStringList;
-  I: Integer;
-begin
-  Result := TObjectList<TFlashMessage>.Create(True); // Own objects
-  if AString = '' then
+  Result := False;
+  if not Assigned(ASession) then
     Exit;
     
-  LStringList := TStringList.Create;
-  try
-    LStringList.Text := AString;
-    for I := 0 to LStringList.Count - 1 do
-    begin
-      if Trim(LStringList[I]) <> '' then
-        Result.Add(TFlashMessage.FromString(LStringList[I]));
-    end;
-  finally
-    LStringList.Free;
-  end;
+  LMessageProvider := GetMessageProvider(ASession);
+  if Assigned(LMessageProvider) then
+    Result := LMessageProvider.HasMessages;
 end;
 
-end. 
+end.
