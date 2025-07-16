@@ -1,0 +1,44 @@
+<!-- Customer Search Form -->
+<div class="row mb-4">
+  <div class="col-md-8">
+    <form method="get" action="/pagination" class="d-flex">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input type="text" 
+               class="form-control" 
+               name="search" 
+               placeholder="Search customers by name, email, company, phone, or city..." 
+               value="@customersPagination.SearchTerm"
+               maxlength="100">
+        
+        <!-- Preserve pagination parameters -->
+        @if(customersPagination.PageSize != 10) {
+          <input type="hidden" name="pageSize" value="@customersPagination.PageSize">
+        }
+        
+        <button class="btn btn-primary" type="submit">
+          <i class="bi bi-search me-1"></i>Search
+        </button>
+        
+        @if(customersPagination.HasSearch) {
+          <a href="@Request.PathInfo" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i>Clear
+          </a>
+        }
+      </div>
+    </form>
+  </div>
+  
+  @if(customersPagination.HasSearch) {
+    <div class="col-md-4">
+      <div class="alert alert-info mb-0 py-2">
+        <i class="bi bi-info-circle me-2"></i>
+        <small>
+          Search results for: <strong>"@customersPagination.SearchTerm"</strong>
+        </small>
+      </div>
+    </div>
+  }
+</div> 

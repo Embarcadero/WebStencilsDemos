@@ -20,6 +20,8 @@ type
   private
     FCustomers: TFDQuery;
     function RenderCustomerTemplate(ATemplate: string; ARequest: TWebRequest; APaginationParams: TPaginationParams = nil): string;
+    procedure ApplySearchFilter(APaginationParams: TPaginationParams);
+    procedure ResetQuery;
   public
     procedure GetCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure GetAllCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
@@ -59,15 +61,42 @@ begin
   inherited;
 end;
 
+procedure TCustomersController.ApplySearchFilter(APaginationParams: TPaginationParams);
+begin
+  // Reset query to base state
+  ResetQuery;
+  if APaginationParams.HasSearch then
+  begin
+    // Add search WHERE clause
+    FCustomers.SQL.Add(APaginationParams.GetSearchSQL);
+
+    // Set search parameter
+    FCustomers.ParamByName('search').AsString := APaginationParams.SearchTerm;
+  end;
+end;
+
+procedure TCustomersController.ResetQuery;
+begin
+  FCustomers.Close;
+  FCustomers.SQL.Clear;
+  FCustomers.SQL.Add('SELECT * FROM customers');
+  FCustomers.Params.Clear;
+end;
+
 procedure TCustomersController.GetCustomers(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   var LPaginationParams := TPaginationParams.Create(Request, 'pagination');
   try
+    // Apply search filter if present
+    ApplySearchFilter(LPaginationParams);
+    
+    // Apply pagination
     FCustomers.PageSize := LPaginationParams.PageSize;
     FCustomers.PageNumber := LPaginationParams.PageNumber;
     FCustomers.ApplyPagination;
     LPaginationParams.TotalPages := FCustomers.TotalPages;
+    
     Response.Content := RenderCustomerTemplate('pagination', Request, LPaginationParams);
     Handled := True;
   finally
@@ -78,9 +107,17 @@ end;
 procedure TCustomersController.GetAllCustomers(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
-  FCustomers.CancelPagination;
-  Response.Content := RenderCustomerTemplate('bigtable', Request);
-  Handled := True;
+  var LPaginationParams := TPaginationParams.Create(Request, 'bigtable');
+  try
+    // Apply search filter if present
+    ApplySearchFilter(LPaginationParams);
+    
+    FCustomers.CancelPagination;
+    Response.Content := RenderCustomerTemplate('bigtable', Request, LPaginationParams);
+    Handled := True;
+  finally
+    LPaginationParams.Free;
+  end;
 end;
 
 procedure TCustomersController.GetEditCustomer(Sender: TObject;
@@ -172,6 +209,7 @@ begin
     
     // Save changes
     FCustomers.Post;
+    FCustomers.Close;
     
     // Add success message
     AddSuccessMessage(Request, 'Customer updated successfully');
@@ -222,7 +260,8 @@ begin
 
     // Delete the record
     FCustomers.Delete;
-    
+    FCustomers.Close;
+
     // Add success message
     AddSuccessMessage(Request, 'Customer deleted successfully');
     

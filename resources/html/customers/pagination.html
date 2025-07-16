@@ -13,13 +13,9 @@
 				</span>
 			</div>
 		</div>
-		
-		<div class="alert alert-warning mb-4">
-			<h6 class="alert-heading">
-				<i class="bi bi-exclamation-triangle me-2"></i>Restricted Access
-			</h6>
-			<p class="mb-0">This page demonstrates role-based access control. Only users with admin privileges can view customer data.</p>
-		</div>
+
+		<!-- Search Form -->
+		@Import partials/customers/searchForm
 
 		@Import customers/table
 		@Import partials/pagination { @pagination = @customersPagination }
