@@ -77,6 +77,7 @@ object MainWebModule: TMainWebModule
       ProviderFlags = [pfInWhere, pfInKey]
       ReadOnly = False
       Required = True
+      Visible = False
     end
     object CustomersCOMPANY: TStringField
       DisplayLabel = 'Company'

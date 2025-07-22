@@ -6,17 +6,20 @@
 				<h1 class="my-text-gradient">
 					<i class="bi bi-list-ol me-3"></i>Customer Pagination Demo
 				</h1>
-			</div>
-			<div class="text-end">
 				<span class="badge bg-danger fs-6">
 					<i class="bi bi-shield-fill-check me-2"></i>Admin Feature
-				</span>
+				</span>				
+			</div>
+			<div class="text-end">
+				<a href="@env.resource/customers/add" class="btn btn-primary me-3">
+					<i class="bi bi-person-plus me-2"></i>Add Customer
+				</a>
 			</div>
 		</div>
 
 		<!-- Search Form -->
 		@Import partials/customers/searchForm
 
-		@Import customers/table
+		@Import partials/customers/table
 		@Import partials/pagination { @pagination = @customersPagination }
 </div>

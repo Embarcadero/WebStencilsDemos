@@ -5,7 +5,7 @@
 	<div class="card-body">
 		@* Form to add new tasks *@
 		<form id="tasks-form" 
-			  hx-post="@env.Resource/tasks/add" 
+			  hx-post="@env.resource/tasks/add" 
 			  hx-target="#task-card"
 			  hx-swap="outerHTML"
 			  @if (env.IsRadServer) { hx-ext="json-enc" }

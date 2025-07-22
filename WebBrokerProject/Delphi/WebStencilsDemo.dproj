@@ -169,11 +169,15 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="Controllers.Tasks.pas"/>
         <DCCReference Include="Controllers.Customers.pas"/>
         <DCCReference Include="Helpers.FDQuery.pas"/>
-        <DCCReference Include="Models.PaginationParams.pas"/>
-        <DCCReference Include="CodeExamplesU.pas"/>
-        <DCCReference Include="LoggerU.pas"/>
+        <DCCReference Include="Utils.PaginationParams.pas"/>
+        <DCCReference Include="Services.CodeExamples.pas"/>
+        <DCCReference Include="Utils.Logger.pas"/>
         <DCCReference Include="Helpers.Messages.pas"/>
         <DCCReference Include="Controllers.Base.pas"/>
+        <DCCReference Include="Web.Stencils.pas"/>
+        <DCCReference Include="System.JSON.Builders.pas"/>
+        <DCCReference Include="JSON.Fluent.pas"/>
+        <DCCReference Include="Utils.Search.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

@@ -21,14 +21,14 @@
             <ul class="pagination mb-0">
                 <!-- Previous button -->
                 <li class="page-item @if (pagination.PageNumber = 1) {disabled}">
-                    <a class="page-link" href="@env.Resource/@pagination.GetPageUrl(@(pagination.PageNumber - 1))" aria-label="Previous">
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=@(pagination.PageNumber - 1)&pageSize=@pagination.PageSize" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
 
                 <!-- First page -->
                 <li class="page-item @if (pagination.PageNumber = 1) {active}">
-                    <a class="page-link" href="@env.Resource/@pagination.GetPageUrl(1)">1</a>
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=1&pageSize=@pagination.PageSize">1</a>
                 </li>
 
                 <!-- Ellipsis if needed -->
@@ -39,21 +39,21 @@
                 <!-- Previous page if not first -->
                 @if (pagination.PageNumber > 2) {
                 <li class="page-item">
-                    <a class="page-link" href="@env.Resource/@pagination.GetPageUrl(@(pagination.PageNumber - 1))">@(pagination.PageNumber - 1)</a>
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=@(pagination.PageNumber - 1)&pageSize=@pagination.PageSize">@(pagination.PageNumber - 1)</a>
                 </li>
                 }
 
                 <!-- Current page if not first or last -->
 				@if ((pagination.PageNumber > 1) and (pagination.PageNumber < pagination.TotalPages)) {
-				<li class="page-item active">
-					<a class="page-link" href="@env.Resource/@pagination.GetPageUrl(@pagination.PageNumber)">@pagination.PageNumber</a>
-				</li>
-				}
+                <li class="page-item active">
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=@pagination.PageNumber&pageSize=@pagination.PageSize">@pagination.PageNumber</a>
+                </li>
+                }
 
                 <!-- Next page if not last -->
                 @if (pagination.PageNumber < pagination.TotalPages) {
                 <li class="page-item">
-                    <a class="page-link" href="@env.Resource/@pagination.GetPageUrl(@(pagination.PageNumber + 1))">@(pagination.PageNumber + 1)</a>
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=@(pagination.PageNumber + 1)&pageSize=@pagination.PageSize">@(pagination.PageNumber + 1)</a>
                 </li>
                 }
 
@@ -65,13 +65,13 @@
                 <!-- Last page if not first -->
                 @if (pagination.TotalPages > 1) {
                 <li class="page-item @if (pagination.PageNumber = pagination.TotalPages) {active}">
-                    <a class="page-link" href="@env.Resource/@pagination.GetPageUrl(@pagination.TotalPages)">@pagination.TotalPages</a>
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=@pagination.TotalPages&pageSize=@pagination.PageSize">@pagination.TotalPages</a>
                 </li>
                 }
 
                 <!-- Next button -->
                 <li class="page-item @if (pagination.PageNumber = pagination.TotalPages) {disabled}">
-                    <a class="page-link" href="@env.Resource/@pagination.GetPageUrl(@(pagination.PageNumber + 1))" aria-label="Next">
+                    <a class="page-link" href="@env.resource/@pagination.Uri?page=@(pagination.PageNumber + 1)&pageSize=@pagination.PageSize" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

@@ -1,6 +1,6 @@
 <li class="list-group-item" id="task-@Task.Id">
 	<form id="task-form-@Task.Id" 
-	 	  hx-put="@env.Resource/tasks?id=@Task.Id" 
+	 	  hx-put="@env.resource/tasks?id=@Task.Id" 
 		  hx-target="#task-card" 		  		
 		  @if (env.IsRadServer) { hx-ext="json-enc" } 
 		  hx-swap="outerHTML"

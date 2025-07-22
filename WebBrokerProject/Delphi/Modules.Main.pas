@@ -1,4 +1,4 @@
-﻿unit MainWebModuleU;
+﻿unit Modules.Main;
 
 interface
 
@@ -50,8 +50,8 @@ uses
   Controllers.Tasks,
   Models.Tasks,
   Controllers.Customers,
-  CodeExamplesU,
-  LoggerU;
+  Services.CodeExamples,
+  Utils.Logger;
 
 type
   { TEnvironmentSettings: Class to hold environment/application settings for WebStencils }
@@ -136,6 +136,9 @@ var
 
 implementation
 
+uses
+  JSON.Fluent;
+
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
 
@@ -161,8 +164,6 @@ begin
 {$ENDIF}
   FIsRadServer := False;
 end;
-
-
 
 { TMainWebModule }
 
@@ -273,7 +274,33 @@ begin
 
   FCodeExamples := TCodeExamples.Create(WebStencilsEngine);
   FEnvironmentSettings := TEnvironmentSettings.Create;
-  WebStencilsEngine.AddVar('env', FEnvironmentSettings);
+  WebStencilsEngine.AddVar('env2', FEnvironmentSettings);
+
+  WebStencilsEngine.AddVar('env', nil, false,
+                            function (AVar: TWebStencilsDataVar; const APropName: string; var AValue: string): Boolean
+                            begin
+                              if APropName = 'app_name' then
+                                AValue := 'WebStencils demo'
+                              else if APropName = 'version' then
+                                AValue := '1.5.2'
+                              else if APropName = 'edition' then
+                                AValue := 'WebBroker Delphi' {$IFDEF CONTAINER} + ' in Docker' {$ENDIF}
+                              else if APropName = 'company' then
+                                Avalue := 'Embarcadero Inc.'
+                              else if APropName = 'resource' then
+                                AValue := ''
+                              else if APropName = 'is_rad_server' then
+                                AValue := 'False'
+                              else if APropName = 'debug' then
+                                Avalue := {$IFDEF DEBUG} 'True' {$ELSE} 'False' {$ENDIF}
+                              else
+                              begin
+                                Result := False;
+                                Exit;
+                              end;
+                              Result := True;
+                            end);
+
   Logger.Info('Required data initialization complete');
 end;
 
@@ -309,6 +336,8 @@ begin
     // Customers routes (admin only)
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
     TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
+    TRoute.Create(mtGet, '/customers/add', FCustomersController.GetAddCustomer),
+    TRoute.Create(mtPost, '/customers/create', FCustomersController.CreateCustomer),
     TRoute.Create(mtGet, '/customers/edit', FCustomersController.GetEditCustomer),
     TRoute.Create(mtPost, '/customers/update', FCustomersController.UpdateCustomer),
     TRoute.Create(mtPost, '/customers/delete', FCustomersController.DeleteCustomer),

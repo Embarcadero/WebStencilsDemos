@@ -3,7 +3,7 @@
   It provides a centralized location for all code snippets displayed in the demo pages.
 }
 
-unit CodeExamplesU;
+unit Services.CodeExamples;
 
 interface
 

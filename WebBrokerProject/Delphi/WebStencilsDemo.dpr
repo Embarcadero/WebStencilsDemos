@@ -22,11 +22,15 @@ uses
   Controllers.Tasks in 'Controllers.Tasks.pas',
   Controllers.Customers in 'Controllers.Customers.pas',
   Helpers.FDQuery in 'Helpers.FDQuery.pas',
-  Models.PaginationParams in 'Models.PaginationParams.pas',
-  CodeExamplesU in 'CodeExamplesU.pas',
-  LoggerU in 'LoggerU.pas',
+  Utils.PaginationParams in 'Utils.PaginationParams.pas',
+  Services.CodeExamples in 'Services.CodeExamples.pas',
+  Utils.Logger in 'Utils.Logger.pas',
   Helpers.Messages in 'Helpers.Messages.pas',
-  Controllers.Base in 'Controllers.Base.pas';
+  Controllers.Base in 'Controllers.Base.pas',
+  Web.Stencils in 'Web.Stencils.pas',
+  System.JSON.Builders in 'System.JSON.Builders.pas',
+  JSON.Fluent in 'JSON.Fluent.pas',
+  Utils.Search in 'Utils.Search.pas';
 
 {$R *.res}
 
