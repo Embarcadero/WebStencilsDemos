@@ -54,29 +54,6 @@ uses
   Utils.Logger;
 
 type
-  { TEnvironmentSettings: Class to hold environment/application settings for WebStencils }
-  TEnvironmentSettings = class(TPersistent)
-  private
-    FAppVersion: string;
-    FAppName: string;
-    FAppEdition: string;
-    FCompanyName: string;
-    FResource: string;
-    FDebugMode: Boolean;
-    FIsRadServer: Boolean;
-  public
-    constructor Create;
-  published
-    property AppVersion: string read FAppVersion;
-    property AppName: string read FAppName;
-    property AppEdition: string read FAppEdition;
-    property CompanyName: string read FCompanyName;
-    property Resource: string read FResource; // Required for RAD Server compatibility
-    property DebugMode: Boolean read FDebugMode;
-    property IsRadServer: Boolean read FIsRadServer;
-  end;
-
-
 
   TMainWebModule = class(TWebModule)
     WebStencilsEngine: TWebStencilsEngine;
@@ -114,15 +91,10 @@ type
       const UserName, Password: string; var Roles: string; var Success: Boolean);
     procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest;
       Response: TWebResponse; var Handled: Boolean);
-    procedure WebSessionManagerAcquire(Sender: TCustomWebSessionManager;
-      Request: TWebRequest; Session: TWebSession);
-    procedure WebSessionManagerRemoved(Sender: TCustomWebSessionManager;
-      Request: TWebRequest; Session: TWebSession);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
     FCodeExamples: TCodeExamples;
-    FEnvironmentSettings: TEnvironmentSettings;
     FResourcesPath: string;
     procedure DefineRoutes;
     procedure InitRequiredData;
@@ -136,34 +108,8 @@ var
 
 implementation
 
-uses
-  JSON.Fluent;
-
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
-
-{ TEnvironmentSettings }
-
-constructor TEnvironmentSettings.Create;
-begin
-  inherited Create;
-  // Initialize properties
-  FAppVersion := '1.5.2';
-  FAppName := 'WebStencils demo';
-  FAppEdition := ' WebBroker Delphi';
-  {$IFDEF CONTAINER}
-  FAppEdition := FAppEdition + ' in Docker';
-  {$ENDIF}
-  FCompanyName := 'Embarcadero Inc.';
-  // This RESOURCE env is required to make the WebStencils templates reusable for RAD Server
-  FResource := '';
-{$IFDEF DEBUG}
-  FDebugMode := True;
-{$ELSE}
-  FDebugMode := False;
-{$ENDIF}
-  FIsRadServer := False;
-end;
 
 { TMainWebModule }
 
@@ -189,7 +135,6 @@ begin
   FTasksController.Free;
   FCustomersController.Free;
   FCodeExamples.Free;
-  FEnvironmentSettings.Free;
   inherited;
   Logger.Info('WebStencils demo module shutdown complete');
 end;
@@ -273,8 +218,6 @@ begin
   end;
 
   FCodeExamples := TCodeExamples.Create(WebStencilsEngine);
-  FEnvironmentSettings := TEnvironmentSettings.Create;
-  WebStencilsEngine.AddVar('env2', FEnvironmentSettings);
 
   WebStencilsEngine.AddVar('env', nil, false,
                             function (AVar: TWebStencilsDataVar; const APropName: string; var AValue: string): Boolean
@@ -367,7 +310,6 @@ begin
   ''', [
     FormatDateTime('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', TTimeZone.Local.ToUniversalTime(Now)),
     TimeToStr(Now),
-    FEnvironmentSettings.AppVersion,
     {$IFDEF LINUX}'Linux'{$ELSE}'Windows'{$ENDIF},
     {$IFDEF CONTAINER}'true'{$ELSE}'false'{$ENDIF},
     FResourcesPath,
@@ -387,13 +329,6 @@ begin
     TMessageManager.ClearMessages(Request.Session);
 end;
 
-procedure TMainWebModule.WebSessionManagerAcquire(
-  Sender: TCustomWebSessionManager; Request: TWebRequest; Session: TWebSession);
-begin
-//  if Assigned(Session.User) then
-//    TMessageManager.AddMessage(Session, mtInfo, Format('Welcome %s!', [Session.UserName]));
-end;
-
 procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;
   Request: TWebRequest; Session: TWebSession);
 begin
@@ -408,12 +343,6 @@ begin
     Logger.Info(Format('Session created for authenticated user: %s', [Session.User.UserName]))
   else
     Logger.Info('Session created for anonymous user');
-end;
-
-procedure TMainWebModule.WebSessionManagerRemoved(
-  Sender: TCustomWebSessionManager; Request: TWebRequest; Session: TWebSession);
-begin
-//  TMessageManager.AddMessage(Request.Session, mtInfo, 'You have been logged out successfully');
 end;
 
 procedure TMainWebModule.WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;

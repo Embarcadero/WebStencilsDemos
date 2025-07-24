@@ -161,8 +161,6 @@ object MainWebModule: TMainWebModule
   end
   object WebSessionManager: TWebSessionManager
     OnCreated = WebSessionManagerCreated
-    OnRemoved = WebSessionManagerRemoved
-    OnAcquire = WebSessionManagerAcquire
     Left = 64
     Top = 152
   end

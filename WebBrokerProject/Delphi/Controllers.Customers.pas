@@ -26,7 +26,6 @@ type
     function RenderCustomerTemplate(ATemplate: string; ARequest: TWebRequest; APaginationParams: TPaginationParams = nil; ASearchParams: TSearchParams = nil): string;
     procedure ResetQuery;
     procedure ApplySearchToQuery(ASearchParams: TSearchParams);
-    function GetPageUrl(APaginationParams: TPaginationParams; ASearchParams: TSearchParams; APage: Integer): string;
     function ValidateCustomerForm(ARequest: TWebRequest): TArray<string>;
   public
     procedure GetCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
@@ -101,11 +100,6 @@ begin
     FCustomers.SQL.Add(SearchSQL);
     FCustomers.ParamByName('search').AsString := '%' + ASearchParams.SearchTerm + '%';
   end;
-end;
-
-function TCustomersController.GetPageUrl(APaginationParams: TPaginationParams; ASearchParams: TSearchParams; APage: Integer): string;
-begin
-  Result := APaginationParams.GetPageUrl(APage, ASearchParams);
 end;
 
 function TCustomersController.ValidateCustomerForm(ARequest: TWebRequest): TArray<string>;

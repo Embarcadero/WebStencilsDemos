@@ -107,9 +107,6 @@ end;
 
 function TBaseController.RenderTemplate(const ATemplatePath: string; ARequest: TWebRequest = nil): string;
 begin
-  // Clear any stale validation errors before rendering
-  // ClearValidationErrorsFromTemplate;
-  
   FWebStencilsProcessor.InputFileName := TPath.Combine(FWebStencilsEngine.RootDirectory, ATemplatePath);
   if Assigned(ARequest) then
   begin

@@ -174,9 +174,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="Utils.Logger.pas"/>
         <DCCReference Include="Helpers.Messages.pas"/>
         <DCCReference Include="Controllers.Base.pas"/>
-        <DCCReference Include="Web.Stencils.pas"/>
-        <DCCReference Include="System.JSON.Builders.pas"/>
-        <DCCReference Include="JSON.Fluent.pas"/>
         <DCCReference Include="Utils.Search.pas"/>
         <DCCReference Include="Utils.FormSession.pas"/>
         <None Include="README.md"/>
