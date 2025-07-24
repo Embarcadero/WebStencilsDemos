@@ -18,7 +18,7 @@ type
     function GetDefaultSearchFields: string;
   end;
 
-  // Search parameters class (separate from pagination)
+  // Search parameters class
   TSearchParams = class
   private
     FSearchTerm: string;

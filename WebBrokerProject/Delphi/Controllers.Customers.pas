@@ -146,7 +146,7 @@ var
   LPaginationParams: TPaginationParams;
   LSearchParams: TSearchParams;
 begin
-  LPaginationParams := TPaginationParams.Create(Request, 'pagination');
+  LPaginationParams := TPaginationParams.Create(Request, 'customers');
   LSearchParams := TSearchParams.Create(Request, FCustomerSearch);
   try
     // Reset query and apply search filter if present
@@ -159,7 +159,7 @@ begin
     FCustomers.ApplyPagination;
     LPaginationParams.TotalPages := FCustomers.TotalPages;
     
-    Response.Content := RenderCustomerTemplate('pagination', Request, LPaginationParams, LSearchParams);
+    Response.Content := RenderCustomerTemplate('index', Request, LPaginationParams, LSearchParams);
     Handled := True;
   finally
     LPaginationParams.Free;
@@ -224,7 +224,7 @@ begin
     StoreFormDataInSession(Request, 'customer_add');
     StoreValidationErrors(Request, 'customer_add', ValidationErrors);
     AddErrorMessage(Request, 'Please correct the errors below');
-    RedirectWithMessage(Response, '/customers/add');
+    Redirect(Response, '/customers/add');
     Handled := True;
     Exit;
   end;
@@ -246,7 +246,7 @@ begin
     ClearFormSession(Request, 'customer_add');
     
     AddSuccessMessage(Request, 'Customer created successfully');
-    RedirectWithMessage(Response, '/pagination');
+    Redirect(Response, '/customers');
     
   except
     on E: Exception do
@@ -256,7 +256,7 @@ begin
       // Store form data for redisplay on error
       StoreFormDataInSession(Request, 'customer_add');
       AddErrorMessage(Request, 'Error creating customer: ' + E.Message);
-      RedirectWithMessage(Response, '/customers/add');
+      Redirect(Response, '/customers/add');
     end;
   end;
   
@@ -272,7 +272,7 @@ begin
   if LCustomerId = '' then
   begin
     AddErrorMessage(Request, 'Customer ID is required');
-    RedirectWithMessage(Response, '/pagination');
+    Redirect(Response, '/customers');
     Handled := True;
     Exit;
   end;
@@ -283,7 +283,7 @@ begin
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
       AddErrorMessage(Request, 'Customer not found');
-      RedirectWithMessage(Response, '/pagination');
+      Redirect(Response, '/customers');
       Handled := True;
       Exit;
     end;
@@ -316,7 +316,7 @@ begin
   if LCustomerId = '' then
   begin
     AddErrorMessage(Request, 'Customer ID is required');
-    RedirectWithMessage(Response, '/pagination');
+    Redirect(Response, '/customers');
     Handled := True;
     Exit;
   end;
@@ -328,7 +328,7 @@ begin
     StoreFormDataInSession(Request, 'customer_edit');
     StoreValidationErrors(Request, 'customer_edit', ValidationErrors);
     AddErrorMessage(Request, 'Please correct the errors below');
-    RedirectWithMessage(Response, '/customers/edit?id=' + LCustomerId);
+    Redirect(Response, '/customers/edit?id=' + LCustomerId);
     Handled := True;
     Exit;
   end;
@@ -340,7 +340,7 @@ begin
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
       AddErrorMessage(Request, 'Customer not found');
-      RedirectWithMessage(Response, '/pagination');
+      Redirect(Response, '/customers');
       Handled := True;
       Exit;
     end;
@@ -360,18 +360,18 @@ begin
     
     LRedirectUrl := Request.GetFieldByName('HTTP_REFERER');
     if LRedirectUrl = '' then
-      LRedirectUrl := '/pagination';
-    RedirectWithMessage(Response, LRedirectUrl);
-    
+      LRedirectUrl := '/customers';
+    Redirect(Response, LRedirectUrl);
+
   except
     on E: Exception do
     begin
       FCustomers.Cancel;
-      
+
       // Store form data for redisplay on error
       StoreFormDataInSession(Request, 'customer_edit');
       AddErrorMessage(Request, 'Error updating customer: ' + E.Message);
-      RedirectWithMessage(Response, '/customers/edit?id=' + LCustomerId);
+      Redirect(Response, '/customers/edit?id=' + LCustomerId);
     end;
   end;
   
@@ -387,7 +387,7 @@ begin
   if LCustomerId = '' then
   begin
     AddErrorMessage(Request, 'Customer ID is required');
-    RedirectWithMessage(Response, '/pagination');
+    Redirect(Response, '/customers');
     Handled := True;
     Exit;
   end;
@@ -399,7 +399,7 @@ begin
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
       AddErrorMessage(Request, 'Customer not found');
-      RedirectWithMessage(Response, '/pagination');
+      Redirect(Response, '/customers');
       Handled := True;
       Exit;
     end;
@@ -412,13 +412,13 @@ begin
     AddSuccessMessage(Request, 'Customer deleted successfully');
     
     // Redirect back to pagination view
-    RedirectWithMessage(Response, '/pagination');
+    Redirect(Response, '/customers');
     
   except
     on E: Exception do
     begin
       AddErrorMessage(Request, 'Error deleting customer: ' + E.Message);
-      RedirectWithMessage(Response, '/pagination');
+      Redirect(Response, '/customers');
     end;
   end;
   

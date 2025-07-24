@@ -33,13 +33,15 @@ type
     FValidationErrors: TObjectList<TValidationError>;
 
     function RenderTemplate(const ATemplatePath: string; ARequest: TWebRequest = nil): string;
+    procedure Redirect(AResponse: TWebResponse; const ALocation: string);
     function GetCurrentSession(ARequest: TWebRequest): TWebSession;
+
+    // Global message methods
     procedure AddSuccessMessage(ARequest: TWebRequest; const AMessage: string);
     procedure AddWarningMessage(ARequest: TWebRequest; const AMessage: string);
     procedure AddErrorMessage(ARequest: TWebRequest; const AMessage: string);
     procedure AddInfoMessage(ARequest: TWebRequest; const AMessage: string);
-    procedure RedirectWithMessage(AResponse: TWebResponse; const ALocation: string);
-    
+
     // Form session management
     procedure StoreFormDataInSession(ARequest: TWebRequest; const AFormName: string);
     procedure StoreValidationErrors(ARequest: TWebRequest; const AFormName: string; const AErrors: TArray<string>);
@@ -126,42 +128,34 @@ begin
 end;
 
 procedure TBaseController.AddSuccessMessage(ARequest: TWebRequest; const AMessage: string);
-var
-  LSession: TWebSession;
 begin
-  LSession := GetCurrentSession(ARequest);
+  var LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
     TMessageManager.AddMessage(LSession, mtSuccess, AMessage);
 end;
 
 procedure TBaseController.AddWarningMessage(ARequest: TWebRequest; const AMessage: string);
-var
-  LSession: TWebSession;
 begin
-  LSession := GetCurrentSession(ARequest);
+  var LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
     TMessageManager.AddMessage(LSession, mtWarning, AMessage);
 end;
 
 procedure TBaseController.AddErrorMessage(ARequest: TWebRequest; const AMessage: string);
-var
-  LSession: TWebSession;
 begin
-  LSession := GetCurrentSession(ARequest);
+  var LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
     TMessageManager.AddMessage(LSession, mtError, AMessage);
 end;
 
 procedure TBaseController.AddInfoMessage(ARequest: TWebRequest; const AMessage: string);
-var
-  LSession: TWebSession;
 begin
-  LSession := GetCurrentSession(ARequest);
+  var LSession := GetCurrentSession(ARequest);
   if Assigned(LSession) then
     TMessageManager.AddMessage(LSession, mtInfo, AMessage);
 end;
 
-procedure TBaseController.RedirectWithMessage(AResponse: TWebResponse; const ALocation: string);
+procedure TBaseController.Redirect(AResponse: TWebResponse; const ALocation: string);
 begin
   AResponse.StatusCode := 302;
   AResponse.Location := ALocation;

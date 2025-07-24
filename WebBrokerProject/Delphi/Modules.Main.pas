@@ -278,7 +278,7 @@ begin
     TRoute.Create(mtPut, '/tasks', FTasksController.EditTask),
     // Customers routes (admin only)
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
-    TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
+    TRoute.Create(mtGet, '/customers', FCustomersController.GetCustomers),
     TRoute.Create(mtGet, '/customers/add', FCustomersController.GetAddCustomer),
     TRoute.Create(mtPost, '/customers/create', FCustomersController.CreateCustomer),
     TRoute.Create(mtGet, '/customers/edit', FCustomersController.GetEditCustomer),
