@@ -159,11 +159,11 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="MainWebModuleU.pas">
+        <DCCReference Include="Modules.Main.pas">
             <Form>MainWebModule</Form>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="ServerConst1.pas"/>
+        <DCCReference Include="Constants.Server.pas"/>
         <DCCReference Include="Helpers.WebModule.pas"/>
         <DCCReference Include="Models.Tasks.pas"/>
         <DCCReference Include="Controllers.Tasks.pas"/>
@@ -178,6 +178,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="System.JSON.Builders.pas"/>
         <DCCReference Include="JSON.Fluent.pas"/>
         <DCCReference Include="Utils.Search.pas"/>
+        <DCCReference Include="Utils.FormSession.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

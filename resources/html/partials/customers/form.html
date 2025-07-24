@@ -1,3 +1,19 @@
+<!-- Display general validation errors -->
+@if(customersValidationErrors.Count > 0) {
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Please correct the following errors:</h6>
+            <ul class="mb-0">
+                @forEach(var error in customersValidationErrors) {
+                <li>@error.Message</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+}
+
 <div class="row">
     @forEach(var field in customers.fields) {
         @if(field.visible) {

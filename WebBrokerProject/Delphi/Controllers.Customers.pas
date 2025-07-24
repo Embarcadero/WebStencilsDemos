@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils,
   System.IOutils,
+  System.Generics.Collections,
   FireDAC.Comp.Client,
   FireDAC.Stan.Param,
   Web.HTTPApp,
@@ -26,6 +27,7 @@ type
     procedure ResetQuery;
     procedure ApplySearchToQuery(ASearchParams: TSearchParams);
     function GetPageUrl(APaginationParams: TPaginationParams; ASearchParams: TSearchParams; APage: Integer): string;
+    function ValidateCustomerForm(ARequest: TWebRequest): TArray<string>;
   public
     procedure GetCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure GetAllCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
@@ -59,7 +61,7 @@ end;
 
 constructor TCustomersController.Create(AWebStencilsEngine: TWebStencilsEngine; ACustomers: TFDQuery);
 begin
-  inherited Create(AWebStencilsEngine);
+  inherited Create(AWebStencilsEngine, 'customers');
   try
     FCustomers := ACustomers;
     // Initialize customer search with the desired fields
@@ -104,6 +106,44 @@ end;
 function TCustomersController.GetPageUrl(APaginationParams: TPaginationParams; ASearchParams: TSearchParams; APage: Integer): string;
 begin
   Result := APaginationParams.GetPageUrl(APage, ASearchParams);
+end;
+
+function TCustomersController.ValidateCustomerForm(ARequest: TWebRequest): TArray<string>;
+var
+  Errors: TList<string>;
+  Email, FirstName, LastName: string;
+  EmailError, MaxLengthError: string;
+begin
+  Errors := TList<string>.Create;
+  try
+    // Validate required fields
+    Errors.AddRange(ValidateRequiredFields(ARequest, ['first_name', 'last_name', 'email']));
+    
+    // Validate email format
+    Email := ARequest.ContentFields.Values['email'];
+    EmailError := ValidateEmailField('email', Email);
+    if EmailError <> '' then
+      Errors.Add(EmailError);
+    
+    // Validate field lengths
+    FirstName := ARequest.ContentFields.Values['first_name'];
+    MaxLengthError := ValidateMaxLength('first_name', FirstName, 50);
+    if MaxLengthError <> '' then
+      Errors.Add(MaxLengthError);
+      
+    LastName := ARequest.ContentFields.Values['last_name'];
+    MaxLengthError := ValidateMaxLength('last_name', LastName, 50);
+    if MaxLengthError <> '' then
+      Errors.Add(MaxLengthError);
+    
+    MaxLengthError := ValidateMaxLength('email', Email, 100);
+    if MaxLengthError <> '' then
+      Errors.Add(MaxLengthError);
+    
+    Result := Errors.ToArray;
+  finally
+    Errors.Free;
+  end;
 end;
 
 procedure TCustomersController.GetCustomers(Sender: TObject;
@@ -158,17 +198,21 @@ end;
 procedure TCustomersController.GetAddCustomer(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
-  // Prepare empty customer record for form fields
   FCustomers.CancelPagination;
   FCustomers.Active := True;
   try
-    // Add a temporary empty record to provide field structure
     FCustomers.Append;
     
+    // Restore form data and errors if available (from validation errors)
+    RestoreFormDataAndErrors(Request, 'customer_add', FCustomers);
+    
     Response.Content := RenderCustomerTemplate('add', Request);
+    
+    // Clear session data AFTER template has been processed
+    ClearFormSessionAfterProcessing(Request, 'customer_add');
+    
     Handled := True;
   finally
-    // Cancel the append operation without saving
     FCustomers.Cancel;
     FCustomers.Active := False;
   end;
@@ -177,52 +221,46 @@ end;
 procedure TCustomersController.CreateCustomer(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 var
-  LField: TField;
-  LFieldName: string;
-  LFieldValue: string;
+  ValidationErrors: TArray<string>;
 begin
+  // 1. Validate form data first
+  ValidationErrors := ValidateCustomerForm(Request);
+  if Length(ValidationErrors) > 0 then
+  begin
+    StoreFormDataInSession(Request, 'customer_add');
+    StoreValidationErrors(Request, 'customer_add', ValidationErrors);
+    AddErrorMessage(Request, 'Please correct the errors below');
+    RedirectWithMessage(Response, '/customers/add');
+    Handled := True;
+    Exit;
+  end;
+  
+  // 2. Try to save the customer
   FCustomers.Active := True;
   try
     FCustomers.CancelPagination;
-    
-    // Begin adding new record
     FCustomers.Append;
     
-    // Set all fields from the form
-    for var i := 0 to Request.ContentFields.Count - 1 do
-    begin
-      LFieldName := Request.ContentFields.Names[i];
-      LFieldValue := Request.ContentFields.Values[LFieldName];
-      
-      // Skip the ID field (should be auto-generated)
-      if SameText(LFieldName, 'id') then
-        Continue;
-        
-      // Find the field in the dataset
-      LField := FCustomers.FindField(LFieldName);
-      if Assigned(LField) then
-      begin
-        if LFieldValue = '' then
-          LField.Clear
-        else
-          LField.AsString := LFieldValue;
-      end;
-    end;
+    // Populate dataset from form data
+    PopulateDatasetFromRequest(FCustomers, Request, ['id']);
     
     // Save the new record
     FCustomers.Post;
     FCustomers.Close;
     
-    // Add success message
-    AddSuccessMessage(Request, 'Customer created successfully');
+    // Clear any saved form data on success
+    ClearFormSession(Request, 'customer_add');
     
-    // Redirect back to pagination view
+    AddSuccessMessage(Request, 'Customer created successfully');
     RedirectWithMessage(Response, '/pagination');
     
   except
     on E: Exception do
     begin
       FCustomers.Cancel;
+      
+      // Store form data for redisplay on error
+      StoreFormDataInSession(Request, 'customer_add');
       AddErrorMessage(Request, 'Error creating customer: ' + E.Message);
       RedirectWithMessage(Response, '/customers/add');
     end;
@@ -245,7 +283,6 @@ begin
     Exit;
   end;
 
-  // Navigate to the specific customer record
   FCustomers.CancelPagination;
   FCustomers.Active := True;
   try
@@ -256,10 +293,20 @@ begin
       Handled := True;
       Exit;
     end;
+    
+    FCustomers.Edit;
+    
+    // Restore form data and errors if available (from validation errors)
+    RestoreFormDataAndErrors(Request, 'customer_edit', FCustomers);
 
     Response.Content := RenderCustomerTemplate('edit', Request);
+    
+    // Clear session data AFTER template has been processed
+    ClearFormSessionAfterProcessing(Request, 'customer_edit');
+    
     Handled := True;
   finally
+    FCustomers.Cancel;
     FCustomers.Active := False;
   end;
 end;
@@ -268,10 +315,8 @@ procedure TCustomersController.UpdateCustomer(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 var
   LCustomerId: string;
-  LField: TField;
-  LFieldName: string;
-  LFieldValue: string;
   LRedirectUrl: string;
+  ValidationErrors: TArray<string>;
 begin
   LCustomerId := Request.ContentFields.Values['id'];
   if LCustomerId = '' then
@@ -282,9 +327,21 @@ begin
     Exit;
   end;
   
+  // 1. Validate form data first
+  ValidationErrors := ValidateCustomerForm(Request);
+  if Length(ValidationErrors) > 0 then
+  begin
+    StoreFormDataInSession(Request, 'customer_edit');
+    StoreValidationErrors(Request, 'customer_edit', ValidationErrors);
+    AddErrorMessage(Request, 'Please correct the errors below');
+    RedirectWithMessage(Response, '/customers/edit?id=' + LCustomerId);
+    Handled := True;
+    Exit;
+  end;
+  
+  // 2. Try to update the customer
   FCustomers.Active := True;
   try
-    // Navigate to the specific customer record
     FCustomers.CancelPagination;
     if not FCustomers.Locate('id', LCustomerId, []) then
     begin
@@ -294,38 +351,19 @@ begin
       Exit;
     end;
 
-    // Begin transaction
     FCustomers.Edit;
     
-    // Update all fields from the form
-    for var i := 0 to Request.ContentFields.Count - 1 do
-    begin
-      LFieldName := Request.ContentFields.Names[i];
-      LFieldValue := Request.ContentFields.Values[LFieldName];
-      
-      // Skip the ID field
-      if SameText(LFieldName, 'id') then
-        Continue;
-        
-      // Find the field in the dataset
-      LField := FCustomers.FindField(LFieldName);
-      if Assigned(LField) then
-      begin
-        if LFieldValue = '' then
-          LField.Clear
-        else
-          LField.AsString := LFieldValue;
-      end;
-    end;
+    // Populate dataset from form data
+    PopulateDatasetFromRequest(FCustomers, Request, ['id']);
     
-    // Save changes
     FCustomers.Post;
     FCustomers.Close;
     
-    // Add success message
+    // Clear any saved form data on success
+    ClearFormSession(Request, 'customer_edit');
+    
     AddSuccessMessage(Request, 'Customer updated successfully');
     
-    // Redirect back to pagination view
     LRedirectUrl := Request.GetFieldByName('HTTP_REFERER');
     if LRedirectUrl = '' then
       LRedirectUrl := '/pagination';
@@ -335,6 +373,9 @@ begin
     on E: Exception do
     begin
       FCustomers.Cancel;
+      
+      // Store form data for redisplay on error
+      StoreFormDataInSession(Request, 'customer_edit');
       AddErrorMessage(Request, 'Error updating customer: ' + E.Message);
       RedirectWithMessage(Response, '/customers/edit?id=' + LCustomerId);
     end;

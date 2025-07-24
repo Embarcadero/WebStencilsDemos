@@ -15,8 +15,8 @@ uses
   {$IFDEF LINUX}
   Posix.Signal,
   {$ENDIF }
-  MainWebModuleU in 'MainWebModuleU.pas' {MainWebModule: TWebModule},
-  ServerConst1 in 'ServerConst1.pas',
+  Modules.Main in 'Modules.Main.pas' {MainWebModule: TWebModule},
+  Constants.Server in 'Constants.Server.pas',
   Helpers.WebModule in 'Helpers.WebModule.pas',
   Models.Tasks in 'Models.Tasks.pas',
   Controllers.Tasks in 'Controllers.Tasks.pas',
@@ -30,7 +30,8 @@ uses
   Web.Stencils in 'Web.Stencils.pas',
   System.JSON.Builders in 'System.JSON.Builders.pas',
   JSON.Fluent in 'JSON.Fluent.pas',
-  Utils.Search in 'Utils.Search.pas';
+  Utils.Search in 'Utils.Search.pas',
+  Utils.FormSession in 'Utils.FormSession.pas';
 
 {$R *.res}
 
