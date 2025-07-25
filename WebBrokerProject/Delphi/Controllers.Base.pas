@@ -17,13 +17,21 @@ uses
   Utils.FormSession;
 
 type
-  // Simple wrapper class for validation errors (WebStencils compatible)
-  TValidationError = class
+
+  // Field error manager for WebStencils compatibility
+  TFieldErrorManager = class
   private
-    FMessage: string;
+    FErrors: TDictionary<string, string>;
+    function GetErrorCount: integer;
   public
-    constructor Create(const AMessage: string);
-    property Message: string read FMessage;
+    constructor Create;
+    destructor Destroy; override;
+    procedure AddError(const AFieldName, AMessage: string);
+    procedure Clear;
+  published
+    function GetError(const AFieldName: string): string;
+    function HasError(const AFieldName: string): Boolean;
+    property ErrorCount: integer read GetErrorCount;
   end;
 
   TBaseController = class
@@ -31,7 +39,7 @@ type
     FWebStencilsEngine: TWebStencilsEngine;
     FWebStencilsProcessor: TWebStencilsProcessor;
     FControllerName: string;
-    FValidationErrors: TObjectList<TValidationError>;
+    FFieldErrorManager: TFieldErrorManager;
 
     function RenderTemplate(const ATemplatePath: string; ARequest: TWebRequest = nil): string;
     procedure Redirect(AResponse: TWebResponse; const ALocation: string);
@@ -45,9 +53,7 @@ type
 
     // Form session management
     procedure StoreFormDataInSession(ARequest: TWebRequest; const AFormName: string);
-    procedure StoreValidationErrors(ARequest: TWebRequest; const AFormName: string; const AErrors: TArray<string>);
     function GetFormDataFromSession(ARequest: TWebRequest; const AFormName: string): TDictionary<string, string>;
-    function GetValidationErrors(ARequest: TWebRequest; const AFormName: string): TArray<string>;
     procedure ClearFormSession(ARequest: TWebRequest; const AFormName: string);
     function HasFormDataInSession(ARequest: TWebRequest; const AFormName: string): Boolean;
     
@@ -55,19 +61,17 @@ type
     procedure AssignFieldValue(AField: TField; const AValue: string);
     procedure RestoreFormDataToDataset(ADataset: TDataset; AFormData: TDictionary<string, string>);
     procedure PopulateDatasetFromRequest(ADataset: TDataset; ARequest: TWebRequest; const ASkipFields: TArray<string> = []);
-    procedure AddValidationErrorsToTemplate(ARequest: TWebRequest; const AFormName: string);
-    procedure ClearValidationErrorsFromTemplate;
-    procedure RestoreFormDataAndErrors(ARequest: TWebRequest; const AFormName: string; ADataset: TDataset);
+    procedure RestoreFormData(ARequest: TWebRequest; const AFormName: string; ADataset: TDataset);
     procedure ClearFormSessionAfterProcessing(ARequest: TWebRequest; const AFormName: string);
     
     // Validation error management
     procedure InitializeValidationErrors;
-    procedure AddValidationError(const AMessage: string);
+    procedure AddValidationError(const AFieldName, AMessage: string);
     procedure ClearValidationErrors;
-    function GetValidationErrorsVarName: string;
+    function GetFieldError(const AFieldName: string): string;
+    function HasFieldError(const AFieldName: string): Boolean;
     
     // Basic validation helpers
-    function ValidateRequiredFields(ARequest: TWebRequest; const ARequiredFields: TArray<string>): TArray<string>;
     function ValidateEmailField(const AFieldName, AValue: string): string;
     function ValidateMaxLength(const AFieldName, AValue: string; AMaxLength: Integer): string;
   public
@@ -77,12 +81,46 @@ type
 
 implementation
 
-{ TValidationError }
+{ TFieldErrorManager }
 
-constructor TValidationError.Create(const AMessage: string);
+constructor TFieldErrorManager.Create;
 begin
   inherited Create;
-  FMessage := AMessage;
+  FErrors := TDictionary<string, string>.Create;
+end;
+
+destructor TFieldErrorManager.Destroy;
+begin
+  FErrors.Free;
+  inherited;
+end;
+
+procedure TFieldErrorManager.AddError(const AFieldName, AMessage: string);
+begin
+  FErrors.AddOrSetValue(AFieldName.ToUpper, AMessage);
+end;
+
+function TFieldErrorManager.GetError(const AFieldName: string): string;
+begin
+  if FErrors.ContainsKey(AFieldName.ToUpper) then
+    Result := FErrors[AFieldName.ToUpper]
+  else
+    Result := '';
+end;
+
+function TFieldErrorManager.HasError(const AFieldName: string): Boolean;
+begin
+  Result := FErrors.ContainsKey(AFieldName.ToUpper);
+end;
+
+procedure TFieldErrorManager.Clear;
+begin
+  FErrors.Clear;
+end;
+
+function TFieldErrorManager.GetErrorCount: Integer;
+begin
+  Result := FErrors.Count;
 end;
 
 { TBaseController }
@@ -95,8 +133,8 @@ begin
   FWebStencilsProcessor.Engine := FWebStencilsEngine;
   FControllerName := AControllerName;
   
-  // Initialize validation errors list
-  FValidationErrors := TObjectList<TValidationError>.Create(True);
+  // Initialize field error manager
+  FFieldErrorManager := TFieldErrorManager.Create;
   
   // Initialize validation errors in template processor
   InitializeValidationErrors;
@@ -104,7 +142,7 @@ end;
 
 destructor TBaseController.Destroy;
 begin
-  FValidationErrors.Free;
+  FFieldErrorManager.Free;
   FWebStencilsProcessor.Free;
   inherited;
 end;
@@ -175,14 +213,7 @@ begin
     TFormSessionManager.StoreFormData(LSession, AFormName, ARequest);
 end;
 
-procedure TBaseController.StoreValidationErrors(ARequest: TWebRequest; const AFormName: string; const AErrors: TArray<string>);
-var
-  LSession: TWebSession;
-begin
-  LSession := GetCurrentSession(ARequest);
-  if Assigned(LSession) then
-    TFormSessionManager.StoreValidationErrors(LSession, AFormName, AErrors);
-end;
+
 
 function TBaseController.GetFormDataFromSession(ARequest: TWebRequest; const AFormName: string): TDictionary<string, string>;
 var
@@ -195,16 +226,7 @@ begin
     Result := TDictionary<string, string>.Create;
 end;
 
-function TBaseController.GetValidationErrors(ARequest: TWebRequest; const AFormName: string): TArray<string>;
-var
-  LSession: TWebSession;
-begin
-  LSession := GetCurrentSession(ARequest);
-  if Assigned(LSession) then
-    Result := TFormSessionManager.GetValidationErrors(LSession, AFormName)
-  else
-    SetLength(Result, 0);
-end;
+
 
 procedure TBaseController.ClearFormSession(ARequest: TWebRequest; const AFormName: string);
 var
@@ -313,33 +335,10 @@ begin
   end;
 end;
 
-procedure TBaseController.AddValidationErrorsToTemplate(ARequest: TWebRequest; const AFormName: string);
-var
-  Errors: TArray<string>;
-  ErrorText: string;
-begin
-  // Clear existing validation errors first
-  ClearValidationErrors;
-  
-  // Get errors from session and add them to our global list
-  Errors := GetValidationErrors(ARequest, AFormName);
-  for ErrorText in Errors do
-    AddValidationError(ErrorText);
-end;
-
-procedure TBaseController.ClearValidationErrorsFromTemplate;
-begin
-  // Clear validation errors from our global list
-  ClearValidationErrors;
-end;
-
-procedure TBaseController.RestoreFormDataAndErrors(ARequest: TWebRequest; const AFormName: string; ADataset: TDataset);
+procedure TBaseController.RestoreFormData(ARequest: TWebRequest; const AFormName: string; ADataset: TDataset);
 var
   FormData: TDictionary<string, string>;
 begin
-  // Clear any existing validation errors first
-  ClearValidationErrorsFromTemplate;
-  
   // Check if we have saved form data from previous error
   if HasFormDataInSession(ARequest, AFormName) then
   begin
@@ -347,9 +346,6 @@ begin
     try
       // Restore form data to dataset
       RestoreFormDataToDataset(ADataset, FormData);
-      
-      // Add validation errors to template
-      AddValidationErrorsToTemplate(ARequest, AFormName);
       
       // NOTE: Session data will be cleared AFTER template processing
       // to ensure data is available during template rendering
@@ -369,46 +365,33 @@ end;
 
 procedure TBaseController.InitializeValidationErrors;
 begin
-  // Always add validation errors variable to template processor (empty by default)
-  FWebStencilsProcessor.AddVar(GetValidationErrorsVarName, FValidationErrors, False);
+  // Always add field error manager to template processor (empty by default)
+  FWebStencilsProcessor.AddVar('fieldErrors', FFieldErrorManager, False);
 end;
 
-procedure TBaseController.AddValidationError(const AMessage: string);
+procedure TBaseController.AddValidationError(const AFieldName, AMessage: string);
 begin
-  FValidationErrors.Add(TValidationError.Create(AMessage));
+  FFieldErrorManager.AddError(AFieldName, AMessage);
 end;
 
 procedure TBaseController.ClearValidationErrors;
 begin
-  FValidationErrors.Clear;
+  FFieldErrorManager.Clear;
 end;
 
-function TBaseController.GetValidationErrorsVarName: string;
+function TBaseController.GetFieldError(const AFieldName: string): string;
 begin
-  Result := FControllerName + 'ValidationErrors';
+  Result := FFieldErrorManager.GetError(AFieldName);
 end;
 
-{ Basic Validation Helpers }
-
-function TBaseController.ValidateRequiredFields(ARequest: TWebRequest; const ARequiredFields: TArray<string>): TArray<string>;
-var
-  Errors: TList<string>;
-  FieldName, FieldValue: string;
+function TBaseController.HasFieldError(const AFieldName: string): Boolean;
 begin
-  Errors := TList<string>.Create;
-  try
-    for FieldName in ARequiredFields do
-    begin
-      FieldValue := Trim(ARequest.ContentFields.Values[FieldName]);
-      if FieldValue = '' then
-        Errors.Add(Format('%s is required', [FieldName.Replace('_', ' ')]));
-    end;
-    
-    Result := Errors.ToArray;
-  finally
-    Errors.Free;
-  end;
+  Result := FFieldErrorManager.HasError(AFieldName);
 end;
+
+
+
+
 
 function TBaseController.ValidateEmailField(const AFieldName, AValue: string): string;
 begin

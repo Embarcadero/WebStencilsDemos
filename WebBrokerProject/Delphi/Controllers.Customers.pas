@@ -26,7 +26,7 @@ type
     function RenderCustomerTemplate(ATemplate: string; ARequest: TWebRequest; APaginationParams: TPaginationParams = nil; ASearchParams: TSearchParams = nil): string;
     procedure ResetQuery;
     procedure ApplySearchToQuery(ASearchParams: TSearchParams);
-    function ValidateCustomerForm(ARequest: TWebRequest): TArray<string>;
+    procedure ValidateCustomerForm(ARequest: TWebRequest);
   public
     procedure GetCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure GetAllCustomers(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
@@ -102,41 +102,55 @@ begin
   end;
 end;
 
-function TCustomersController.ValidateCustomerForm(ARequest: TWebRequest): TArray<string>;
+procedure TCustomersController.ValidateCustomerForm(ARequest: TWebRequest);
 var
-  Errors: TList<string>;
   Email, FirstName, LastName: string;
   EmailError, MaxLengthError: string;
 begin
-  Errors := TList<string>.Create;
-  try
-    // Validate required fields
-    Errors.AddRange(ValidateRequiredFields(ARequest, ['first_name', 'last_name', 'email']));
+  // Clear any existing validation errors
+  ClearValidationErrors;
+  
+  // Validate required fields
+  if Trim(ARequest.ContentFields.Values['first_name']) = '' then
+    AddValidationError('first_name', 'First name is required');
     
-    // Validate email format
-    Email := ARequest.ContentFields.Values['email'];
+  if Trim(ARequest.ContentFields.Values['last_name']) = '' then
+    AddValidationError('last_name', 'Last name is required');
+    
+  if Trim(ARequest.ContentFields.Values['email']) = '' then
+    AddValidationError('email', 'Email is required');
+  
+  // Validate email format
+  Email := ARequest.ContentFields.Values['email'];
+  if Email <> '' then
+  begin
     EmailError := ValidateEmailField('email', Email);
     if EmailError <> '' then
-      Errors.Add(EmailError);
-    
-    // Validate field lengths
-    FirstName := ARequest.ContentFields.Values['first_name'];
+      AddValidationError('email', EmailError);
+  end;
+  
+  // Validate field lengths
+  FirstName := ARequest.ContentFields.Values['first_name'];
+  if FirstName <> '' then
+  begin
     MaxLengthError := ValidateMaxLength('first_name', FirstName, 50);
     if MaxLengthError <> '' then
-      Errors.Add(MaxLengthError);
+      AddValidationError('first_name', MaxLengthError);
+  end;
       
-    LastName := ARequest.ContentFields.Values['last_name'];
+  LastName := ARequest.ContentFields.Values['last_name'];
+  if LastName <> '' then
+  begin
     MaxLengthError := ValidateMaxLength('last_name', LastName, 50);
     if MaxLengthError <> '' then
-      Errors.Add(MaxLengthError);
-    
+      AddValidationError('last_name', MaxLengthError);
+  end;
+  
+  if Email <> '' then
+  begin
     MaxLengthError := ValidateMaxLength('email', Email, 100);
     if MaxLengthError <> '' then
-      Errors.Add(MaxLengthError);
-    
-    Result := Errors.ToArray;
-  finally
-    Errors.Free;
+      AddValidationError('email', MaxLengthError);
   end;
 end;
 
@@ -197,8 +211,8 @@ begin
   try
     FCustomers.Append;
     
-    // Restore form data and errors if available (from validation errors)
-    RestoreFormDataAndErrors(Request, 'customer_add', FCustomers);
+    // Restore form data if available (from validation errors)
+    RestoreFormData(Request, 'customer_add', FCustomers);
     
     Response.Content := RenderCustomerTemplate('add', Request);
     
@@ -214,15 +228,12 @@ end;
 
 procedure TCustomersController.CreateCustomer(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-var
-  ValidationErrors: TArray<string>;
 begin
   // 1. Validate form data first
-  ValidationErrors := ValidateCustomerForm(Request);
-  if Length(ValidationErrors) > 0 then
+  ValidateCustomerForm(Request);
+  if HasFieldError('first_name') or HasFieldError('last_name') or HasFieldError('email') then
   begin
     StoreFormDataInSession(Request, 'customer_add');
-    StoreValidationErrors(Request, 'customer_add', ValidationErrors);
     AddErrorMessage(Request, 'Please correct the errors below');
     Redirect(Response, '/customers/add');
     Handled := True;
@@ -276,7 +287,7 @@ begin
     Handled := True;
     Exit;
   end;
-
+  
   FCustomers.CancelPagination;
   FCustomers.Active := True;
   try
@@ -287,10 +298,9 @@ begin
       Handled := True;
       Exit;
     end;
-    var l := FCustomers.FieldByName('activation_date').Text;
     FCustomers.Edit;
-    // Restore form data and errors if available (from validation errors)
-    RestoreFormDataAndErrors(Request, 'customer_edit', FCustomers);
+    // Restore form data if available (from validation errors)
+    RestoreFormData(Request, 'customer_edit', FCustomers);
 
     Response.Content := RenderCustomerTemplate('edit', Request);
     
@@ -309,7 +319,6 @@ procedure TCustomersController.UpdateCustomer(Sender: TObject;
 var
   LCustomerId: string;
   LRedirectUrl: string;
-  ValidationErrors: TArray<string>;
 begin
   LCustomerId := Request.ContentFields.Values['id'];
   if LCustomerId = '' then
@@ -321,11 +330,10 @@ begin
   end;
   
   // 1. Validate form data first
-  ValidationErrors := ValidateCustomerForm(Request);
-  if Length(ValidationErrors) > 0 then
+  ValidateCustomerForm(Request);
+  if HasFieldError('first_name') or HasFieldError('last_name') or HasFieldError('email') then
   begin
     StoreFormDataInSession(Request, 'customer_edit');
-    StoreValidationErrors(Request, 'customer_edit', ValidationErrors);
     AddErrorMessage(Request, 'Please correct the errors below');
     Redirect(Response, '/customers/edit?id=' + LCustomerId);
     Handled := True;

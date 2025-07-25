@@ -78,22 +78,11 @@ type
     CustomersCOUNTRY: TStringField;
     CustomersIP_ADDRESS: TStringField;
     Countries: TFDQuery;
-    FDAutoIncField1: TFDAutoIncField;
-    StringField1: TStringField;
-    StringField2: TStringField;
-    StringField3: TStringField;
-    StringField4: TStringField;
-    StringField5: TStringField;
-    StringField6: TStringField;
-    StringField7: TStringField;
-    StringField8: TStringField;
-    StringField9: TStringField;
-    StringField10: TStringField;
-    StringField11: TStringField;
     CustomersAGE: TIntegerField;
     CustomersACTIVATION_DATE: TDateField;
     CustomersACTIVE: TBooleanField;
     CustomersCOMMENTS: TWideMemoField;
+    CountriesCOUNTRY: TStringField;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure WebModuleCreate(Sender: TObject);
@@ -190,7 +179,6 @@ begin
   else
     FResourcesPath := EnvResourcesPath;
 {$ENDIF}
-
   Logger.Info(Format('Resources path set to: %s', [FResourcesPath]));
   WebStencilsEngine.RootDirectory := TPath.Combine(FResourcesPath, 'html');
   WebFileDispatcher.RootDirectory := WebStencilsEngine.RootDirectory;
