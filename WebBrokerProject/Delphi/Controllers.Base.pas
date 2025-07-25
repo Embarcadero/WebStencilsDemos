@@ -7,6 +7,7 @@ uses
   System.IOUtils,
   System.Classes,
   System.Generics.Collections,
+  System.DateUtils,
   Web.HTTPApp,
   Web.Stencils,
   FireDAC.Comp.Client,
@@ -51,6 +52,7 @@ type
     function HasFormDataInSession(ARequest: TWebRequest; const AFormName: string): Boolean;
     
     // Form data helpers
+    procedure AssignFieldValue(AField: TField; const AValue: string);
     procedure RestoreFormDataToDataset(ADataset: TDataset; AFormData: TDictionary<string, string>);
     procedure PopulateDatasetFromRequest(ADataset: TDataset; ARequest: TWebRequest; const ASkipFields: TArray<string> = []);
     procedure AddValidationErrorsToTemplate(ARequest: TWebRequest; const AFormName: string);
@@ -226,6 +228,39 @@ end;
 
 { Form Data Helpers }
 
+procedure TBaseController.AssignFieldValue(AField: TField; const AValue: string);
+var
+  DateValue: TDateTime;
+begin
+  if not Assigned(AField) then
+    Exit;
+    
+  if AValue = '' then
+    AField.Clear
+  else
+  begin
+    // Handle date/time field conversions using ISO 8601 functions
+    if (AField.DataType = ftDate) or (AField.DataType = ftDateTime) or (AField.DataType = ftTime) then
+    begin
+      if TryISO8601ToDate(AValue, DateValue, False) then
+        AField.AsDateTime := DateValue
+      else
+        AField.AsString := AValue; // Fallback to string
+    end
+    else if AField.DataType = ftBoolean then
+    begin
+      // For boolean fields, if the field is present in POST data, it's True
+      // If not present, it's False (handled by the hidden field)
+      if AValue = 'True' then
+        AField.AsBoolean := True
+      else
+        AField.AsBoolean := False;
+    end
+    else
+      AField.AsString := AValue;
+  end;
+end;
+
 procedure TBaseController.RestoreFormDataToDataset(ADataset: TDataset; AFormData: TDictionary<string, string>);
 var
   Pair: TPair<string, string>;
@@ -238,12 +273,7 @@ begin
   begin
     Field := ADataset.FindField(Pair.Key);
     if Assigned(Field) then
-    begin
-      if Pair.Value = '' then
-        Field.Clear
-      else
-        Field.AsString := Pair.Value;
-    end;
+      AssignFieldValue(Field, Pair.Value);
   end;
 end;
 
@@ -278,12 +308,7 @@ begin
     begin
       Field := ADataset.FindField(FieldName);
       if Assigned(Field) then
-      begin
-        if FieldValue = '' then
-          Field.Clear
-        else
-          Field.AsString := FieldValue;
-      end;
+        AssignFieldValue(Field, FieldValue);
     end;
   end;
 end;

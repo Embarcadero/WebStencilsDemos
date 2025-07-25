@@ -287,9 +287,8 @@ begin
       Handled := True;
       Exit;
     end;
-    
+    var l := FCustomers.FieldByName('activation_date').Text;
     FCustomers.Edit;
-    
     // Restore form data and errors if available (from validation errors)
     RestoreFormDataAndErrors(Request, 'customer_edit', FCustomers);
 

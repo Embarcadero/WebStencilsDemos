@@ -16,26 +16,7 @@
 
 <div class="row">
     @forEach(var field in customers.fields) {
-        @if(field.visible) {
-        <div class="col-md-6 mb-3">
-            <label for="@field.fieldName" class="form-label">
-                @field.displayLabel
-                @if(field.required) {
-                <span class="text-danger">*</span>
-                }
-            </label>
-            <input 
-            type="text" 
-            class="form-control" 
-            id="@field.fieldName" 
-            name="@field.fieldName"
-            value="@field.Value"
-            @if(field.required) { required }
-            maxlength="@field.size">
-        </div>	
-        } @else {
-            <input type="hidden" name="@field.fieldName" value="@field.Value">
-        }
+        @import partials/dynamicInput
     }
 </div> 
 
@@ -48,6 +29,9 @@
             </p>
             <p>
                 If changes in the FireDAC query are made, the form will be updated automatically.
+            </p>
+            <p>
+                Input types are automatically determined based on the FireDAC field data type (text, number, etc.).
             </p>
         </div>
     </div>

@@ -65,6 +65,8 @@ object MainWebModule: TMainWebModule
   end
   object Customers: TFDQuery
     Connection = Connection
+    FormatOptions.AssignedValues = [fvFmtDisplayDate]
+    FormatOptions.FmtDisplayDate = 'yyyy-mm-dd'
     SQL.Strings = (
       'SELECT *'
       'FROM customers')
@@ -97,6 +99,7 @@ object MainWebModule: TMainWebModule
       DisplayLabel = 'Last Name'
       FieldName = 'LAST_NAME'
       Origin = 'LAST_NAME'
+      Required = True
       Size = 15
     end
     object CustomersGENDER: TStringField
@@ -104,6 +107,12 @@ object MainWebModule: TMainWebModule
       FieldName = 'GENDER'
       Origin = 'GENDER'
       Size = 11
+    end
+    object CustomersAGE: TIntegerField
+      DisplayLabel = 'Age'
+      DisplayWidth = 2
+      FieldName = 'AGE'
+      Origin = 'AGE'
     end
     object CustomersPOSTAL_CODE: TStringField
       DisplayLabel = 'Postal Code'
@@ -126,6 +135,8 @@ object MainWebModule: TMainWebModule
     object CustomersCOUNTRY: TStringField
       DisplayLabel = 'Country'
       FieldName = 'COUNTRY'
+      LookupDataSet = Countries
+      LookupKeyFields = 'COUNTRY'
       Origin = 'COUNTRY'
       Size = 34
     end
@@ -139,7 +150,6 @@ object MainWebModule: TMainWebModule
       DisplayLabel = 'e-mail'
       FieldName = 'EMAIL'
       Origin = 'EMAIL'
-      Required = True
       Size = 34
     end
     object CustomersIP_ADDRESS: TStringField
@@ -147,6 +157,23 @@ object MainWebModule: TMainWebModule
       FieldName = 'IP_ADDRESS'
       Origin = 'IP_ADDRESS'
       Size = 15
+    end
+    object CustomersACTIVATION_DATE: TDateField
+      DisplayLabel = 'Activation Date'
+      FieldName = 'ACTIVATION_DATE'
+      Origin = 'ACTIVATION_DATE'
+      DisplayFormat = 'yyyy-mm-dd'
+    end
+    object CustomersACTIVE: TBooleanField
+      DisplayLabel = 'Active'
+      FieldName = 'ACTIVE'
+      Origin = 'ACTIVE'
+    end
+    object CustomersCOMMENTS: TWideMemoField
+      DisplayLabel = 'Comments'
+      FieldName = 'COMMENTS'
+      Origin = 'COMMENTS'
+      BlobType = ftWideMemo
     end
   end
   object Connection: TFDConnection
@@ -228,5 +255,91 @@ object MainWebModule: TMainWebModule
       end>
     Left = 176
     Top = 152
+  end
+  object Countries: TFDQuery
+    Connection = Connection
+    SQL.Strings = (
+      'SELECT *'
+      'FROM countries')
+    Left = 341
+    Top = 88
+    object FDAutoIncField1: TFDAutoIncField
+      DisplayLabel = 'Id'
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = False
+      Required = True
+      Visible = False
+    end
+    object StringField1: TStringField
+      DisplayLabel = 'Company'
+      FieldName = 'COMPANY'
+      Origin = 'COMPANY'
+      Required = True
+      Size = 13
+    end
+    object StringField2: TStringField
+      DisplayLabel = 'First Name'
+      FieldName = 'FIRST_NAME'
+      Origin = 'FIRST_NAME'
+      Required = True
+      Size = 12
+    end
+    object StringField3: TStringField
+      DisplayLabel = 'Last Name'
+      FieldName = 'LAST_NAME'
+      Origin = 'LAST_NAME'
+      Size = 15
+    end
+    object StringField4: TStringField
+      DisplayLabel = 'Gender'
+      FieldName = 'GENDER'
+      Origin = 'GENDER'
+      Size = 11
+    end
+    object StringField5: TStringField
+      DisplayLabel = 'Postal Code'
+      FieldName = 'POSTAL_CODE'
+      Origin = 'POSTAL_CODE'
+      Size = 14
+    end
+    object StringField6: TStringField
+      DisplayLabel = 'Address'
+      FieldName = 'ADDRESS'
+      Origin = 'ADDRESS'
+      Size = 27
+    end
+    object StringField7: TStringField
+      DisplayLabel = 'City'
+      FieldName = 'CITY'
+      Origin = 'CITY'
+      Size = 40
+    end
+    object StringField8: TStringField
+      DisplayLabel = 'Country'
+      FieldName = 'COUNTRY'
+      Origin = 'COUNTRY'
+      Size = 34
+    end
+    object StringField9: TStringField
+      DisplayLabel = 'Phone'
+      FieldName = 'PHONE'
+      Origin = 'PHONE'
+      Size = 17
+    end
+    object StringField10: TStringField
+      DisplayLabel = 'e-mail'
+      FieldName = 'EMAIL'
+      Origin = 'EMAIL'
+      Required = True
+      Size = 34
+    end
+    object StringField11: TStringField
+      DisplayLabel = 'IP Address'
+      FieldName = 'IP_ADDRESS'
+      Origin = 'IP_ADDRESS'
+      Size = 15
+    end
   end
 end
