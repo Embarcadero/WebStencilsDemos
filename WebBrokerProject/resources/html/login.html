@@ -1,0 +1,106 @@
+@LayoutPage layouts/baseLayout
+
+@ExtraHeader {
+<style>
+.login-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-card {
+    width: 100%;
+    max-width: 400px;
+}
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.demo-credentials {
+    background-color: var(--bs-body-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+</style>
+}
+
+<div class="container login-container">
+    <div class="login-card">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <div class="login-header">
+                    <img src="@env.resource/static/img/logo.png" alt="Logo" width="64" height="64" class="mb-3">
+                    <h3 class="fw-bold my-text-gradient">WebStencils Login</h3>
+                    <p class="text-muted">Please sign in to access protected areas</p>
+                </div>
+	
+
+                <div class="demo-credentials">
+                    <h6 class="fw-bold mb-2">
+                        <i class="bi bi-info-circle me-2"></i>Demo Credentials
+                    </h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <strong>User Account:</strong><br>
+                                Username: <code>demo</code><br>
+                                Password: <code>demo123</code><br>
+                                Role: <span class="badge bg-primary">user</span>
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <strong>Admin Account:</strong><br>
+                                Username: <code>admin</code><br>
+                                Password: <code>admin123</code><br>
+                                Role: <span class="badge bg-danger">admin</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" action="@env.resource/login">
+                    <input type="hidden" name="returnUrl" value="@query.returnUrl">
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="text" class="form-control" id="username" name="username" required 
+                                   placeholder="Enter your username" autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input type="password" class="form-control" id="password" name="password" required 
+                                   placeholder="Enter your password" autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a href="@env.resource/" class="text-decoration-none">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

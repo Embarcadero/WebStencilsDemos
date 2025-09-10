@@ -1,4 +1,4 @@
-﻿unit MainWebModuleU;
+﻿unit Modules.Main;
 
 interface
 
@@ -9,6 +9,7 @@ uses
   System.IOUtils,
   System.SysUtils,
   System.DateUtils,
+  System.StrUtils,
 
   // Data units
   Data.DB,
@@ -39,38 +40,20 @@ uses
   FireDAC.Comp.Client,
   FireDAC.Comp.DataSet,
   FireDAC.UI.Intf,
+  FireDAC.VCLUI.Wait,
 
   // Own units
   Helpers.WebModule,
   Helpers.FDQuery,
+  Helpers.Messages,
+  Controllers.Base,
   Controllers.Tasks,
   Models.Tasks,
   Controllers.Customers,
-  CodeExamplesU,
-  LoggerU;
+  Services.CodeExamples,
+  Utils.Logger;
 
 type
-  { TEnvironmentSettings: Class to hold environment/application settings for WebStencils }
-  TEnvironmentSettings = class(TPersistent)
-  private
-    FAppVersion: string;
-    FAppName: string;
-    FAppEdition: string;
-    FCompanyName: string;
-    FResource: string;
-    FDebugMode: Boolean;
-    FIsRadServer: Boolean;
-  public
-    constructor Create;
-  published
-    property AppVersion: string read FAppVersion;
-    property AppName: string read FAppName;
-    property AppEdition: string read FAppEdition;
-    property CompanyName: string read FCompanyName;
-    property Resource: string read FResource; // Required for RAD Server compatibility
-    property DebugMode: Boolean read FDebugMode;
-    property IsRadServer: Boolean read FIsRadServer;
-  end;
 
   TMainWebModule = class(TWebModule)
     WebStencilsEngine: TWebStencilsEngine;
@@ -79,18 +62,47 @@ type
     [WebStencilsVar('customers', false)]
     Customers: TFDQuery;
     Connection: TFDConnection;
+    WebSessionManager: TWebSessionManager;
+    WebFormsAuthenticator: TWebFormsAuthenticator;
+    WebAuthorizer: TWebAuthorizer;
+    CustomersID: TFDAutoIncField;
+    CustomersCOMPANY: TStringField;
+    CustomersFIRST_NAME: TStringField;
+    CustomersLAST_NAME: TStringField;
+    CustomersGENDER: TStringField;
+    CustomersEMAIL: TStringField;
+    CustomersPHONE: TStringField;
+    CustomersADDRESS: TStringField;
+    CustomersPOSTAL_CODE: TStringField;
+    CustomersCITY: TStringField;
+    CustomersCOUNTRY: TStringField;
+    CustomersIP_ADDRESS: TStringField;
+    [WebStencilsVar('countries', false)]
+    Countries: TFDQuery;
+    CustomersAGE: TIntegerField;
+    CustomersACTIVATION_DATE: TDateField;
+    CustomersACTIVE: TBooleanField;
+    CustomersCOMMENTS: TWideMemoField;
+    CountriesCOUNTRY: TStringField;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure WebModuleCreate(Sender: TObject);
     procedure WebStencilsEngineValue(Sender: TObject;
       const AObjectName, APropName: string; var AReplaceText: string;
       var AHandled: Boolean);
     procedure WebModule1ActHealthAction(Sender: TObject;
       Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebSessionManagerCreated(Sender: TCustomWebSessionManager;
+      Request: TWebRequest; Session: TWebSession);
+    procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest;
+      Response: TWebResponse; var Handled: Boolean);
+    procedure WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
+      Request: TWebRequest; const UserName, Password: string; var Roles: string;
+      var Success: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
     FCodeExamples: TCodeExamples;
-    FEnvironmentSettings: TEnvironmentSettings;
     FResourcesPath: string;
     procedure DefineRoutes;
     procedure InitRequiredData;
@@ -104,38 +116,20 @@ var
 
 implementation
 
-{%CLASSGROUP 'System.Classes.TPersistent'}
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
-
-{ TEnvironmentSettings }
-
-constructor TEnvironmentSettings.Create;
-begin
-  inherited Create;
-  // Initialize properties
-  FAppVersion := '1.0.0';
-  FAppName := 'WebStencils demo';
-  FAppEdition := ' WebBroker Delphi';
-  {$IFDEF CONTAINER}
-  FAppEdition := FAppEdition + ' in Docker';
-  {$ENDIF}
-  FCompanyName := 'Embarcadero Inc.';
-  // This RESOURCE env is required to make the WebStencils templates reusable for RAD Server
-  FResource := '';
-{$IFDEF DEBUG}
-  FDebugMode := True;
-{$ELSE}
-  FDebugMode := False;
-{$ENDIF}
-  FIsRadServer := False;
-end;
 
 { TMainWebModule }
 
 constructor TMainWebModule.Create(AOwner: TComponent);
 begin
   inherited;
-  Logger.Info('Initializing WebStencils demo module...');
+  Logger.Info('WebStencils demo module constructor called');
+end;
+
+procedure TMainWebModule.WebModuleCreate(Sender: TObject);
+begin
+  Logger.Info('Initializing WebStencils demo module in OnCreate event...');
   InitControllers;
   InitRequiredData;
   DefineRoutes;
@@ -149,7 +143,6 @@ begin
   FTasksController.Free;
   FCustomersController.Free;
   FCodeExamples.Free;
-  FEnvironmentSettings.Free;
   inherited;
   Logger.Info('WebStencils demo module shutdown complete');
 end;
@@ -179,7 +172,7 @@ begin
   BinaryPath := TPath.GetDirectoryName(ParamStr(0));
 {$IFDEF MSWINDOWS}
   if EnvResourcesPath = '' then
-    FResourcesPath := TPath.Combine(BinaryPath, '../../../../resources')
+    FResourcesPath := TPath.Combine(BinaryPath, '../../../resources')
   else
     FResourcesPath := EnvResourcesPath;
 {$ELSE}
@@ -188,7 +181,6 @@ begin
   else
     FResourcesPath := EnvResourcesPath;
 {$ENDIF}
-
   Logger.Info(Format('Resources path set to: %s', [FResourcesPath]));
   WebStencilsEngine.RootDirectory := TPath.Combine(FResourcesPath, 'html');
   WebFileDispatcher.RootDirectory := WebStencilsEngine.RootDirectory;
@@ -233,8 +225,35 @@ begin
   end;
 
   FCodeExamples := TCodeExamples.Create(WebStencilsEngine);
-  FEnvironmentSettings := TEnvironmentSettings.Create;
-  WebStencilsEngine.AddVar('env', FEnvironmentSettings);
+
+  WebStencilsEngine.AddVar('env', nil, false,
+                            function (AVar: TWebStencilsDataVar; const APropName: string; var AValue: string): Boolean
+                            begin
+                              if APropName = 'app_name' then
+                                AValue := 'WebStencils demo'
+                              else if APropName = 'version' then
+                                AValue := '1.5.2'
+                              else if APropName = 'edition' then
+                                AValue := 'WebBroker Delphi' {$IFDEF CONTAINER} + ' in Docker' {$ENDIF}
+                              else if APropName = 'company' then
+                                Avalue := 'Embarcadero Inc.'
+                              else if APropName = 'resource' then
+                                AValue := ''
+                              else if APropName = 'is_rad_server' then
+                                AValue := 'False'
+                              else if APropName = 'debug' then
+                                Avalue := {$IFDEF DEBUG} 'True' {$ELSE} 'False' {$ENDIF}
+                              else
+                              begin
+                                Result := False;
+                                Exit;
+                              end;
+                              Result := True;
+                            end);
+
+
+  TWebStencilsProcessor.Whitelist.Configure(TField, ['DisplayText', 'Value', 'DisplayLabel', 'FieldName', 'Required', 'LookupDataSet', 'LookupKeyFields', 'Visible', 'DataType', 'Size', 'IsNull'], nil, False);
+
   Logger.Info('Required data initialization complete');
 end;
 
@@ -251,7 +270,7 @@ begin
       AReplaceText := FormatDateTime('yyyy', Now)
     else
       AReplaceText := Format('SYSTEM_%s_NOT_FOUND', [APropName.ToUpper]);
-  AHandled := True;      
+    AHandled := True;      
   end;
 end;
 
@@ -260,15 +279,22 @@ begin
   Logger.Info('Defining application routes...');
   // Define the application's routes using a declarative approach.
   // This class helper maps HTTP methods and paths to their respective handler methods.
-  AddRoutes([TRoute.Create(mtDelete, '/tasks', FTasksController.DeleteTask),
+  AddRoutes([
+    // Task routes (protected)
+    TRoute.Create(mtDelete, '/tasks', FTasksController.DeleteTask),
     TRoute.Create(mtPost, '/tasks/add', FTasksController.CreateTask),
     TRoute.Create(mtGet, '/tasks/edit', FTasksController.GetEditTask),
     TRoute.Create(mtPut, '/tasks/toggleCompleted', FTasksController.TogglecompletedTask),
     TRoute.Create(mtPut, '/tasks', FTasksController.EditTask),
-    // Customers routes
+    // Customers routes (admin only)
     TRoute.Create(mtGet, '/bigtable', FCustomersController.GetAllCustomers),
-    TRoute.Create(mtGet, '/pagination', FCustomersController.GetCustomers),
-    // Add health check endpoint
+    TRoute.Create(mtGet, '/customers', FCustomersController.GetCustomers),
+    TRoute.Create(mtGet, '/customers/add', FCustomersController.GetAddCustomer),
+    TRoute.Create(mtPost, '/customers/create', FCustomersController.CreateCustomer),
+    TRoute.Create(mtGet, '/customers/edit', FCustomersController.GetEditCustomer),
+    TRoute.Create(mtPost, '/customers/update', FCustomersController.UpdateCustomer),
+    TRoute.Create(mtPost, '/customers/delete', FCustomersController.DeleteCustomer),
+    // System routes
     TRoute.Create(mtGet, '/health', WebModule1ActHealthAction)
     ]);
   Logger.Info('Application routes defined successfully');
@@ -294,15 +320,64 @@ begin
   ''', [
     FormatDateTime('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', TTimeZone.Local.ToUniversalTime(Now)),
     TimeToStr(Now),
-    FEnvironmentSettings.AppVersion,
     {$IFDEF LINUX}'Linux'{$ELSE}'Windows'{$ENDIF},
     {$IFDEF CONTAINER}'true'{$ELSE}'false'{$ENDIF},
     FResourcesPath,
     Connection.Params.Database
   ]);
-  
+
   Response.Content := HealthData;
   Handled := True;
+end;
+
+procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  // Message clearing - only when not redirecting
+  var IsRedirect := (Response.StatusCode >= 300) and (Response.StatusCode < 400);
+  if not (IsRedirect) and Assigned(Request.Session) then
+    TMessageManager.ClearMessages(Request.Session);
+end;
+
+procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;
+  Request: TWebRequest; Session: TWebSession);
+begin
+  Logger.Info(Format('New session created: %s', [Session.Id]));
+  Logger.Info(Format('Request Path: %s', [Request.PathInfo]));
+  Logger.Info(Format('Request Method: %s', [Request.Method]));
+
+  // Add session creation timestamp for demo purposes
+  Session.DataVars.Values['created'] := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+  TMessageManager.EnsureMessageProvider(Session);
+  if Assigned(Session.User) then
+    Logger.Info(Format('Session created for authenticated user: %s', [Session.User.UserName]))
+  else
+    Logger.Info('Session created for anonymous user');
+end;
+
+procedure TMainWebModule.WebFormsAuthenticatorAuthenticate(
+  Sender: TCustomWebAuthenticator; Request: TWebRequest; const UserName,
+  Password: string; var Roles: string; var Success: Boolean);
+begin
+  Logger.Info(Format('Authentication attempt for user: %s', [UserName]));
+
+  // Demo hardcoded credentials
+  Success := False;
+  Roles := '';
+  if SameText(UserName, 'demo') and SameText(Password, 'demo123') then
+  begin
+    Success := True;
+    Roles := 'user';
+  end
+  else if SameText(UserName, 'admin') and SameText(Password, 'admin123') then
+  begin
+    Success := True;
+    Roles := 'admin';
+  end;
+  if Success then
+    Logger.Info(Format('User %s authenticated successfully with role: %s', [UserName, Roles]))
+  else
+    Logger.Info(Format('Authentication failed for user: %s', [UserName]));
 end;
 
 end.

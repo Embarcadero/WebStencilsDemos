@@ -1,0 +1,63 @@
+﻿<nav class="navbar navbar-expand-lg bg-body-tertiary shadow sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="@env.resource/">
+      <img src="@env.resource/static/img/logo.png" alt="Logo" width="32" height="32" class="me-2">
+      <div class="d-flex flex-column lh-1">
+        <span>@env.app_name</span>
+        <small class="text-muted fs-6">@env.edition</small>
+      </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav me-auto mb-2 mb-lg-0">
+        <a class="nav-link @if (page.pagename = 'home') { active }" aria-current="page" href="@env.resource/">Home</a>
+        <a class="nav-link @if (page.pagename = 'basics') { active }" aria-current="page" href="@env.resource/basics">The Basics</a>
+        <a class="nav-link @if (page.pagename = 'keywords') { active }" aria-current="page" href="@env.resource/keywords">Keywords</a>
+        <a class="nav-link @if (page.pagename = 'components') { active }" aria-current="page" href="@env.resource/components">Components</a>
+        <a class="nav-link @if (page.pagename = 'templates') { active }" aria-current="page" href="@env.resource/templates">Templates</a>
+        <a class="nav-link @if (page.pagename = 'sessionInfo') { active }" aria-current="page" href="@env.resource/sessionInfo">Session Info</a>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Examples
+          </a>
+          <div class="dropdown-menu">
+            @if (session.Authenticated) {
+              <a class="dropdown-item @if (page.pagename = 'tasks') { active }" href="@env.resource/tasks">
+                <i class="bi bi-check2-square me-2"></i>HTMX - Tasks
+              </a>
+              <hr class="dropdown-divider">
+              <h6 class="dropdown-header">
+                <i class="bi bi-shield-fill-check me-2"></i>Admin Only
+              </h6>
+              <a class="dropdown-item @if (page.pagename = 'customers') { active }" href="@env.resource/bigtable">
+                <i class="bi bi-table me-2"></i>Big table
+              </a>
+              <a class="dropdown-item @if (page.pagename = 'customers') { active }" href="@env.resource/customers">
+                <i class="bi bi-list-ol me-2"></i>Customers
+              </a>			           
+            } @else {
+              <span class="dropdown-item-text text-muted">
+                <i class="bi bi-lock me-2"></i>Sign in to view examples
+              </span>
+              <hr class="dropdown-divider">
+              <a class="dropdown-item" href="@env.resource/login">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+              </a>
+            }
+          </div>
+        </li>
+      </div>
+           
+      <div class="d-flex align-items-center">
+        @Import layouts/authMenu        
+        <!-- Button to toggle theme -->
+        <button id="theme-toggle-btn" class="btn btn-link text-decoration-none text-body">
+          <i id="theme-icon" class="bi bi-moon-stars fs-5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

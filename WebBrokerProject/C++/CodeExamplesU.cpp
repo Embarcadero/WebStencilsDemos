@@ -173,4 +173,20 @@ void TCodeExamples::InitValues() {
         "        @Import partials/tasks/item { @Task }\n"
         "    }\n"
         "</div>");
+
+    Add("codeSessionProperties",
+        "@session.Id\n"
+        "@session.Authenticated\n"
+        "@session.UserName\n"
+        "@session.UserRoles\n"
+        "@session.CreatedTime\n"
+        "@session.AccessedTime\n"
+        "@session.AccessedCount\n"
+        "@session.Timeout");
+
+    Add("codeSessionInformation",
+        "@session.LastURL\n"
+        "@session.IP\n"
+        "@session.LastReferer\n"
+        "@session.LastUserAgent");
 }

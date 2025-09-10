@@ -1,0 +1,83 @@
+<div class="card shadow rounded-4 overflow-hidden">
+	<div class="table-responsive">
+		<table class="table table-hover">
+			<thead class="table-dark">
+				<tr>
+					<th scope="col" class="border-0 py-3 ps-4">ID</th>
+					<th scope="col" class="border-0 py-3">Company</th>
+					<th scope="col" class="border-0 py-3">Name</th>
+					<th scope="col" class="border-0 py-3">Location</th>
+					<th scope="col" class="border-0 py-3">Phone</th>
+					<th scope="col" class="border-0 py-3">Email</th>
+					<th scope="col" class="border-0 py-3 text-end pe-4">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="table-group-divider">
+				@forEach (var customer in customers) {
+				<tr class="align-middle">
+					<td class="fw-medium text-muted ps-4">
+						<span class="badge bg-secondary">#@customer.id</span>
+					</td>
+					<td>
+						<div class="fw-bold">@customer.company</div>
+						@if(customer.country) {
+							<small class="text-muted">@customer.country</small>
+						}
+					</td>
+					<td>
+						<div class="fw-medium">@customer.first_name @customer.last_name</div>
+						@if(customer.gender) {
+							<small class="text-muted">@customer.gender</small>
+						}
+					</td>
+					<td>
+						<div class="fw-medium">@customer.city</div>
+						@if(customer.address) {
+							<small class="text-muted d-block">@customer.address</small>
+						}
+						@if(customer.postal_code) {
+							<small class="text-muted">@customer.postal_code</small>
+						}
+					</td>
+					<td>
+						@if(customer.phone) {
+							<a href="tel:@customer.phone" class="text-decoration-none">
+								<i class="bi bi-telephone-fill text-success me-1"></i>@customer.phone
+							</a>
+						} @else {
+							<span class="text-muted">-</span>
+						}
+					</td>
+					<td>
+						@if(customer.email) {
+							<a href="mailto:@customer.email" class="text-decoration-none">
+								<i class="bi bi-envelope-fill text-info me-1"></i>@customer.email
+							</a>
+						} @else {
+							<span class="text-muted">-</span>
+						}
+					</td>
+					<td class="text-end pe-4">
+						<a href="@env.resource/customers/edit?id=@customer.id" 
+						   class="btn btn-outline-primary btn-sm" 
+						   title="Edit Customer"
+						   data-bs-toggle="tooltip">
+							<i class="bi bi-pencil-square"></i>
+						</a>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script>
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+	var tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+		return new bootstrap.Tooltip(tooltipTriggerEl);
+	});
+});
+</script>

@@ -1,0 +1,39 @@
+@LayoutPage layouts/mainLayout
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">
+              <i class="bi bi-person-plus me-2"></i>Add New Customer
+            </h3>
+            <span class="badge bg-danger">
+              <i class="bi bi-shield-fill-check me-2"></i>Admin Only
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <form method="post" action="@env.resource/customers/create">
+            @Import partials/customers/form
+            
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <a href="@env.resource/customers" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Customers
+              </a>
+              <div>
+                <button type="reset" class="btn btn-outline-warning me-2">
+                  <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                </button>
+                <button type="submit" class="btn btn-success">
+                  <i class="bi bi-plus-lg me-2"></i>Create Customer
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>WebStencils demo</title>
+	<link rel="icon" type="image/x-icon" href="@env.resource/static/img/favicon.ico">
+
+	<!-- Bootstrap CSS -->
+	<!-- IMPORTANT: In case of importing links from CDNs, the @ symbol needs to be typed twice to escape it -->	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@@5.3.7/dist/css/bootstrap.min.css" 
+	      rel="stylesheet" 
+		  integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
+	
+	<!-- Bootstrap Icons CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@@1.11.3/font/bootstrap-icons.min.css">
+	
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="@env.resource/static/css/custom.css">
+	
+	<!-- Custom JS for handling Light and Dark modes -->	
+	<script src="@env.resource/static/js/modeToggle.js"></script>
+	@RenderHeader
+</head>
+
+<body>
+	@RenderBody
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@@5.3.7/dist/js/bootstrap.bundle.min.js" 
+	        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" 
+			crossorigin="anonymous"></script>
+	<!-- Custom JS -->
+	<script src="@env.resource/static/js/custom.js"></script>
+</body>
+
+</html>

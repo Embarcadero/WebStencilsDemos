@@ -14,17 +14,21 @@ uses
   {$ENDIF }
   {$IFDEF LINUX}
   Posix.Signal,
-  {$ENDIF}
-  MainWebModuleU in 'MainWebModuleU.pas' {MainWebModule: TWebModule},
-  ServerConst1 in 'ServerConst1.pas',
+  {$ENDIF }
+  Modules.Main in 'Modules.Main.pas' {MainWebModule: TWebModule},
+  Constants.Server in 'Constants.Server.pas',
   Helpers.WebModule in 'Helpers.WebModule.pas',
   Models.Tasks in 'Models.Tasks.pas',
   Controllers.Tasks in 'Controllers.Tasks.pas',
   Controllers.Customers in 'Controllers.Customers.pas',
   Helpers.FDQuery in 'Helpers.FDQuery.pas',
-  Models.PaginationParams in 'Models.PaginationParams.pas',
-  CodeExamplesU in 'CodeExamplesU.pas',
-  LoggerU in 'LoggerU.pas';
+  Utils.PaginationParams in 'Utils.PaginationParams.pas',
+  Services.CodeExamples in 'Services.CodeExamples.pas',
+  Utils.Logger in 'Utils.Logger.pas',
+  Helpers.Messages in 'Helpers.Messages.pas',
+  Controllers.Base in 'Controllers.Base.pas',
+  Utils.Search in 'Utils.Search.pas',
+  Utils.FormSession in 'Utils.FormSession.pas';
 
 {$R *.res}
 
@@ -176,6 +180,7 @@ begin
   Writeln(sWelcomeText);
   {$IFDEF CONTAINER}
   Logger.Info('Running in container mode');
+  Logger.ConsoleLogging := True;
   {$ELSE}
   Logger.Info('Running in interactive mode');
   WriteCommands;

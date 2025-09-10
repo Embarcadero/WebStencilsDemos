@@ -159,19 +159,23 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="MainWebModuleU.pas">
+        <DCCReference Include="Modules.Main.pas">
             <Form>MainWebModule</Form>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="ServerConst1.pas"/>
+        <DCCReference Include="Constants.Server.pas"/>
         <DCCReference Include="Helpers.WebModule.pas"/>
         <DCCReference Include="Models.Tasks.pas"/>
         <DCCReference Include="Controllers.Tasks.pas"/>
         <DCCReference Include="Controllers.Customers.pas"/>
         <DCCReference Include="Helpers.FDQuery.pas"/>
-        <DCCReference Include="Models.PaginationParams.pas"/>
-        <DCCReference Include="CodeExamplesU.pas"/>
-        <DCCReference Include="LoggerU.pas"/>
+        <DCCReference Include="Utils.PaginationParams.pas"/>
+        <DCCReference Include="Services.CodeExamples.pas"/>
+        <DCCReference Include="Utils.Logger.pas"/>
+        <DCCReference Include="Helpers.Messages.pas"/>
+        <DCCReference Include="Controllers.Base.pas"/>
+        <DCCReference Include="Utils.Search.pas"/>
+        <DCCReference Include="Utils.FormSession.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -1177,7 +1181,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
         <PreLinkEvent/>
         <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent>powershell -ExecutionPolicy Bypass -File $(PROJECTDIR)\build_docker_image.ps1</PostBuildEvent>
+        <PostBuildEvent>powershell -ExecutionPolicy Bypass -File $(PROJECTDIR)\build_docker_image.ps1</PostBuildEvent>
         <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
     </PropertyGroup>
 </Project>

@@ -1,0 +1,23 @@
+  @* oob is an HTMX used to replace values out of the current band. Requests that require refreshing the stats include a query param oob=true *@
+	<div id="task-stats">
+    <div class="row align-items-center">
+      <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <div class="d-flex align-items-center gap-3">
+          <div class="text-secondary">
+            <i class="bi bi-list-task"></i> Total: <span class="fw-bold">@Tasks.Count</span>
+          </div>
+          <div class="text-success">
+            <i class="bi bi-check2-circle"></i> Done: <span class="fw-bold">@Tasks.CompletedCount</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="progress" style="height: 10px">
+          <div class="progress-bar bg-success" 
+               role="progressbar" 
+               style="width: @(Tasks.CompletedCount * 100 / Tasks.Count)%">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

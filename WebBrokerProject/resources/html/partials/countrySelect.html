@@ -1,0 +1,34 @@
+@if(field.visible) {
+    <div class="col-md-6 mb-3">         
+        <label for="@field.fieldName" class="form-label">
+            @field.displayLabel
+            @if(field.required) {
+            <span class="text-danger">*</span>
+            }
+        </label>
+        <!-- Dropdown for lookup fields -->
+        <select 
+        class="form-select" 
+        id="@field.fieldName" 
+        name="@field.fieldName"
+        @if (field.required) { required }>
+            <option value="">Select...</option>
+            @forEach(var record in countries) {
+                <option 
+                value="@record.country" 
+                @if(record.country = field.Value) { selected }>
+                @record.country
+                </option>
+            }
+        </select>
+        
+        <!-- Display field-specific validation errors -->
+        @if(fieldErrors.HasError(field.fieldName)) {
+            <div class="invalid-feedback d-block">
+                @(fieldErrors.GetError(field.fieldName))
+            </div>
+        }
+    </div>
+} @else {
+    <input type="hidden" name="@field.fieldName" value="@field.Value">
+}     

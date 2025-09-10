@@ -1,0 +1,25 @@
+.my-hero {	
+	padding: 3rem 0;	
+	background-image: linear-gradient(180deg, rgba(var(--bs-body-bg-rgb), 0.01), rgba(var(--bs-body-bg-rgb), 1) 85%),radial-gradient(ellipse at top left, rgba(var(--bs-primary-rgb), 0.5), transparent 50%),radial-gradient(ellipse at top right, rgba(var(--bs-warning-rgb), 0.5), transparent 50%),radial-gradient(ellipse at center right, rgba(var(--bs-danger-rgb), 0.5), transparent 50%),radial-gradient(ellipse at center left, rgba(var(--bs-danger-rgb), 0.5), transparent 50%);	
+}
+    
+.code-snippet .card-body {
+		position: relative;
+}
+
+.code-snippet .copy-btn {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		z-index: 10;
+}
+
+.code-snippet pre {
+		margin-top: 10px;
+}
+
+.my-text-gradient {
+	background: linear-gradient(to right, var(--bs-code-color) 0%, var(--bs-emphasis-color) 80%);	
+  -webkit-background-clip: text;
+  color: transparent;
+}

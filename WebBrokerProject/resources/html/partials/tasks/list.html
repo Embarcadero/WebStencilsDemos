@@ -1,0 +1,6 @@
+@* This is the partial view for the task list *@
+<ul class="list-group list-group-flush" id="task-list">
+	@ForEach (var Task in Tasks.AllTasks) {
+		@Import partials/tasks/item { @Task }
+	}
+</ul>

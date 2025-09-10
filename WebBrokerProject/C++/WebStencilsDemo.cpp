@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <memory>
 #include <string>
-#include "ServerConst1.h"
+#include "ConstantsServer.h"
 #include <windows.h>
 #include <fcntl.h>
 #include <io.h>
@@ -61,11 +61,11 @@ void setPort(std::unique_ptr<TIdHTTPWebBrokerBridge>const& server, int port)
 
 void writeStatus(std::unique_ptr<TIdHTTPWebBrokerBridge>const& server)
 {
-    printf("%s%s", sIndyVersion, AnsiString(server->SessionList->Version).c_str());
-    printf("%s%s", sActive, server->Active ? "true" : "false");
-    printf("%s%d", sPort, server->DefaultPort);
-    printf("%s%s", sSessionID, AnsiString(server->SessionIDCookieName).c_str());
-    printf("%s", cArrow);
+    printf("%ls%ls", sIndyVersion, server->SessionList->Version.c_str());
+    printf("%ls%ls", sActive, server->Active ? "true" : "false");
+    printf("%ls%d", sPort, server->DefaultPort);
+    printf("%ls%ls", sSessionID, server->SessionIDCookieName.c_str());
+    printf("%ls", cArrow);
 }
 
 void stopServer(std::unique_ptr<TIdHTTPWebBrokerBridge>const& server)
@@ -104,7 +104,7 @@ void runServer(int port)
     startServer(server);
     printf(sServerReady, port);
 
-    writeCommands();
+    printf("%s", sCommands);
 
     while (true)
     {
@@ -135,7 +135,7 @@ void runServer(int port)
             else if (strcmp(command.c_str(), cCommandStatus) == 0)
                 writeStatus(server);
             else if (strcmp(command.c_str(), cCommandHelp) == 0)
-                writeCommands();
+                printf("%s", sCommands);
             else if (strcmp(command.c_str(), cCommandExit) == 0) {
                 stopServer(server);
                 break;

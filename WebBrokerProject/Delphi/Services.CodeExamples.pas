@@ -3,7 +3,7 @@
   It provides a centralized location for all code snippets displayed in the demo pages.
 }
 
-unit CodeExamplesU;
+unit Services.CodeExamples;
 
 interface
 
@@ -204,6 +204,24 @@ begin
               @Import partials/tasks/item { @Task }
           }
       </div>
+      ''');
+  Add('codeSessionProperties',
+      '''
+      @session.Id
+      @session.Authenticated
+      @session.UserName
+      @session.UserRoles
+      @session.CreatedTime
+      @session.AccessedTime
+      @session.AccessedCount
+      @session.Timeout
+      ''');
+  Add('codeSessionInformation',
+      '''
+      @session.LastURL
+      @session.IP
+      @session.LastReferer
+      @session.LastUserAgent
       ''');
 end;
 

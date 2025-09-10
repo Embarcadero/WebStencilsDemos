@@ -1,6 +1,6 @@
 ﻿#pragma hdrstop
 
-#include "ModelPaginationParams.h"
+#include "UtilsPaginationParams.h"
 #include <System.SysUtils.hpp>
 
 //-----------------------------------------------------------------------------

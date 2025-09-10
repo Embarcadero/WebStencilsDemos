@@ -1,4 +1,4 @@
-﻿unit ServerConst1;
+﻿unit Constants.Server;
 
 interface
 

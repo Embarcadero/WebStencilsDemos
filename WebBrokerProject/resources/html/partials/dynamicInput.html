@@ -1,0 +1,169 @@
+@if(field.visible) {
+<div class="col-md-6 mb-3">
+    <label for="@field.fieldName" class="form-label">
+        @field.displayLabel
+        @if(field.required) {
+        <span class="text-danger">*</span>
+        }		
+    </label>
+    @switch(field.dataType) {
+        @case "ftInteger" {
+            <!-- Number input for integer types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            step="1">
+        } @case "ftSmallint" {
+            <!-- Number input for small integer types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            step="1">
+        } @case "ftLargeint" {
+            <!-- Number input for large integer types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if(field.size > 0) { maxlength="@field.size" }
+            step="1">
+        } @case "ftWord" {
+            <!-- Number input for word types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            step="1">
+        } @case "ftFloat" {
+            <!-- Number input for float types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            step="0.01">
+        } @case "ftCurrency" {
+            <!-- Number input for currency types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            step="0.01">
+        } @case "ftBCD" {
+            <!-- Number input for BCD types -->
+            <input 
+            type="number" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.Value" }
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            step="0.01">
+        } @case "ftDate" {            
+            <!-- Date input for date types -->
+            <input 
+            type="date" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@field.DisplayText" }
+            @if (field.required) { required }>
+        } @case "ftDateTime" {
+            <!-- Datetime input for datetime types -->
+            <input 
+            type="datetime-local" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@(FormatDateTime('yyyy-mm-dd''T''hh:nn', field.Value))" }
+            @if (field.required) { required }>
+        } @case "ftTime" {
+            <!-- Time input for time types -->
+            <input 
+            type="time" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if not(field.IsNull) { value="@(FormatDateTime('hh:nn:ss', field.Value))" }
+            @if (field.required) { required }>
+        } @case "ftBoolean" {
+            <!-- Checkbox for boolean types -->
+            <div class="form-check">
+                <input type="hidden" name="@field.fieldName" value="False">
+                <input 
+                type="checkbox" 
+                class="form-check-input @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+                id="@field.fieldName" 
+                name="@field.fieldName"
+                value="True"
+                @if(field.Value) { checked }
+                @if(field.required) { required }>
+                <label class="form-check-label" for="@field.fieldName">
+                    @field.displayLabel
+                </label>
+            </div>
+        } @case "ftMemo" {
+            <!-- Textarea for memo types -->
+            <textarea 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            rows="3">@field.Value</textarea>
+        } @case "ftWideMemo" {
+            <!-- Textarea for wide memo types -->
+            <textarea 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            @if (field.required) { required }
+            @if (field.size > 0) { maxlength="@field.size" }
+            rows="3">@field.Value</textarea>
+        } @default {
+            <!-- Default text input for other types -->
+            <input 
+            type="text" 
+            class="form-control @if(fieldErrors.HasError(field.fieldName)) { is-invalid }" 
+            id="@field.fieldName" 
+            name="@field.fieldName"
+            value="@field.Value"
+            @if (field.required) { required }
+            @if(field.size > 0) { maxlength="@field.size" }>
+        }
+    }    
+    <!-- Display field-specific validation errors -->
+    @if(fieldErrors.HasError(field.fieldName)) {
+        <div class="invalid-feedback d-block">
+            @(fieldErrors.GetError(field.fieldName))
+        </div>
+    }
+</div>
+} @else {
+    <input type="hidden" name="@field.fieldName" value="@field.Value">
+} 

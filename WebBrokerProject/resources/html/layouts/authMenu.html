@@ -1,0 +1,34 @@
+@if (session.Authenticated) {
+    <!-- User is logged in -->
+    <div class="dropdown me-3">
+      <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-person-circle me-2"></i>@session.UserName
+      </button>
+      <ul class="dropdown-menu">
+        <li><h6 class="dropdown-header">Signed in as: @session.UserName</h6></li>
+        <li><span class="dropdown-item-text small">Roles: @session.UserRoles</span></li>
+        <li><hr class="dropdown-divider"></li>
+        @if (session.UserHasRole('admin')) {
+          <li><a class="dropdown-item" href="@env.resource/bigtable">
+            <i class="bi bi-table me-2"></i>Big Table Demo
+          </a></li>
+          <li><a class="dropdown-item" href="@env.resource/customers">
+            <i class="bi bi-list-ol me-2"></i>Customers Demo
+          </a></li>
+          <li><hr class="dropdown-divider"></li>
+        }
+        <li>
+          <form method="post" action="@env.resource/logout" class="d-inline">
+            <button type="submit" class="dropdown-item text-danger">
+              <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  } @else {
+    <!-- User is not logged in -->
+    <a href="@env.resource/login" class="btn btn-outline-primary me-3">
+      <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+    </a>
+  }

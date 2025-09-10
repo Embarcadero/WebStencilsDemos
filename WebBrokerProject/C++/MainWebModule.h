@@ -36,6 +36,8 @@
 #include "ClassHelpers.h"
 #include "ControllerTasks.h"
 #include "ControllerCustomers.h"
+#include "UtilsLogger.h"
+#include "HelpersMessages.h"
 
 // Other FireDAC includes (cleaned up duplicates)
 #include <FireDAC.DApt.hpp>
@@ -68,13 +70,14 @@ public:
     __fastcall TEnvironmentSettings();
 
 __published:
-    __property System::UnicodeString AppVersion = {read=FAppVersion};
-    __property System::UnicodeString AppName = {read=FAppName};
-    __property System::UnicodeString AppEdition = {read=FAppEdition};
-    __property System::UnicodeString CompanyName = {read=FCompanyName};
-    __property System::UnicodeString Resource = {read=FResource};
-    __property bool DebugMode = {read=FDebugMode};
-    __property bool IsRadServer = {read=FIsRadServer};
+    // Match Delphi template names (snake_case)
+    __property System::UnicodeString app_name = {read=FAppName};
+    __property System::UnicodeString version = {read=FAppVersion};
+    __property System::UnicodeString edition = {read=FAppEdition};
+    __property System::UnicodeString company = {read=FCompanyName};
+    __property System::UnicodeString resource = {read=FResource};
+    __property bool is_rad_server = {read=FIsRadServer};
+    __property bool debug = {read=FDebugMode};
 };
 
 //---------------------------------------------------------------------------
@@ -85,6 +88,41 @@ __published:    // IDE-managed Components
     TWebFileDispatcher *WebFileDispatcher;
     TFDQuery *Customers;
     TFDConnection *Connection;
+    TWebSessionManager *WebSessionManager;
+    TWebFormsAuthenticator *WebFormsAuthenticator;
+    TWebAuthorizer *WebAuthorizer;
+    TFDAutoIncField *CustomersID;
+    TStringField *CustomersCOMPANY;
+    TStringField *CustomersFIRST_NAME;
+    TStringField *CustomersLAST_NAME;
+    TStringField *CustomersGENDER;
+    TStringField *CustomersEMAIL;
+    TStringField *CustomersPHONE;
+    TStringField *CustomersADDRESS;
+    TStringField *CustomersPOSTAL_CODE;
+    TStringField *CustomersCITY;
+    TStringField *CustomersCOUNTRY;
+    TStringField *CustomersIP_ADDRESS;
+    TFDQuery *Countries;
+    TIntegerField *CustomersAGE;
+    TDateField *CustomersACTIVATION_DATE;
+    TBooleanField *CustomersACTIVE;
+    TWideMemoField *CustomersCOMMENTS;
+    TStringField *CountriesCOUNTRY;
+    void __fastcall WebModuleCreate(TObject *Sender);
+    void __fastcall WebModuleAfterDispatch(TObject *Sender, TWebRequest *Request, TWebResponse *Response,
+          bool &Handled);
+    void __fastcall WebSessionManagerCreated(TCustomWebSessionManager *Sender, TWebRequest *Request,
+          TWebSession *Session);
+    void __fastcall WebFormsAuthenticatorAuthenticate(TCustomWebAuthenticator *Sender,
+          TWebRequest *Request, const UnicodeString UserName,
+          const UnicodeString Password, UnicodeString &Roles,
+          bool &Success);
+    void __fastcall WebStencilsEngineValue(TObject *Sender, const UnicodeString AObjectName,
+          const UnicodeString APropName, UnicodeString &AValue,
+          bool &AHandled);
+    void __fastcall WebModule1ActHealthAction(TObject *Sender, TWebRequest *Request,
+            TWebResponse *Response, bool &Handled);
 
 private:    // User declarations
     std::unique_ptr<TTasksController> FTasksController;
@@ -96,8 +134,6 @@ private:    // User declarations
     void DefineRoutes();
     void InitRequiredData();
     void InitControllers();
-    void __fastcall WebStencilsEngineValue(TObject* Sender, const String AObjectName,
-            const String APropName, String &AReplaceText, bool &AHandled);
 
 public:        // User declarations
     __fastcall TMainWebModule(TComponent* Owner);

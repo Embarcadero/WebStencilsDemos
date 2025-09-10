@@ -1,0 +1,137 @@
+﻿@LayoutPage layouts/mainLayout
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-info-circle me-2"></i>WebStencils Session Information
+        </div>
+        <div class="card-body">
+          <p class="lead mb-4">
+            This page demonstrates WebStencils' built-in session integration. 
+            All session properties are automatically available in templates without any custom code.
+          </p>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <h5 class="mb-3">
+                <i class="bi bi-gear me-2"></i>Session Properties
+              </h5>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <tbody>
+                    <tr>
+                      <td><strong>Session ID:</strong></td>
+                      <td><code>@session.Id</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Authenticated:</strong></td>
+                      <td><code>@session.Authenticated</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>User Name:</strong></td>
+                      <td><code>@session.UserName</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>User Roles:</strong></td>
+                      <td><code>@session.UserRoles</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Created Time:</strong></td>
+                      <td><code>@session.CreatedTime</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Accessed Time:</strong></td>
+                      <td><code>@session.AccessedTime</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Access Count:</strong></td>
+                      <td><code>@session.AccessedCount</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Timeout:</strong></td>
+                      <td><code>@session.Timeout</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <h5 class="mb-3">
+                <i class="bi bi-globe me-2"></i>Request Information
+              </h5>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <tbody>
+                    <tr>
+                      <td><strong>Last URL:</strong></td>
+                      <td><code>@session.LastURL</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Last IP:</strong></td>
+                      <td><code>@session.LastIP</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Last Referer:</strong></td>
+                      <td><code>@session.LastReferer</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Last User Agent:</strong></td>
+                      <td><code>@session.LastUserAgent</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <h3 class="mb-4">Available Session Values</h3>
+          <div class="row">
+            <div class="col-lg-6">
+              <h5 class="mb-3">
+                Session Properties
+              </h5>
+              @Import partials/codeBlock { @code = @codeSessionProperties }
+            </div>
+            <div class="col-lg-6">
+              <h5 class="mb-3">
+                Session Information
+              </h5>
+              @Import partials/codeBlock { @code = @codeSessionInformation }
+            </div>
+          </div>
+
+          <div class="alert alert-info">
+            <h6 class="alert-heading">
+              <i class="bi bi-lightbulb me-2"></i>WebStencils Session Integration
+            </h6>
+            <p class="mb-0">
+              WebStencils automatically integrates with session management components like 
+              <code>TWebSessionManager</code>, <code>TWebFormsAuthenticator</code>, and <code>TWebAuthorizer</code>.
+              No custom code is needed to expose session data to templates.
+            </p>
+          </div>
+          
+          <div class="text-center mt-4">
+            <a href="@env.resource/" class="btn btn-primary">
+              <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+            @if (session.Authenticated) {
+              <a href="@env.resource/tasks" class="btn btn-outline-primary">
+                <i class="bi bi-check2-square me-2"></i>View Tasks
+              </a>
+            } @else {
+              <a href="@env.resource/login" class="btn btn-outline-primary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

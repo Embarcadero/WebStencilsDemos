@@ -1,0 +1,56 @@
+﻿@LayoutPage layouts/mainLayout
+
+@* HTMX is being loaded specifically in this page *@
+
+@ExtraHeader {
+<script src="https://unpkg.com/htmx.org@@2.0.2"></script>
+
+	@if (env.is_rad_server) {
+	<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+	}
+}
+
+<div class="container mt-5">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<div>
+			<h1 class="my-text-gradient">HTMX Tasks Demo</h1>
+			<p class="text-muted mb-0">
+				<i class="bi bi-person-circle me-2"></i>Welcome, <strong>@session.UserName</strong>
+				@if (session.UserHasRole('admin')) {
+					<span class="badge bg-danger ms-2">Admin User</span>
+				} @else {
+					<span class="badge bg-primary ms-2">Standard User</span>
+				}
+			</p>
+		</div>
+		<div class="text-end">
+			<small class="text-muted">
+				<i class="bi bi-shield-check me-1"></i>Protected Area<br>
+				<i class="bi bi-clock me-1"></i>Session: @session.Id
+			</small>
+		</div>
+	</div>
+
+	<div class="col col-lg-6 mx-auto">
+		@Import partials/tasks/card
+	</div>
+	
+	@if (session.UserHasRole('admin')) {
+		<div class="col col-lg-6 mx-auto mt-4">
+			<div class="alert alert-info">
+				<h6 class="alert-heading">
+					<i class="bi bi-shield-fill-check me-2"></i>Admin Features
+				</h6>
+				<p class="mb-2">As an admin user, you have access to additional features:</p>
+				<div class="d-grid gap-2 d-md-flex">
+					<a href="@env.resource/bigtable" class="btn btn-sm btn-outline-primary">
+						<i class="bi bi-table me-2"></i>Big Table Data
+					</a>
+					<a href="@env.resource/customers" class="btn btn-sm btn-outline-primary">
+						<i class="bi bi-list-ol me-2"></i>Customers Demo
+					</a>
+				</div>
+			</div>
+		</div>
+	}
+</div>
