@@ -1,0 +1,20 @@
+<li class="list-group-item list-group-item-action d-flex" id="task-@Task.Id">
+	<input class="form-check-input me-2" 
+		   hx-put="@env.Resource/tasks/toggleCompleted?id=@Task.Id" 
+		   hx-target="#task-card"
+		   hx-swap="outerHTML" 
+		   type="checkbox" 
+		   id="Checkbox-@Task.Id" 
+		   @if ( Task.Completed ) { checked }>
+	<span class="task-text @if( Task.Completed ) { text-decoration-line-through }">@Task.Description</span>
+	<div class="btn-group ms-auto">
+		<button class="btn btn-danger btn-sm delete-btn" 
+				hx-delete="@env.Resource/tasks?id=@Task.Id" 
+				hx-target="#task-card"
+				hx-swap="outerHTML"><i class="bi-trash"></i></button>
+		<button class="btn btn-primary btn-sm edit-btn" 
+				hx-get="@env.Resource/tasks/edit?id=@Task.Id" 
+				hx-target="#task-@Task.Id"
+				hx-swap="outerHTML"><i class="bi-pencil"></i></button>
+	</div>
+</li>

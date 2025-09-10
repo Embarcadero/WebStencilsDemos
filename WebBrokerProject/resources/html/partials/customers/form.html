@@ -1,0 +1,26 @@
+<div class="row">	
+    @forEach(var f in customers.fields) {        
+        @if (f.fieldName = "COUNTRY") {
+            @import partials/countrySelect { @field = @f }
+        } @else {
+            @import partials/dynamicInput { @field = @f }
+        }
+    }
+</div> 
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h6><i class="bi bi-info-circle-fill me-2"></i>Aditional info</h6>
+            <p>
+                This form is created dynamically from the FireDAC query, using the <code>customers.fields</code> metadata.
+            </p>
+            <p>
+                If changes in the FireDAC query are made, the form will be updated automatically.
+            </p>
+            <p>
+                Input types are automatically determined based on the FireDAC field data type (text, number, etc.).
+            </p>
+        </div>
+    </div>
+</div>

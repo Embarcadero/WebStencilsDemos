@@ -180,6 +180,7 @@ begin
   Writeln(sWelcomeText);
   {$IFDEF CONTAINER}
   Logger.Info('Running in container mode');
+  Logger.ConsoleLogging := True;
   {$ELSE}
   Logger.Info('Running in interactive mode');
   WriteCommands;

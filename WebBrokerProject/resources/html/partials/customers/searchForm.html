@@ -1,0 +1,46 @@
+<!-- Customer Search Form -->
+<div class="row mb-4 justify-content-center">
+
+  <div class="col-lg-8 col-xl-6">
+    <div class="card-body p-4">        
+      <form method="get" action="/customers">
+        <div class="input-group input-group-lg">
+          <input type="text" 
+                  class="form-control border-primary" 
+                  name="search" 
+                  placeholder="Name, email, company, phone, or city..." 
+                  value="@customersSearchParams.SearchTerm"
+                  maxlength="100">
+          
+          <!-- Preserve pagination parameters -->
+          @if(customersPagination.PageSize <> 10) {
+            <input type="hidden" name="pageSize" value="@customersPagination.PageSize">
+          }
+          
+          <button class="btn btn-primary btn-lg px-4" type="submit">
+            <i class="bi bi-search me-2"></i>Search
+          </button>
+          
+          @if(customersSearchParams.HasSearch) {
+            <a href="@page.request_path" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-x-circle me-1"></i>Clear
+            </a>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  @if(customersSearchParams.HasSearch) {
+    <div class="col-12 mt-3">
+      <div class="text-center">
+        <div class="alert alert-info d-inline-flex align-items-center px-4 py-2 mb-0">
+          <i class="bi bi-info-circle me-2"></i>
+          <span>
+            Search results for: <strong class="text-primary">"@customersSearchParams.SearchTerm"</strong>
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+</div> 

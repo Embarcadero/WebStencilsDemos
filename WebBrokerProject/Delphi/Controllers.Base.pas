@@ -1,4 +1,4 @@
-unit Controllers.Base;
+﻿unit Controllers.Base;
 
 interface
 
@@ -14,7 +14,8 @@ uses
   Data.DB,
   
   Helpers.Messages,
-  Utils.FormSession;
+  Utils.FormSession,
+  Utils.Logger;
 
 type
 
@@ -128,36 +129,57 @@ end;
 constructor TBaseController.Create(AWebStencilsEngine: TWebStencilsEngine; const AControllerName: string);
 begin
   inherited Create;
-  FWebStencilsEngine := AWebStencilsEngine;
-  FWebStencilsProcessor := TWebStencilsProcessor.Create(nil);
-  FWebStencilsProcessor.Engine := FWebStencilsEngine;
-  FControllerName := AControllerName;
-  
-  // Initialize field error manager
-  FFieldErrorManager := TFieldErrorManager.Create;
-  
-  // Initialize validation errors in template processor
-  InitializeValidationErrors;
+  try
+    FWebStencilsEngine := AWebStencilsEngine;
+    FWebStencilsProcessor := TWebStencilsProcessor.Create(nil);
+    FWebStencilsProcessor.Engine := FWebStencilsEngine;
+    FControllerName := AControllerName;
+    
+    // Initialize field error manager
+    FFieldErrorManager := TFieldErrorManager.Create;
+    
+    // Initialize validation errors in template processor
+    InitializeValidationErrors;
+    
+    Logger.Debug(Format('Created base controller: %s', [FControllerName]));
+  except
+    on E: Exception do
+      Logger.Error(Format('TBaseController constructor error: %s', [E.Message]));
+  end;
 end;
 
 destructor TBaseController.Destroy;
 begin
-  FFieldErrorManager.Free;
-  FWebStencilsProcessor.Free;
+  try
+    Logger.Debug(Format('Destroyed base controller: %s', [FControllerName]));
+    FFieldErrorManager.Free;
+    FWebStencilsProcessor.Free;
+  except
+    on E: Exception do
+      Logger.Error(Format('Error destroying base controller: %s', [E.Message]));
+  end;
   inherited;
 end;
 
 function TBaseController.RenderTemplate(const ATemplatePath: string; ARequest: TWebRequest = nil): string;
 begin
-  FWebStencilsProcessor.InputFileName := TPath.Combine(FWebStencilsEngine.RootDirectory, ATemplatePath);
-  if Assigned(ARequest) then
-  begin
-    FWebStencilsProcessor.WebRequest := ARequest;
+  try
+    FWebStencilsProcessor.InputFileName := TPath.Combine(FWebStencilsEngine.RootDirectory, ATemplatePath);
+    if Assigned(ARequest) then
+    begin
+      FWebStencilsProcessor.WebRequest := ARequest;
+    end;
+    Result := FWebStencilsProcessor.Content;
+    
+    // Clear validation errors after template processing
+    ClearValidationErrors;
+  except
+    on E: Exception do
+    begin
+      Logger.Error(Format('Error rendering template %s: %s', [ATemplatePath, E.Message]));
+      Result := '';
+    end;
   end;
-  Result := FWebStencilsProcessor.Content;
-  
-  // Clear validation errors after template processing
-  ClearValidationErrors;
 end;
 
 function TBaseController.GetCurrentSession(ARequest: TWebRequest): TWebSession;
@@ -257,29 +279,34 @@ begin
   if not Assigned(AField) then
     Exit;
     
-  if AValue = '' then
-    AField.Clear
-  else
-  begin
-    // Handle date/time field conversions using ISO 8601 functions
-    if (AField.DataType = ftDate) or (AField.DataType = ftDateTime) or (AField.DataType = ftTime) then
-    begin
-      if TryISO8601ToDate(AValue, DateValue, False) then
-        AField.AsDateTime := DateValue
-      else
-        AField.AsString := AValue; // Fallback to string
-    end
-    else if AField.DataType = ftBoolean then
-    begin
-      // For boolean fields, if the field is present in POST data, it's True
-      // If not present, it's False (handled by the hidden field)
-      if AValue = 'True' then
-        AField.AsBoolean := True
-      else
-        AField.AsBoolean := False;
-    end
+  try
+    if AValue = '' then
+      AField.Clear
     else
-      AField.AsString := AValue;
+    begin
+      // Handle date/time field conversions using ISO 8601 functions
+      if (AField.DataType = ftDate) or (AField.DataType = ftDateTime) or (AField.DataType = ftTime) then
+      begin
+        if TryISO8601ToDate(AValue, DateValue, False) then
+          AField.AsDateTime := DateValue
+        else
+          AField.AsString := AValue; // Fallback to string
+      end
+      else if AField.DataType = ftBoolean then
+      begin
+        // For boolean fields, if the field is present in POST data, it's True
+        // If not present, it's False (handled by the hidden field)
+        if AValue = 'True' then
+          AField.AsBoolean := True
+        else
+          AField.AsBoolean := False;
+      end
+      else
+        AField.AsString := AValue;
+    end;
+  except
+    on E: Exception do
+      Logger.Warning(Format('Field assignment warning for %s: %s', [AField.FieldName, E.Message]));
   end;
 end;
 
@@ -388,10 +415,6 @@ function TBaseController.HasFieldError(const AFieldName: string): Boolean;
 begin
   Result := FFieldErrorManager.HasError(AFieldName);
 end;
-
-
-
-
 
 function TBaseController.ValidateEmailField(const AFieldName, AValue: string): string;
 begin

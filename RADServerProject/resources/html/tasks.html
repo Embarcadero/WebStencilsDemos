@@ -1,0 +1,18 @@
+﻿@LayoutPage layouts/mainLayout
+
+@* HTMX is being loaded specifically in this page *@
+
+@ExtraHeader {
+<script src="https://unpkg.com/htmx.org@@2.0.2"></script>
+@if (env.IsRadServer) {
+<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+}
+}
+
+<div class="container mt-5">
+	<h1 class="my-text-gradient">HTMX Tasks demo app</h1>
+
+	<div class="col col-lg-6 mx-auto">
+		@Import partials/tasks/card
+	</div>
+</div>

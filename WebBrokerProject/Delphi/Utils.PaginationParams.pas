@@ -6,7 +6,8 @@ uses
   System.SysUtils,
   System.NetEncoding,
   Web.HTTPApp,
-  Utils.Search;
+  Utils.Search,
+  Utils.Logger;
 
 type
 
@@ -44,38 +45,51 @@ procedure TPaginationParams.ParsePaginationParams(Request: TWebRequest);
 var
   PageSizeStr, PageNumberStr: string;
 begin
-  // Initialize with default values
-  FPageSize := DEFAULT_PAGE_SIZE;
-  FPageNumber := DEFAULT_PAGE_NUMBER;
+  try
+    // Initialize with default values
+    FPageSize := DEFAULT_PAGE_SIZE;
+    FPageNumber := DEFAULT_PAGE_NUMBER;
 
-  // Try to get PageSize parameter
-  PageSizeStr := Request.QueryFields.Values['pageSize'];
-  if PageSizeStr <> '' then
-  begin
-    FPageSize := StrToIntDef(PageSizeStr, DEFAULT_PAGE_SIZE);
-    // Validate PageSize
-    if FPageSize <= 0 then
-      FPageSize := DEFAULT_PAGE_SIZE
-    else if FPageSize > MAX_PAGE_SIZE then
-      FPageSize := MAX_PAGE_SIZE;
-   end;
+    // Try to get PageSize parameter
+    PageSizeStr := Request.QueryFields.Values['pageSize'];
+    if PageSizeStr <> '' then
+    begin
+      FPageSize := StrToIntDef(PageSizeStr, DEFAULT_PAGE_SIZE);
+      // Validate PageSize
+      if FPageSize <= 0 then
+        FPageSize := DEFAULT_PAGE_SIZE
+      else if FPageSize > MAX_PAGE_SIZE then
+        FPageSize := MAX_PAGE_SIZE;
+     end;
 
-  // Try to get PageNumber parameter
-  PageNumberStr := Request.QueryFields.Values['page'];
-  if PageNumberStr <> '' then
-  begin
-    FPageNumber := StrToIntDef(PageNumberStr, DEFAULT_PAGE_NUMBER);
-    // Validate PageNumber
-    if FPageNumber <= 0 then
-      FPageNumber := DEFAULT_PAGE_NUMBER;
+    // Try to get PageNumber parameter
+    PageNumberStr := Request.QueryFields.Values['page'];
+    if PageNumberStr <> '' then
+    begin
+      FPageNumber := StrToIntDef(PageNumberStr, DEFAULT_PAGE_NUMBER);
+      // Validate PageNumber
+      if FPageNumber <= 0 then
+        FPageNumber := DEFAULT_PAGE_NUMBER;
+    end;
+  except
+    on E: Exception do
+      Logger.Error(Format('Error parsing pagination params: %s', [E.Message]));
   end;
 end;
 
 function TPaginationParams.GetPageUrl(APage: Integer; ASearchParams: TSearchParams = nil): string;
 begin
-  Result := Format('%s?page=%d&pageSize=%d', [FUri, APage, FPageSize]);
-  if Assigned(ASearchParams) and ASearchParams.HasSearch then
-    Result := Result + '&search=' + ASearchParams.GetSearchTermForUrl;
+  try
+    Result := Format('%s?page=%d&pageSize=%d', [FUri, APage, FPageSize]);
+    if Assigned(ASearchParams) and ASearchParams.HasSearch then
+      Result := Result + '&search=' + ASearchParams.GetSearchTermForUrl;
+  except
+    on E: Exception do
+    begin
+      Logger.Error(Format('Error generating page URL: %s', [E.Message]));
+      Result := FUri;
+    end;
+  end;
 end;
 
 end.

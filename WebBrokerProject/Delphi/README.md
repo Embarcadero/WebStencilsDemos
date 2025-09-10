@@ -77,10 +77,29 @@ curl http://localhost:8080/health
 ### Docs
 Most of the menus explain the general use of WebStencils as well as some suggested ideas for templating patterns. 
 
+### 🔐 Authentication System
+The application includes a complete authentication system with:
+- **User Login/Logout**: Secure session-based authentication
+- **Role-Based Access**: User and admin roles with different permissions
+- **Protected Features**: Admin-only access to customer management
+- **Demo Credentials**: 
+  - User: `demo` / `demo123` (user role)
+  - Admin: `admin` / `admin123` (admin role)
+
+### 📊 Enhanced Customer Management
+Complete CRUD operations for customer data:
+- **Create**: Add new customers with form validation
+- **Read**: List customers with search and pagination
+- **Update**: Edit customer information with validation
+- **Delete**: Remove customers with confirmation
+- **Search**: Multi-field search across name, email, company, phone, and city
+- **Pagination**: Server-side pagination with configurable page sizes
+- **Dynamic Forms**: Forms automatically generated from FireDAC query metadata
+
 ### Big Table
 This demo loads 1000 customers loaded in a FireDAC query. Customers data is stored in a `sqlite` database in `resources/data/database.sqlite3`.
 
-### Pagination
+### Customers
 Same `customers` table from the `sqlite` database, but this time using server-side pagination.
 
 ### To-Do app - HTMX Integration
@@ -94,29 +113,55 @@ The project consists of the following main components:
 
 ### 🔑 Key Delphi Units
 - `WebStencilsDemo.dpr`: The main project file that includes WebBroker
-- `MainWebModuleU.pas`: Handles web requests and sets up the WebStencils engine
-- `Model.Tasks.pas` and `Controller.Tasks.pas`: Implement the Tasks demo functionality (Tasks are stored in memory using a singleton)
-- `Controller.Customers.pas`: contains the controller used for `Big Table` and `Pagination` demos. 
-- `Model.PaginationParams.pas` defines a reusable pagination system for WebStencils. 
-- `Helper` namespace: includes multiple class helpers to simplify some of the functionality like simplification for routing in a WebModule or pagination on a FDQuery. 
-- `CodeExamplesU.pas`: Contains code examples used in the demo pages
+- `Modules.Main.pas`: Handles web requests and sets up the WebStencils engine (renamed from MainWebModuleU.pas)
+- `Controllers.Base.pas`: Base controller with form session management and validation
+- `Controllers.Customers.pas`: Enhanced customer management with CRUD operations
+- `Controllers.Tasks.pas`: Implement the Tasks demo functionality (Tasks are stored in memory using a singleton)
+- `Models.Tasks.pas`: Task data model and management
+- `Utils.FormSession.pas`: Form data persistence and validation across requests
+- `Utils.Search.pas`: Configurable search functionality
+- `Utils.PaginationParams.pas`: Reusable pagination system for WebStencils
+- `Utils.Logger.pas`: Comprehensive logging system
+- `Helpers.Messages.pas`: Flash message system for user feedback
+- `Helpers.FDQuery.pas`: FireDAC query helpers for pagination
+- `Services.CodeExamples.pas`: Code examples used in the demo pages
+- `Constants.Server.pas`: Server-related constants and messages
 
 ### 📄 HTML Templates
 Located in the **shared** `resources/html` directory. This demonstrates how the same templates can be used across different projects (Delphi/C++, WebBroker/RAD Server).
 - `layouts/mainLayout.html`: The main layout template
+- `layouts/baseLayout.html`: Base layout for authentication pages
+- `layouts/authMenu.html`: Authentication menu component
 - Various content pages (e.g., `home.html`, `basics.html`, `keywords.html`)
+- `login.html`, `logout.html`: Authentication templates
+- `customers/`: Enhanced customer management templates (add, edit, index, bigtable)
 - Partial templates reusable across pages in the `partials/` directory
-- `partials/customers`: Templates for the `Big Table` and `Pagination` demos.
-- `partials/tasks`: Templates specific to the HTMX Tasks demo.
+- `partials/customers/`: Templates for customer CRUD operations
+- `partials/messages.html`: Flash message display
+- `partials/dynamicInput.html`: Dynamic form input generation
+- `partials/tasks`: Templates specific to the HTMX Tasks demo
 
 > **IMPORTANT**
 > The `codeBlock` template has a `copy` button. Due to browser security limitations, this only works if the URL is `localhost` or if it's being run under https. If the demo is accessed through the network, the button is not functional.
 
 ## ✨ Environment Variables & Data Sources
-- The `MainWebModuleU` demonstrates handling custom environment variables accessible in templates via `@env.VARIABLE_NAME` (e.g., `@env.APP_NAME`, `@env.APP_EDITION`).
+- The `Modules.Main` demonstrates handling custom environment variables accessible in templates via `@env.VARIABLE_NAME` (e.g., `@env.APP_NAME`, `@env.APP_EDITION`).
 - It also shows handling system variables like `@system.year` and `@system.timestamp` via the WebStencilsEngine `OnValue` event.
 - The `DEBUG_MODE` variable is automatically set based on the build configuration.
 - **Data Sources:** This project uses an in-memory list for Tasks and an SQLite database (`resources/data/database.sqlite3`) for Customer data, showcasing WebStencils' independence from specific data storage mechanisms.
+
+## 💬 Flash Message System
+The application includes a comprehensive flash message system:
+- **Message Types**: Success, warning, error, and info messages
+- **Session Persistence**: Messages survive page redirects
+- **Bootstrap Integration**: Styled message display with icons
+- **Automatic Cleanup**: Messages are cleared after display
+
+## 🔍 Search & Pagination Features
+- **Multi-Field Search**: Search across customer name, email, company, phone, and city
+- **URL Parameter Handling**: Search terms preserved in URLs
+- **Configurable Pagination**: Adjustable page sizes with validation
+- **Search Result Highlighting**: Visual feedback for search results
 
 ## 💻 Web Tech Used
 - Bootstrap 5.3

@@ -1,0 +1,15 @@
+<li class="list-group-item" id="task-@Task.Id">
+	<form id="task-form-@Task.Id" 
+	 	  hx-put="@env.resource/tasks?id=@Task.Id" 
+		  hx-target="#task-card" 		  		
+		  @if (env.is_rad_server) { hx-ext="json-enc" } 
+		  hx-swap="outerHTML"
+		  hx-boost="true">
+		<div class="input-group mb-3">
+			<input type="text" class="form-control" name="task" value="@Task.Description" id="task-edit-@Task.id" required>
+			<button class="btn btn-success btn-sm edit-btn" type="submit">
+				<i class="bi-check"></i>
+			</button>
+		</div>
+	</form>
+</li>

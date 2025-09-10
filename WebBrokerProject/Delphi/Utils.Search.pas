@@ -1,10 +1,11 @@
-unit Utils.Search;
+﻿unit Utils.Search;
 
 interface
 
 uses
   Web.HTTPApp,
-  FireDAC.Comp.Client;
+  FireDAC.Comp.Client,
+  Utils.Logger;
 
 type
   // Base search class that can be used for any entity
@@ -25,11 +26,13 @@ type
     FBaseSearch: TBaseSearch;
   public
     constructor Create(ARequest: TWebRequest; ABaseSearch: TBaseSearch);
-    property SearchTerm: string read FSearchTerm;
-    property BaseSearch: TBaseSearch read FBaseSearch;
-    function HasSearch: Boolean;
     function GetSearchSQL: string;
     function GetSearchTermForUrl: string;
+    function GetHasSearch: Boolean;
+  published
+    property HasSearch: Boolean read GetHasSearch;
+    property SearchTerm: string read FSearchTerm;
+    property BaseSearch: TBaseSearch read FBaseSearch;
   end;
 
 implementation
@@ -74,27 +77,40 @@ begin
     Exit;
   end;
 
-  WhereClause := '';
-  
-  for Field in FSearchFields do
-  begin
-    if WhereClause <> '' then
-      WhereClause := WhereClause + ' OR ';
-    WhereClause := WhereClause + Format('UPPER(%s) LIKE UPPER(:search)', [Field]);
+  try
+    WhereClause := '';
+    
+    for Field in FSearchFields do
+    begin
+      if WhereClause <> '' then
+        WhereClause := WhereClause + ' OR ';
+      WhereClause := WhereClause + Format('UPPER(%s) LIKE UPPER(:search)', [Field]);
+    end;
+    
+    Result := 'WHERE (' + WhereClause + ')';
+  except
+    on E: Exception do
+    begin
+      Logger.Error(Format('Error generating search SQL: %s', [E.Message]));
+      Result := '';
+    end;
   end;
-  
-  Result := 'WHERE (' + WhereClause + ')';
 end;
 
 { TSearchParams }
 
 constructor TSearchParams.Create(ARequest: TWebRequest; ABaseSearch: TBaseSearch);
 begin
-  FBaseSearch := ABaseSearch;
-  FSearchTerm := Trim(ARequest.QueryFields.Values['search']);
+  try
+    FBaseSearch := ABaseSearch;
+    FSearchTerm := Trim(ARequest.QueryFields.Values['search']);
+  except
+    on E: Exception do
+      Logger.Error(Format('Error creating search params from request: %s', [E.Message]));
+  end;
 end;
 
-function TSearchParams.HasSearch: Boolean;
+function TSearchParams.GetHasSearch: Boolean;
 begin
   Result := FSearchTerm <> '';
 end;

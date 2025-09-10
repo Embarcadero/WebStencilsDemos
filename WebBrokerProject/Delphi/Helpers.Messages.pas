@@ -1,4 +1,4 @@
-unit Helpers.Messages;
+﻿unit Helpers.Messages;
 
 interface
 
@@ -7,7 +7,8 @@ uses
   System.Classes,
   System.Generics.Collections,
   Web.HTTPApp,
-  Web.Stencils;
+  Web.Stencils,
+  Utils.Logger;
 
 type
   TMessageType = (mtSuccess, mtWarning, mtError, mtInfo);
@@ -123,11 +124,16 @@ begin
   if not Assigned(ASession) then
     Exit;
 
-  EnsureMessageProvider(ASession);
-  LMessageProvider := GetMessageProvider(ASession);
+  try
+    EnsureMessageProvider(ASession);
+    LMessageProvider := GetMessageProvider(ASession);
 
-  LNewMessage := TFlashMessage.Create(AMessageType, AMessage);
-  LMessageProvider.Messages.Add(LNewMessage);
+    LNewMessage := TFlashMessage.Create(AMessageType, AMessage);
+    LMessageProvider.Messages.Add(LNewMessage);
+  except
+    on E: Exception do
+      Logger.Error(Format('Error adding message: %s', [E.Message]));
+  end;
 end;
 
 class function TMessageManager.GetMessageProvider(ASession: TWebSession): TMessageProvider;
@@ -138,9 +144,14 @@ begin
   if not Assigned(ASession) then
     Exit;
     
-  LIndex := ASession.DataVars.IndexOf(SESSION_KEY);
-  if LIndex >= 0 then
-    Result := TMessageProvider(ASession.DataVars.Objects[LIndex]);
+  try
+    LIndex := ASession.DataVars.IndexOf(SESSION_KEY);
+    if LIndex >= 0 then
+      Result := TMessageProvider(ASession.DataVars.Objects[LIndex]);
+  except
+    on E: Exception do
+      Logger.Warning(Format('Error getting message provider: %s', [E.Message]));
+  end;
 end;
 
 class procedure TMessageManager.EnsureMessageProvider(ASession: TWebSession);
@@ -150,10 +161,15 @@ begin
   if not Assigned(ASession) then
     Exit;
     
-  LIndex := ASession.DataVars.IndexOf(SESSION_KEY);
-  if (LIndex < 0) or (ASession.DataVars.Objects[LIndex] = nil) then
-  begin
-    ASession.DataVars.AddObject(SESSION_KEY, TMessageProvider.Create);
+  try
+    LIndex := ASession.DataVars.IndexOf(SESSION_KEY);
+    if (LIndex < 0) or (ASession.DataVars.Objects[LIndex] = nil) then
+    begin
+      ASession.DataVars.AddObject(SESSION_KEY, TMessageProvider.Create);
+    end;
+  except
+    on E: Exception do
+      Logger.Error(Format('Error ensuring message provider: %s', [E.Message]));
   end;
 end;
 
@@ -164,9 +180,14 @@ begin
   if not Assigned(ASession) then
     Exit;
     
-  LMessageProvider := GetMessageProvider(ASession);
-  if Assigned(LMessageProvider) then
-    LMessageProvider.Clear;
+  try
+    LMessageProvider := GetMessageProvider(ASession);
+    if Assigned(LMessageProvider) then
+      LMessageProvider.Clear;
+  except
+    on E: Exception do
+      Logger.Warning(Format('Error clearing messages: %s', [E.Message]));
+  end;
 end;
 
 class function TMessageManager.HasMessages(ASession: TWebSession): Boolean;

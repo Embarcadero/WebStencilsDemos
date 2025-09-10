@@ -37,3 +37,4 @@ void TWebModuleHelper::AddRoutes(TWebModule* WebModule, const std::vector<TRoute
         AddAction(WebModule, Route.MethodType, Route.PathInfo, Route.OnAction, Route.Default);
     }
 }
+

@@ -1,0 +1,26 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Company</th>
+			<th scope="col">Last Name</th>
+			<th scope="col">First Name</th>
+			<th scope="col">City</th>
+			<th scope="col">Phone</th>
+			<th scope="col">Email</th>
+		</tr>
+	</thead>
+	<tbody>
+		@forEach (var customer in customers) {
+		<tr>
+			<th scope="row">@customer.id</th>
+			<td>@customer.company</td>
+			<td>@customer.last_name</td>
+			<td>@customer.first_name</td>
+			<td>@customer.city</td>
+			<td>@customer.phone</td>
+			<td>@customer.email</td>
+		</tr>
+		}
+	</tbody>
+</table>

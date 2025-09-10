@@ -1,0 +1,8 @@
+﻿@LayoutPage layouts/mainLayout
+
+<div class="container mt-5">
+	<h1 class="my-text-gradient">Customers</h1>
+	<p>This example shows how to use pagination</p>
+	@Import customers/table
+	@Import partials/pagination { @pagination = @customersPagination }
+</div>

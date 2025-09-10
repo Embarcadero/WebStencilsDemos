@@ -1,0 +1,61 @@
+﻿@LayoutPage layouts/mainLayout
+
+<div class="container mt-5">
+
+<h1 class="my-text-gradient">Layout and Content Placeholders</h1>
+    <p>WebStencils provides a powerful layout system similar to other template engines like Razor. This system allows
+        you to define a common structure for your pages and inject specific content into that structure.</p>
+
+    <h3 class="mt-4">@@LayoutPage</h3>
+    <p>The <code>@@LayoutPage</code> directive is used in a content page to specify which layout template should be used
+        as the structure for that page. It's typically placed at the top of the content file:</p>
+
+		@Import partials/codeBlock { @code = @codeLayoutPage }
+
+    <h3 class="mt-4">@@RenderBody</h3>
+    <p>The <code>@@RenderBody</code> directive is used in the layout template to indicate where the content from the
+        specific page should be inserted. For example, in your <code>BaseTemplate.html</code>:</p>
+    
+		@Import partials/codeBlock { @code = @codeRenderBody }
+
+    <h3 class="mt-4">@@Import</h3>
+    <p>The <code>@@Import</code> directive allows you to merge an external file into a specific location in the current
+        template. This is useful for creating reusable components. </p>
+    <p>This directive allows structuring your templates in nested folders. It’s also possible to omit the file
+        extension, as long as the default one has been defined in the Engine or Processor.</p>
+
+		@Import partials/codeBlock { @code = @codeImport }
+		
+	<h2 class="mt-5">Template Patterns</h2>
+	<p>WebStencils supports several common template patterns that can help you organize your application's views
+			effectively.</p>
+
+	<h3 class="mt-5">Standard Layout</h3>
+	<p>This pattern uses the built-in <code>@@LayoutPage</code> and <code>@@RenderBody</code> approach we've already
+			discussed. It's ideal for maintaining a consistent structure across your site while allowing individual pages to
+			provide their specific content. This demo follows this pattern.</p>
+
+	<h3 class="mt-5">Header/Body/Footer</h3>
+	<p>In this pattern, each page is an individual template, but they all share common parts like headers and footers.
+			Instead of using a layout page, you might structure your templates like this:</p>
+			
+	@Import partials/codeBlock { @code = @codeHeaderBodyFooter }				
+
+	<p>This approach offers more flexibility than the standard layout pattern but may require more management of common
+			elements.</p>
+
+	<h3 class="mt-5">Reusable Components</h3>
+	<p>Using the <code>@@Import</code> directive, you can define individual sets of components that can be reused
+			throughout your application. This directive also allows passing of iterable objects and even defining aliases
+			for a more agnostic component definition. For example:</p>
+			
+	@Import partials/codeBlock { @code = @codeReusableComponents }				
+
+	<p>This pattern allows you to break your UI into smaller, manageable pieces that can be easily maintained and reused
+			across different pages. You can find some examples of this pattern in the code of this demo.</p>
+</div>
+
+
+
+
+</div>

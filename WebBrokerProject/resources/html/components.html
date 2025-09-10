@@ -1,0 +1,67 @@
+﻿@LayoutPage layouts/mainLayout
+
+<div class="container mt-5">
+
+    <h1 class="my-text-gradient">WebStencils Components</h1>
+    <p>WebStencils introduces two main components that work together to process your templates and generate the final
+        HTML output: the WebStencils Engine and the WebStencils Processor.</p>
+
+    <h3 class="mt-5">WebStencils Engine</h3>
+    <p>The WebStencils Engine is the central component that manages the overall processing of your templates. It can be
+        used in two primary scenarios:</p>
+    <ul>
+        <li><strong>Connected to WebStencilsProcessor components</strong>: In this setup, the engine provides shared
+            settings and behavior for multiple processors, reducing the need to customize each processor individually.
+        </li>
+        <li><strong>Standalone usage</strong>: The engine can create WebStencilsProcessor components as needed, allowing
+            you to place only the engine component on your web modules.</li>
+    </ul>
+    <p>Key properties and methods of <code>TWebStencilsEngine</code> include:</p>
+    <ul>
+        <li><code>Dispatcher</code>: Specifies a file dispatcher (implements <code>IWebDispatch</code>) for
+            post-processing of text files.</li>
+        <li><code>PathTemplates</code>: A collection of request path templates used for matching and processing
+            requests.</li>
+        <li><code>RootDirectory</code>: Specifies the file system root path for relative file paths.</li>
+        <li><code>DefaultFileExt</code>: Sets the default file extension (default is '.html').</li>
+        <li><code>AddVar</code>: Adds objects to the list of script variables available to processors.</li>
+        <li><code>AddModule</code>: Scans an object for members marked with <code>[WebStencilsVar]</code> attributes and
+            adds them as script variables.</li>
+    </ul>
+
+    <h3 class="mt-5">WebStencils Processor</h3>
+    <p>The WebStencils Processor is responsible for processing individual files (typically HTML) and their associated
+        templates. It can be used standalone or created and managed by the WebStencils Engine.</p>
+    <p>Key properties and methods of <code>TWebStencilsProcessor</code> include:</p>
+    <ul>
+        <li><code>InputFilename</code>: Specifies the file to process.</li>
+        <li><code>InputLines</code>: Allows direct assignment of content to process.</li>
+        <li><code>Engine</code>: Specifies the engine to inherit data variables, event handlers, etc. (optional).</li>
+        <li><code>Content</code>: Produces the final processed content.</li>
+        <li><code>AddVar</code>: Adds objects to the list of script variables available to the processor.</li>
+    </ul>
+
+    <h3 class="mt-5">Adding Data with AddVar</h3>
+    <p>The <code>AddVar</code> method is crucial for passing data from your Delphi code to your WebStencils templates.
+        There are several ways to use <code>AddVar</code>:</p>
+    <ol>
+        <li><strong>Direct object assignment</strong>:</li>
+				
+        @Import partials/codeBlock { @code = @codeDataObject }
+				
+        <li><strong>Using anonymous methods</strong>:</li>
+	
+				@Import partials/codeBlock { @code = @codeDataMethod }
+		
+        <li><strong>Using attributes</strong>: You can mark fields, properties, or methods in your classes with the
+            <code>[WebStencilsVar]</code> attribute, then use <code>AddModule</code> to add all marked members as script
+            variables:
+        </li>
+				
+				@Import partials/codeBlock { @code = @codeDataAttribute }
+				
+    </ol>
+    <p>It’s important to keep in mind that only objects with the <code>GetEnumerator</code> method, where the enumerator
+        returns an object value, can be used. Records can’t be used from WebStencils.</p>
+				
+</div>

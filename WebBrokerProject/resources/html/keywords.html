@@ -1,0 +1,42 @@
+﻿@LayoutPage layouts/mainLayout
+
+<div class="container mt-5">
+
+    <h1 class="my-text-gradient">WebStencils Keywords and Examples</h1>
+    <p>Let's explore the various WebStencils keywords with examples:</p>
+
+    <h3 class="mt-5">Comments (@@* .. *@@)</h3>
+    <p>Comments in WebStencils are enclosed in <code>@@* *@@</code> and are omitted from the resulting HTML.</p>
+    
+		@Import partials/codeBlock { @code = @codeComments }
+
+    <h3 class="mt-5">@@if and @@else</h3>
+    <p>Conditional execution is handled with <code>@@if</code> and <code>@@else</code>.</p>
+    
+		@Import partials/codeBlock { @code = @codeIfAndElse }
+
+    <h3 class="mt-5">@@if not</h3>
+    <p>For negative conditional execution, use <code>@@if not</code>.</p>
+
+		@Import partials/codeBlock { @code = @codeIfNot }
+
+    <h3 class="mt-5">@@ForEach</h3>
+    <p>The <code>@@ForEach</code> keyword is used for iteration over elements in an enumerator.</p>
+
+		@Import partials/codeBlock { @code = @codeForEach }
+
+    <h3 class="mt-5">@@query</h3>
+    <p>The <code>@@query</code> keyword is used to read HTTP query parameters. In this example, <code>searchTerm</code>
+        would be a parameter included in the URL: <code>yourdomain.com?searchTerm="mySearch"</code></p>
+
+		@Import partials/codeBlock { @code = @codeQuery }
+
+    <h3 class="mt-5">@@page</h3>
+    <p>The <code>@@page</code> keyword allows accesing multiple properties from the page as well as access connection.
+    </p>
+
+		@Import partials/codeBlock { @code = @codePage }
+
+    @Import partials/pageInfo
+
+</div>

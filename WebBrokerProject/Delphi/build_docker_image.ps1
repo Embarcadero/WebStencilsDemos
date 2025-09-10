@@ -28,7 +28,7 @@ if (-not (Test-Path $executablePath)) {
 }
 
 # Verify resources directory exists
-$resourcesPath = Join-Path $scriptPath "..\..\resources"
+$resourcesPath = Join-Path $scriptPath "..\resources"
 if (-not (Test-Path $resourcesPath)) {
     Write-Error "resources directory not found"
     exit 1

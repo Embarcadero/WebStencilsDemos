@@ -117,7 +117,7 @@ end;
 procedure TTasksResource1.DataModuleCreate(Sender: TObject);
 const
   //////////////////////
-  // Replace the constant LProjectPath with the absolute path to the resources folder of the reporitory
+  // Replace the constant LProjectPath with the absolute path to the resources folder of the project
   //////////////////////
   LProjectPath: string = 'C:\replace\with\your\absolute\path\to\the\resources\folder';
 begin

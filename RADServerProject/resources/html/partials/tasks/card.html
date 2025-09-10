@@ -1,0 +1,27 @@
+﻿<div class="card shadow my-5" id="task-card">
+  <div class="card-header">
+		@Import partials/tasks/stats
+  </div>
+	<div class="card-body">
+		@* Form to add new tasks *@
+		<form id="tasks-form" 
+			  hx-post="@env.Resource/tasks/add" 
+			  hx-target="#task-card"
+			  hx-swap="outerHTML"
+			  @if (env.IsRadServer) { hx-ext="json-enc" }
+			  hx-boost="true">
+			<div class="input-group mb-3">
+				<input type="text" class="form-control form-control-lg" name="task" id="task-input"
+					placeholder="Add new task..." required>
+				<button class="btn btn-primary" type="submit">
+					Add Task
+				</button>
+			</div>
+		</form>
+		<h5 class="card-title text-center mt-4">My Tasks</h5>
+
+		@* This is where the task list will be rendered *@
+		@Import partials/tasks/list
+	</div>
+
+</div>

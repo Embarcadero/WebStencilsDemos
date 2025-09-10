@@ -77,6 +77,7 @@ type
     CustomersCITY: TStringField;
     CustomersCOUNTRY: TStringField;
     CustomersIP_ADDRESS: TStringField;
+    [WebStencilsVar('countries', false)]
     Countries: TFDQuery;
     CustomersAGE: TIntegerField;
     CustomersACTIVATION_DATE: TDateField;
@@ -93,10 +94,11 @@ type
       Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure WebSessionManagerCreated(Sender: TCustomWebSessionManager;
       Request: TWebRequest; Session: TWebSession);
-    procedure WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
-      const UserName, Password: string; var Roles: string; var Success: Boolean);
     procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest;
       Response: TWebResponse; var Handled: Boolean);
+    procedure WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
+      Request: TWebRequest; const UserName, Password: string; var Roles: string;
+      var Success: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -170,7 +172,7 @@ begin
   BinaryPath := TPath.GetDirectoryName(ParamStr(0));
 {$IFDEF MSWINDOWS}
   if EnvResourcesPath = '' then
-    FResourcesPath := TPath.Combine(BinaryPath, '../../../../resources')
+    FResourcesPath := TPath.Combine(BinaryPath, '../../../resources')
   else
     FResourcesPath := EnvResourcesPath;
 {$ELSE}
@@ -248,6 +250,9 @@ begin
                               end;
                               Result := True;
                             end);
+
+
+  TWebStencilsProcessor.Whitelist.Configure(TField, ['DisplayText', 'Value', 'DisplayLabel', 'FieldName', 'Required', 'LookupDataSet', 'LookupKeyFields', 'Visible', 'DataType', 'Size', 'IsNull'], nil, False);
 
   Logger.Info('Required data initialization complete');
 end;
@@ -340,7 +345,7 @@ begin
   Logger.Info(Format('New session created: %s', [Session.Id]));
   Logger.Info(Format('Request Path: %s', [Request.PathInfo]));
   Logger.Info(Format('Request Method: %s', [Request.Method]));
-  
+
   // Add session creation timestamp for demo purposes
   Session.DataVars.Values['created'] := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
   TMessageManager.EnsureMessageProvider(Session);
@@ -350,33 +355,29 @@ begin
     Logger.Info('Session created for anonymous user');
 end;
 
-procedure TMainWebModule.WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
-  const UserName, Password: string; var Roles: string; var Success: Boolean);
+procedure TMainWebModule.WebFormsAuthenticatorAuthenticate(
+  Sender: TCustomWebAuthenticator; Request: TWebRequest; const UserName,
+  Password: string; var Roles: string; var Success: Boolean);
 begin
   Logger.Info(Format('Authentication attempt for user: %s', [UserName]));
 
   // Demo hardcoded credentials
   Success := False;
   Roles := '';
-
   if SameText(UserName, 'demo') and SameText(Password, 'demo123') then
   begin
     Success := True;
     Roles := 'user';
-    Logger.Info(Format('User %s authenticated successfully with role: %s', [UserName, Roles]));
   end
   else if SameText(UserName, 'admin') and SameText(Password, 'admin123') then
   begin
     Success := True;
     Roles := 'admin';
-    Logger.Info(Format('User %s authenticated successfully with role: %s', [UserName, Roles]));
-  end
-  else
-  begin
-    Logger.Info(Format('Authentication failed for user: %s', [UserName]));
   end;
+  if Success then
+    Logger.Info(Format('User %s authenticated successfully with role: %s', [UserName, Roles]))
+  else
+    Logger.Info(Format('Authentication failed for user: %s', [UserName]));
 end;
-
-
 
 end.

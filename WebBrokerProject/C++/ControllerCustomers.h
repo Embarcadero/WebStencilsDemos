@@ -4,27 +4,44 @@
 #include <System.Classes.hpp>
 #include <System.SysUtils.hpp>
 #include <System.IOUtils.hpp>
+#include <System.Generics.Collections.hpp>
 #include <FireDAC.Comp.Client.hpp>
+#include <FireDAC.Stan.Param.hpp>
 #include <Web.HTTPApp.hpp>
-#include <Web.Stencils.hpp> // Includes TWebStencilsEngine and TWebStencilsProcessor definitions
-#include "ModelPaginationParams.h"
-#include "FDQueryHelpers.h" // Include our helper functions
+#include <Web.Stencils.hpp>
+#include <Data.DB.hpp>
+#include <memory>
 
-class TCustomersController : public TObject
+#include "ControllersBase.h"
+#include "UtilsPaginationParams.h"
+#include "FDQueryHelpers.h"
+#include "UtilsSearch.h"
+
+class TCustomersController : public TBaseController
 {
 private:
-	TFDQuery* FCustomers; // Pointer to the FDQuery component (owned by DataModule/Form)
-	Web::Stencils::TWebStencilsProcessor* FWebStencilsProcessor; // Owns this processor
-	Web::Stencils::TWebStencilsEngine* FWebStencilsEngine; // Pointer to the engine (owned elsewhere)
+    TFDQuery* FCustomers;
+    std::unique_ptr<TBaseSearch> FCustomerSearch;
 
-	String RenderTemplate(String ATemplate, TPaginationParams* APaginationParams = nullptr);
+    String RenderCustomerTemplate(const String& ATemplate, TWebRequest* ARequest,
+                                  TPaginationParams* APaginationParams = nullptr,
+                                  TSearchParams* ASearchParams = nullptr);
+    void ResetQuery();
+    void ApplySearchToQuery(TSearchParams* ASearchParams);
+    void ValidateCustomerForm(TWebRequest* ARequest);
 
 public:
-	void __fastcall GetCustomers(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool &Handled);
-	void __fastcall GetAllCustomers(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool &Handled);
+    void GetCustomers(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
+    void GetAllCustomers(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
 
-	__fastcall TCustomersController(Web::Stencils::TWebStencilsEngine* AWebStencilsEngine, TFDQuery* ACustomers);
-	__fastcall ~TCustomersController();
+    void GetAddCustomer(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
+    void CreateCustomer(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
+    void GetEditCustomer(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
+    void UpdateCustomer(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
+    void DeleteCustomer(TObject* Sender, TWebRequest* Request, TWebResponse* Response, bool& Handled);
+
+    TCustomersController(Web::Stencils::TWebStencilsEngine* AWebStencilsEngine, TFDQuery* ACustomers);
+    virtual ~TCustomersController();
 };
 
 #endif
