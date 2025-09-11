@@ -31,9 +31,9 @@ Loads and manages tasks from the `TASKS` table in the shared InterBase database 
 ## 📁 Project Structure
 1.  C++ source files (`.cpp`, `.h`)
 2.  Delphi Form files (`.dfm`) for the RAD Server module
-3.  **Shared** InterBase database (`tasks.ib`) in `resources/data`
-4.  **Shared** HTML templates (`.html`) in `resources/html`
-5.  **Shared** Static assets (CSS, JS, images) in `resources/static`
+3.  InterBase database (`tasks.ib`) in `resources/data`
+4.  HTML templates (`.html`) in `resources/html`
+5.  Static assets (CSS, JS, images) in `resources/static`
 
 ### 🔑 Key C++ Files
 - `WebStencilsRADServerCppDemo.cbproj`: Main C++ Builder project file.
@@ -44,7 +44,7 @@ Loads and manages tasks from the `TASKS` table in the shared InterBase database 
 - `CodeExamplesU.h/.cpp`: Contains code snippets for documentation pages.
 
 ### 📄 HTML Templates
-Located in the **shared** `resources/html` directory, demonstrating template reusability across different backends and languages.
+Located in the `resources/html` directory, demonstrating WebStencils templating capabilities.
 - `layouts/mainLayout.html`: Main layout.
 - Various content pages (e.g., `home.html`, `basics.html`).
 - Reusable partials in `partials/`.

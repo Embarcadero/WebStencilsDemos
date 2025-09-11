@@ -26,8 +26,8 @@ Uses an in-memory `TList` (`ModelTasks.h/.cpp`) managed by a singleton to store 
 ## 📁 Project Structure
 1.  C++ source files (`.cpp`, `.h`)
 2.  Datamodule files (`.dfm`)
-3.  **Shared** HTML templates (`.html`) from `resources/html`
-4.  **Shared** Static assets (CSS, JS, images) from `resources/static`
+3.  HTML templates (`.html`) from `resources/html`
+4.  Static assets (CSS, JS, images) from `resources/static`
 
 ### 🔑 Key C++ Files
 - `WebStencilsDemo.cbproj`: Main C++ Builder project file.
@@ -39,7 +39,7 @@ Uses an in-memory `TList` (`ModelTasks.h/.cpp`) managed by a singleton to store 
 - `CodeExamplesU.h/.cpp`: Contains code snippets for the documentation pages.
 
 ### 📄 HTML Templates
-Located in the **shared** `resources/html` directory. This highlights how the same templates serve both Delphi and C++ projects.
+Located in the `resources/html` directory. This demonstrates WebStencils templating capabilities.
 - `layouts/mainLayout.html`: Main layout.
 - Various content pages (e.g., `home.html`, `basics.html`).
 - Reusable partials in `partials/`.

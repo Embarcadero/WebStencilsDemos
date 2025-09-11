@@ -108,8 +108,8 @@ This demo uses an in-memory `TList<TTaskItem>` managed by a singleton (`Model.Ta
 ## 📁 Project Structure
 The project consists of the following main components:
 1. Delphi source files (`.pas` and `.dfm`)
-2. **Shared** HTML templates (`.html`) located in `resources/html`
-3. **Shared** Static assets (CSS, JavaScript, images) located in `resources/static`
+2. HTML templates (`.html`) located in `resources/html`
+3. Static assets (CSS, JavaScript, images) located in `resources/static`
 
 ### 🔑 Key Delphi Units
 - `WebStencilsDemo.dpr`: The main project file that includes WebBroker
@@ -128,7 +128,7 @@ The project consists of the following main components:
 - `Constants.Server.pas`: Server-related constants and messages
 
 ### 📄 HTML Templates
-Located in the **shared** `resources/html` directory. This demonstrates how the same templates can be used across different projects (Delphi/C++, WebBroker/RAD Server).
+Located in the `resources/html` directory. This demonstrates WebStencils templating capabilities.
 - `layouts/mainLayout.html`: The main layout template
 - `layouts/baseLayout.html`: Base layout for authentication pages
 - `layouts/authMenu.html`: Authentication menu component

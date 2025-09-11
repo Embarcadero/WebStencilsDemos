@@ -28,9 +28,9 @@ Loads and manages tasks from the `TASKS` table in the shared InterBase database 
 
 ## 📁 Project Structure 
 1.  Delphi units (`.pas`)
-2.  **Shared** InterBase database (`tasks.ib`) in `resources/data`
-3.  **Shared** HTML templates (`.html`) in `resources/html`
-4.  **Shared** Static assets (CSS, JS, images) in `resources/static`
+2.  InterBase database (`tasks.ib`) in `resources/data`
+3.  HTML templates (`.html`) in `resources/html`
+4.  Static assets (CSS, JS, images) in `resources/static`
 
 ### 🔑 Key Delphi Units
 - `WebStencilsRADServerDemo.dpr`: Main project file.
@@ -41,7 +41,7 @@ Loads and manages tasks from the `TASKS` table in the shared InterBase database 
 - `CodeExamplesU.pas`: Contains code snippets for documentation pages.
 
 ### 📄 HTML Templates
-Located in the **shared** `resources/html` directory, demonstrating template reusability across different backends and languages.
+Located in the `resources/html` directory, demonstrating WebStencils templating capabilities.
 - `layouts/mainLayout.html`: Main layout.
 - Various content pages (e.g., `home.html`, `basics.html`).
 - Reusable partials in `partials/`.
