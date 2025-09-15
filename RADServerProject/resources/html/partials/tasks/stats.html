@@ -15,7 +15,7 @@
         <div class="progress" style="height: 10px">
           <div class="progress-bar bg-success" 
                role="progressbar" 
-               style="width: @(Tasks.CompletedCount * 100 / Tasks.Count)%">
+               style="width: @(Round(Tasks.CompletedCount * 100 / Tasks.Count))%">
           </div>
         </div>
       </div>
