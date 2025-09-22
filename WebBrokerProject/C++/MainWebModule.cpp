@@ -227,7 +227,6 @@ void __fastcall TMainWebModule::WebModule1ActHealthAction(TObject *Sender, TWebR
         "  \"status\": \"healthy\",\n"
         "  \"timestamp\": \"%s\",\n"
         "  \"uptime\": \"%s\",\n"
-        "  \"version\": \"%s\",\n"
         "  \"environment\": \"%s\",\n"
         "  \"container\": false,\n"
         "  \"resources_path\": \"%s\",\n"
@@ -235,7 +234,7 @@ void __fastcall TMainWebModule::WebModule1ActHealthAction(TObject *Sender, TWebR
         "}",
         ARRAYOFCONST((
             FormatDateTime("yyyy-mm-dd\"T\"hh:nn:ss.zzz\"Z\"", TTimeZone::Local->ToUniversalTime(Now())),
-            TimeToStr(Now()),
+			TimeToStr(Now()),
 #ifdef _WIN64
             "Windows x64",
 #else

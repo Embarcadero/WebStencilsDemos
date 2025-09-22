@@ -311,8 +311,7 @@ begin
       "status": "healthy",
       "timestamp": "%s",
       "uptime": "%s",
-      "version": "%s",
-
+      "environment": "%s",
       "container": %s,
       "resources_path": "%s",
       "database_path": "%s"
