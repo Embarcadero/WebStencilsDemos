@@ -14,6 +14,12 @@ const PlainTemplate1 = '''
   ''';
 
 const HTMLTemplate1 = '''
+  <style>
+    body {
+      background-color: white !important;
+      color: black !important;
+    }
+  </style>
   <ul>
     <li>Name: <strong>@person.name</strong></li>
     <li>Age: <strong>@person.age</strong></li>
