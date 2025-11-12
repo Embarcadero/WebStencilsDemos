@@ -20,11 +20,15 @@ if (-not (Test-Path $linux64Path)) {
     exit 1
 }
 
-# Verify the executable exists
-$executablePath = Join-Path $linux64Path "Docker\WebStencilsDemo"
+# Verify the executable exists (check both Release and Docker directories)
+$executablePath = Join-Path $linux64Path "Release\WebStencilsDemo"
 if (-not (Test-Path $executablePath)) {
-    Write-Error "WebStencilsDemo executable not found in Linux64/Docker"
-    exit 1
+    # Fallback to Docker directory for backward compatibility
+    $executablePath = Join-Path $linux64Path "Docker\WebStencilsDemo"
+    if (-not (Test-Path $executablePath)) {
+        Write-Error "WebStencilsDemo executable not found in Linux64/Release or Linux64/Docker"
+        exit 1
+    }
 }
 
 # Verify resources directory exists
@@ -48,17 +52,18 @@ if (Test-Path $buildContextPath) {
 }
 New-Item -ItemType Directory -Path $buildContextPath | Out-Null
 
-# Create the directory structure for the executable
-$executableDestDir = Join-Path $buildContextPath "Linux64\Docker"
+# Always copy to Linux64/Release in build context for consistency
+$executableDestDir = Join-Path $buildContextPath "Linux64\Release"
 New-Item -ItemType Directory -Path $executableDestDir -Force | Out-Null
 
 # Copy required files to build context
-Copy-Item -Path $executablePath -Destination (Join-Path $buildContextPath "Linux64\Docker\WebStencilsDemo") -Force
+$executableDestPath = Join-Path $executableDestDir "WebStencilsDemo"
+Copy-Item -Path $executablePath -Destination $executableDestPath -Force
 Copy-Item -Path $resourcesPath -Destination (Join-Path $buildContextPath "resources") -Recurse -Force
 Copy-Item -Path (Join-Path $scriptPath "Dockerfile") -Destination (Join-Path $buildContextPath "Dockerfile") -Force
 
 # Set executable permissions using WSL
-$wslExecutablePath = wsl wslpath -u ((Join-Path $buildContextPath "Linux64\Docker\WebStencilsDemo") -replace '\\', '/')
+$wslExecutablePath = wsl wslpath -u ($executableDestPath -replace '\\', '/')
 wsl chmod +x $wslExecutablePath
 
 # Convert Windows path to WSL path
