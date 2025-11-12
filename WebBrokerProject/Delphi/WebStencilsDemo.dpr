@@ -170,7 +170,6 @@ end;
 
 procedure RunServer(APort: Integer);
 var
-  LResponse: string;
   {$IFDEF LINUX}
   OldAct: sigaction_t;
   NewAct: sigaction_t;

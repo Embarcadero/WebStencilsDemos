@@ -40,7 +40,7 @@ uses
   FireDAC.Comp.Client,
   FireDAC.Comp.DataSet,
   FireDAC.UI.Intf,
-  FireDAC.VCLUI.Wait,
+  FireDAC.Comp.UI,
 
   // Own units
   Helpers.WebModule,
@@ -84,6 +84,7 @@ type
     CustomersACTIVE: TBooleanField;
     CustomersCOMMENTS: TWideMemoField;
     CountriesCOUNTRY: TStringField;
+    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure WebModuleCreate(Sender: TObject);

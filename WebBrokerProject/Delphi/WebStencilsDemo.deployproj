@@ -5,26 +5,16 @@
     </ProjectExtensions>
     <PropertyGroup/>
     <ItemGroup Condition="'$(Platform)'=='Win64'">
-        <DeployFile Include="Win64\Debug\WebStencilsDemo.rsm" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>WebStencilsDemo\</RemoteDir>
-            <RemoteName>WebStencilsDemo.rsm</RemoteName>
-            <DeployClass>DebugSymbols</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Win64\Release\WebStencilsDemo.exe" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\</RemoteDir>
-            <RemoteName>WebStencilsDemo.exe</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-            <Required>True</Required>
-        </DeployFile>
         <DeployFile Include="README.md" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>WebStencilsDemo\</RemoteDir>
+            <RemoteName>README.md</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="README.md" Condition="'$(Config)'=='Release'">
             <RemoteDir>WebStencilsDemo\</RemoteDir>
             <RemoteName>README.md</RemoteName>
             <DeployClass>ProjectFile</DeployClass>
@@ -43,144 +33,19 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
+        <DeployFile Include="Win64\Release\WebStencilsDemo.exe" Condition="'$(Config)'=='Release'">
+            <RemoteDir>WebStencilsDemo\</RemoteDir>
+            <RemoteName>WebStencilsDemo.exe</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Win64x'"/>
     <ItemGroup Condition="'$(Platform)'=='Linux64'">
-        <DeployFile Include="html\keywords.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\</RemoteDir>
-            <RemoteName>keywords.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\static\css\custom.css" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\static\css\</RemoteDir>
-            <RemoteName>custom.css</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\tasks\list.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\tasks\</RemoteDir>
-            <RemoteName>list.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\tasks\card.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\tasks\</RemoteDir>
-            <RemoteName>card.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\pageInfo.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\</RemoteDir>
-            <RemoteName>pageInfo.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\static\img\favicon.ico" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\static\img\</RemoteDir>
-            <RemoteName>favicon.ico</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\static\js\custom.js" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\static\js\</RemoteDir>
-            <RemoteName>custom.js</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\components.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\</RemoteDir>
-            <RemoteName>components.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\hero.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\</RemoteDir>
-            <RemoteName>hero.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\static\js\modeToggle.js" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\static\js\</RemoteDir>
-            <RemoteName>modeToggle.js</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\home.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\</RemoteDir>
-            <RemoteName>home.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\tasks\itemEdit.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\tasks\</RemoteDir>
-            <RemoteName>itemEdit.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\layouts\footer.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\layouts\</RemoteDir>
-            <RemoteName>footer.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\basics.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\</RemoteDir>
-            <RemoteName>basics.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="README.md" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>WebStencilsDemo\</RemoteDir>
-            <RemoteName>README.md</RemoteName>
-            <DeployClass>ProjectFile</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="Linux64\Debug\WebStencilsDemo" Condition="'$(Config)'=='Debug'">
             <RemoteDir>WebStencilsDemo\</RemoteDir>
             <RemoteName>WebStencilsDemo</RemoteName>
@@ -190,78 +55,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
-        </DeployFile>
-        <DeployFile Include="html\layouts\navbar.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\layouts\</RemoteDir>
-            <RemoteName>navbar.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="resources\data\customersFireDac.json" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\resources\data\</RemoteDir>
-            <RemoteName>customersFireDac.json</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\tasks\item.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\tasks\</RemoteDir>
-            <RemoteName>item.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\examples\customers.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\examples\</RemoteDir>
-            <RemoteName>customers.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\templates.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\</RemoteDir>
-            <RemoteName>templates.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\examples\tasks.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\examples\</RemoteDir>
-            <RemoteName>tasks.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\partials\codeBlock.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\partials\</RemoteDir>
-            <RemoteName>codeBlock.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="html\layouts\mainLayout.html" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\layouts\</RemoteDir>
-            <RemoteName>mainLayout.html</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
         </DeployFile>
         <DeployFile Include="Linux64\Release\WebStencilsDemo" Condition="'$(Config)'=='Release'">
             <RemoteDir>WebStencilsDemo\</RemoteDir>
@@ -273,17 +66,6 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="html\static\img\logo.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>WebStencilsDemo\html\static\img\</RemoteDir>
-            <RemoteName>logo.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-    </ItemGroup>
-    <ItemGroup Condition="'$(Platform)'=='Win32'">
         <DeployFile Include="README.md" Condition="'$(Config)'=='Release'">
             <RemoteDir>WebStencilsDemo\</RemoteDir>
             <RemoteName>README.md</RemoteName>
@@ -293,6 +75,8 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='Win32'">
         <DeployFile Include="Win32\Debug\WebStencilsDemo.exe" Condition="'$(Config)'=='Debug'">
             <RemoteDir>WebStencilsDemo\</RemoteDir>
             <RemoteName>WebStencilsDemo.exe</RemoteName>
@@ -312,6 +96,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="README.md" Condition="'$(Config)'=='Release'">
+            <RemoteDir>WebStencilsDemo\</RemoteDir>
+            <RemoteName>README.md</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
         </DeployFile>
     </ItemGroup>
 </Project>

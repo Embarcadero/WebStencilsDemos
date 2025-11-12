@@ -271,4 +271,10 @@ object MainWebModule: TMainWebModule
       Size = 255
     end
   end
+  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
+    Provider = 'Console'
+    ScreenCursor = gcrNone
+    Left = 336
+    Top = 152
+  end
 end
