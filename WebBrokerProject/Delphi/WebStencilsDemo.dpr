@@ -170,10 +170,11 @@ end;
 
 procedure RunServer(APort: Integer);
 var
-  {$IFDEF LINUX}
+  LResponse: string;
+{$IFDEF LINUX}
   OldAct: sigaction_t;
   NewAct: sigaction_t;
-  {$ENDIF}
+{$ENDIF}
 begin
   Logger.Info('Starting server...');
   Writeln(sWelcomeText);
