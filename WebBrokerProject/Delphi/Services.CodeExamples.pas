@@ -112,6 +112,20 @@ begin
         <p>Your cart is empty.</p>
       }
       ''');
+  Add('codeSwitch',
+      '''
+      @switch(status.id) {
+        @case 0 {
+          <span class="status-active">active</span>
+        } @case 1 {
+          <span class="status-inactive">inactive</span>
+        } @case 2 {
+          <span class="status-pending">pending</span>
+        } @default {
+          <span class="status-unknown">unknown</span>
+        }
+      }
+      ''');
   Add('codeForeach',
       '''
       <ul>

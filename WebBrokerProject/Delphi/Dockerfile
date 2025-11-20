@@ -27,14 +27,17 @@ USER appuser
 ENV APP_LOG_PATH=/app/logs/app.log \
     APP_DB_PATH=/app/data/database.sqlite3 \
     APP_RESOURCES_PATH=/app/resources \
-    DOCKER_CONTAINER=1
+    APP_BACKUP_DB_PATH=/app/backup/database.sqlite3 \
+    DOCKER_CONTAINER=1 \
+    DEMO_MODE=true \
+    DEMO_RESET_INTERVAL=900
 
 EXPOSE 8080
 
 VOLUME ["/app/logs", "/app/data"]
 
-# Health check for web service
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["/usr/bin/curl", "-f", "http://localhost:8080/", "||", "exit", "1"]
+# Health check for web service (using bash built-in /dev/tcp - no dependencies needed)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD bash -c 'exec 3<>/dev/tcp/localhost/8080 && echo -e "GET /health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep -q "healthy" || exit 1'
 
 CMD ["/app/WebStencilsDemo"]

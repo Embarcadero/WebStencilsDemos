@@ -20,10 +20,9 @@ type
 
   TTasksController = class
   private
-    FTasks: TTasks;
     FWebStencilsProcessor: TWebStencilsProcessor;
     FWebStencilsEngine: TWebStencilsEngine;
-    function RenderTemplate(ATemplate: string; ATask: TTaskItem = nil): string;
+    function RenderTemplate(ATemplate: string; ARequest: TWebRequest; ATask: TTaskItem = nil): string;
   public
     procedure CreateTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure GetEditTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
@@ -41,9 +40,11 @@ uses
 
 { TTasksController }
 
-function TTasksController.RenderTemplate(ATemplate: string; ATask: TTaskItem = nil): string;
+function TTasksController.RenderTemplate(ATemplate: string; ARequest: TWebRequest; ATask: TTaskItem = nil): string;
 begin
   FWebStencilsProcessor.InputFileName := TPath.Combine(FWebStencilsEngine.rootDirectory, 'partials/tasks/' + ATemplate + '.html');
+  if Assigned(ARequest) then
+    FWebStencilsProcessor.WebRequest := ARequest;
   if Assigned(ATask) then
     FWebStencilsProcessor.AddVar('Task', ATask, False);
   Result := FWebStencilsProcessor.Content;
@@ -58,8 +59,6 @@ begin
     FWebStencilsEngine := AWebStencilsEngine;
     FWebStencilsProcessor := TWebStencilsProcessor.Create(nil);
     FWebStencilsProcessor.Engine := FWebStencilsEngine;
-    FTasks := TTasks.GetInstance;
-    FWebStencilsEngine.AddVar('Tasks', FTasks);
     Logger.Info('TTasksController created successfully');
   except
     on E: Exception do
@@ -75,7 +74,6 @@ begin
   try
     Logger.Info('TTasksController destroying...');
     FWebStencilsProcessor.Free;
-    FTasks.Free;
     Logger.Info('TTasksController destroyed successfully');
   except
     on E: Exception do
@@ -87,11 +85,12 @@ end;
 procedure TTasksController.CreateTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   try
+    var LTasks := TTasks.GetInstanceForSession(Request.Session);
     var lTask := Request.ContentFields.Values['task'];
     Logger.Info(Format('Creating task: %s', [lTask]));
     lTask := TNetEncoding.HTML.Encode(lTask);
-    FTasks.AddTask(lTask);
-    Response.Content := RenderTemplate('card');
+    LTasks.AddTask(lTask);
+    Response.Content := RenderTemplate('card', Request);
     Handled := True;
     Logger.Info('Task created successfully');
   except
@@ -106,10 +105,11 @@ end;
 procedure TTasksController.DeleteTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   try
+    var LTasks := TTasks.GetInstanceForSession(Request.Session);
     var lId := Request.QueryFields.Values['id'];
     Logger.Info(Format('Deleting task with ID: %s', [lId]));
-    FTasks.DeleteTask(lId.ToInteger);
-    Response.Content := RenderTemplate('card');
+    LTasks.DeleteTask(lId.ToInteger);
+    Response.Content := RenderTemplate('card', Request);
     Handled := True;
     Logger.Info('Task deleted successfully');
   except
@@ -124,11 +124,12 @@ end;
 procedure TTasksController.EditTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   try
-    var lId := Request.QueryFields.Values['id'];
-    var lTask := Request.ContentFields.Values['task'];
-    Logger.Info(Format('Editing task with ID: %s, new description: %s', [lId, lTask]));
-    FTasks.EditTask(lId.ToInteger, lTask);
-    Response.Content := RenderTemplate('card');
+    var LTasks := TTasks.GetInstanceForSession(Request.Session);
+    var LId := Request.QueryFields.Values['id'];
+    var LTask := Request.ContentFields.Values['task'];
+    Logger.Info(Format('Editing task with ID: %s, new description: %s', [LId, LTask]));
+    LTasks.EditTask(LId.ToInteger, LTask);
+    Response.Content := RenderTemplate('card', Request);
     Handled := True;
     Logger.Info('Task edited successfully');
   except
@@ -143,10 +144,11 @@ end;
 procedure TTasksController.GetEditTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   try
-    var lId := Request.QueryFields.Values['id'];
-    Logger.Info(Format('Getting edit task with ID: %s', [lId]));
-    var lTask := FTasks.FindTaskById(lId.ToInteger);
-    Response.Content := RenderTemplate('itemEdit', lTask);
+    var LTasks := TTasks.GetInstanceForSession(Request.Session);
+    var LId := Request.QueryFields.Values['id'];
+    Logger.Info(Format('Getting edit task with ID: %s', [LId]));
+    var LTask := LTasks.FindTaskById(LId.ToInteger);
+    Response.Content := RenderTemplate('itemEdit', Request, LTask);
     Handled := True;
     Logger.Info('Edit task template rendered successfully');
   except
@@ -161,10 +163,11 @@ end;
 procedure TTasksController.TogglecompletedTask(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   try
-    var lId := Request.QueryFields.Values['id'];
-    Logger.Info(Format('Toggling completed status for task with ID: %s', [lId]));
-    FTasks.TogglecompletedTask(lId.ToInteger);
-    Response.Content := RenderTemplate('card');
+    var LTasks := TTasks.GetInstanceForSession(Request.Session);
+    var LId := Request.QueryFields.Values['id'];
+    Logger.Info(Format('Toggling completed status for task with ID: %s', [LId]));
+    LTasks.TogglecompletedTask(LId.ToInteger);
+    Response.Content := RenderTemplate('card', Request);
     Handled := True;
     Logger.Info('Task completion status toggled successfully');
   except

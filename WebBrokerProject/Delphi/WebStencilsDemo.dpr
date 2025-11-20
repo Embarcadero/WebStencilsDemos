@@ -28,7 +28,9 @@ uses
   Helpers.Messages in 'Helpers.Messages.pas',
   Controllers.Base in 'Controllers.Base.pas',
   Utils.Search in 'Utils.Search.pas',
-  Utils.FormSession in 'Utils.FormSession.pas';
+  Utils.FormSession in 'Utils.FormSession.pas',
+  Utils.DemoReset in 'Utils.DemoReset.pas',
+  Utils.Config in 'Utils.Config.pas';
 
 {$R *.res}
 

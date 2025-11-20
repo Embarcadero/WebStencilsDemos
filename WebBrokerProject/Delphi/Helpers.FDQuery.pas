@@ -56,15 +56,13 @@ begin
 end;
 
 procedure TFDQueryHelper.SetPageSize(const Value: Integer);
-var
-  LOldPageNumber: Integer;
 begin
   if Value <= 0 then
     raise Exception.Create('PageSize must be greater than 0');
 
   try
     // Store the current page before changing page size
-    LOldPageNumber := PageNumber;
+    var LOldPageNumber := PageNumber;
 
     // Set the new page size
     FetchOptions.RecsMax := Value;

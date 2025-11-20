@@ -29,7 +29,6 @@ type
     function GetSearchSQL: string;
     function GetSearchTermForUrl: string;
     function GetHasSearch: Boolean;
-  published
     property HasSearch: Boolean read GetHasSearch;
     property SearchTerm: string read FSearchTerm;
     property BaseSearch: TBaseSearch read FBaseSearch;

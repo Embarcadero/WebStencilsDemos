@@ -19,6 +19,11 @@
     <p>For negative conditional execution, use <code>@@if not</code>.</p>
 
 		@Import partials/codeBlock { @code = @codeIfNot }
+        
+    <h3 class="mt-5">@@switch</h3>
+    <p>The <code>@@switch</code> operator allows you to execute different code blocks based on the value of an expression, providing a more readable alternative to multiple if-else statements.</p>
+
+		@Import partials/codeBlock { @code = @codeSwitch }            
 
     <h3 class="mt-5">@@ForEach</h3>
     <p>The <code>@@ForEach</code> keyword is used for iteration over elements in an enumerator.</p>
