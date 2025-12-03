@@ -184,6 +184,8 @@ object MainWebModule: TMainWebModule
         'urces\data\database.sqlite3'
       'SharedCache=False'
       'JournalMode=WAL'
+      'LockingMode=Normal'
+      'Synchronous=Full'
       'DriverID=SQLite')
     LoginPrompt = False
     Left = 253

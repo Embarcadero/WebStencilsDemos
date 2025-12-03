@@ -7,7 +7,7 @@ param(
 )
 
 # Docker Hub repository
-$dockerHubRepo = "thony/webstencils-demo"
+$dockerHubRepo = "radstudio/webstencils-demo"
 $localImageName = "webstencils-demo"
 $localImageTag = "latest"
 

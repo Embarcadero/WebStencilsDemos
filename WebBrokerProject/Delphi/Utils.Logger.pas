@@ -21,7 +21,7 @@ type
     FConsoleLogging: Boolean;
     FLastCleanupCheck: TDateTime;
     FCleaningUp: Boolean;
-    procedure WriteLog(Level: TLogLevel; const Message: string);
+    procedure WriteLog(Level: TLogLevel; const AMessage: string);
     function GetLogLevelString(Level: TLogLevel): string;
     procedure EnsureLogDirectory;
     procedure EnsureLogFileOpen;
@@ -30,10 +30,10 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Info(const Message: string);
-    procedure Error(const Message: string);
-    procedure Debug(const Message: string);
-    procedure Warning(const Message: string);
+    procedure Info(const AMessage: string);
+    procedure Error(const AMessage: string);
+    procedure Debug(const AMessage: string);
+    procedure Warning(const AMessage: string);
     procedure CleanupLogs(RetentionDays: Integer = 7);
     property LogPath: string read FLogPath write FLogPath;
     property LogLevel: TLogLevel read FLogLevel write FLogLevel;
@@ -132,7 +132,7 @@ begin
   Result := LOG_LEVEL_STRINGS[Level];
 end;
 
-procedure TLogger.WriteLog(Level: TLogLevel; const Message: string);
+procedure TLogger.WriteLog(Level: TLogLevel; const AMessage: string);
 var
   LogMessage: string;
 begin
@@ -142,7 +142,7 @@ begin
   LogMessage := Format('[%s] [%s] %s',
     [FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now),
      GetLogLevelString(Level),
-     Message]);
+     AMessage]);
      
   // Output to console if enabled
   if FConsoleLogging then
@@ -171,24 +171,24 @@ begin
   end;
 end;
 
-procedure TLogger.Info(const Message: string);
+procedure TLogger.Info(const AMessage: string);
 begin
-  WriteLog(llInfo, Message);
+  WriteLog(llInfo, AMessage);
 end;
 
-procedure TLogger.Error(const Message: string);
+procedure TLogger.Error(const AMessage: string);
 begin
-  WriteLog(llError, Message);
+  WriteLog(llError, AMessage);
 end;
 
-procedure TLogger.Debug(const Message: string);
+procedure TLogger.Debug(const AMessage: string);
 begin
-  WriteLog(llDebug, Message);
+  WriteLog(llDebug, AMessage);
 end;
 
-procedure TLogger.Warning(const Message: string);
+procedure TLogger.Warning(const AMessage: string);
 begin
-  WriteLog(llWarning, Message);
+  WriteLog(llWarning, AMessage);
 end;
 
 procedure TLogger.CheckAndCleanupLogs;

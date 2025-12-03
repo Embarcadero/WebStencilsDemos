@@ -16,7 +16,6 @@ WORKDIR /app
 # Copy application and set permissions
 COPY --chown=appuser:appuser Linux64/Release/WebStencilsDemo /app/WebStencilsDemo
 COPY --chown=appuser:appuser ../resources /app/resources
-COPY --chown=appuser:appuser ../resources/data/database.sqlite3 /app/backup/database.sqlite3
 
 RUN chmod +x /app/WebStencilsDemo
 
@@ -25,9 +24,8 @@ USER appuser
 
 # Environment variables
 ENV APP_LOG_PATH=/app/logs/app.log \
-    APP_DB_PATH=/app/data/database.sqlite3 \
+    APP_DB_FILE=/app/data/database.sqlite3 \
     APP_RESOURCES_PATH=/app/resources \
-    APP_BACKUP_DB_PATH=/app/backup/database.sqlite3 \
     DOCKER_CONTAINER=1 \
     DEMO_MODE=true \
     DEMO_RESET_INTERVAL=900

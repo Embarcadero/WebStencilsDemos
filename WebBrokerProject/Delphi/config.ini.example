@@ -13,13 +13,14 @@
 ; Leave empty to use environment variable APP_RESOURCES_PATH or default
 ResourcesPath=
 
-; Path to the active database file
-; Leave empty to use environment variable APP_DB_PATH or default
-DatabasePath=
+; Full path to the active database file (including filename)
+; Leave empty to use environment variable APP_DB_FILE or default
+DatabaseFile=
 
-; Path to the backup database file (used for initialization and demo reset)
-; Leave empty to use environment variable APP_BACKUP_DB_PATH or default
-BackupDbPath=
+; Full path to the backup database file (including filename, used for demo reset when DEMO_MODE is enabled)
+; If not specified, backup file path is auto-determined based on active database location
+; Leave empty to use environment variable APP_BACKUP_DB_FILE or auto-determined default
+BackupDatabaseFile=
 
 [Demo]
 ; Enable demo mode with automatic data reset (true/false)

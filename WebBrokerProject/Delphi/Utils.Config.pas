@@ -12,8 +12,8 @@
   Example config.ini:
     [Paths]
     ResourcesPath=C:\MyApp\resources
-    DatabasePath=C:\MyApp\data\database.sqlite3
-    BackupDbPath=C:\MyApp\backup\database.sqlite3
+    DatabaseFile=C:\MyApp\data\database.sqlite3
+    BackupDatabaseFile=C:\MyApp\backup\database.sqlite3
     
     [Demo]
     DemoMode=true
@@ -38,9 +38,11 @@ type
   public
     class constructor Create;
     class destructor Destroy;
-    class function ReadString(const Section, Key, Default: string): string;
-    class function ReadInteger(const Section, Key: string; Default: Integer): Integer;
-    class function ReadBool(const Section, Key: string; Default: Boolean): Boolean;
+    // Check INI file > Environment variable > Default
+    // EnvVarName: If empty string, skips environment variable check (INI > Default only)
+    class function ReadString(const Section, Key, Default: string; const EnvVarName: string = ''): string;
+    class function ReadInteger(const Section, Key: string; Default: Integer; const EnvVarName: string = ''): Integer;
+    class function ReadBool(const Section, Key: string; Default: Boolean; const EnvVarName: string = ''): Boolean;
     class function ConfigFileExists: Boolean;
     class property ConfigPath: string read FConfigPath;
   end;
@@ -77,61 +79,117 @@ begin
     FIniFile.Free;
 end;
 
-class function TAppConfig.ReadString(const Section, Key, Default: string): string;
-begin
-  if FConfigExists and Assigned(FIniFile) then
-    Result := FIniFile.ReadString(Section, Key, Default)
-  else
-    Result := Default;
-end;
-
-class function TAppConfig.ReadInteger(const Section, Key: string; Default: Integer): Integer;
-begin
-  if FConfigExists and Assigned(FIniFile) then
-    Result := FIniFile.ReadInteger(Section, Key, Default)
-  else
-    Result := Default;
-end;
-
-class function TAppConfig.ReadBool(const Section, Key: string; Default: Boolean): Boolean;
+class function TAppConfig.ReadString(const Section, Key, Default: string; const EnvVarName: string = ''): string;
 var
-  ValueStr: string;
-  OriginalValue: string;
+  IniValue: string;
+  EnvValue: string;
 begin
+  // Priority 1: INI file
   if FConfigExists and Assigned(FIniFile) then
   begin
-    // Read as string first to handle various boolean representations
-    OriginalValue := FIniFile.ReadString(Section, Key, '');
-    ValueStr := Trim(OriginalValue);
-    
-    // If key doesn't exist or is empty, return default
-    if ValueStr = '' then
+    IniValue := FIniFile.ReadString(Section, Key, '');
+    if IniValue <> '' then
     begin
-      Result := Default;
+      Result := IniValue;
       Exit;
     end;
-    
-    // Parse common boolean string representations
-    // We'll handle more variations: true, false, 1, 0, yes, no, on, off
-    ValueStr := LowerCase(ValueStr);
-    if (ValueStr = 'true') or (ValueStr = '1') or (ValueStr = 'yes') or (ValueStr = 'on') then
-    begin
-      Result := True;
-    end
-    else if (ValueStr = 'false') or (ValueStr = '0') or (ValueStr = 'no') or (ValueStr = 'off') then
-    begin
-      Result := False;
-    end
-    else
-    begin
-      // Fall back to TIniFile.ReadBool for standard Delphi INI boolean values
-      Result := FIniFile.ReadBool(Section, Key, Default);
-    end;
-  end
-  else
-  begin
-    Result := Default;
   end;
+  
+  // Priority 2: Environment variable (if EnvVarName provided)
+  if EnvVarName <> '' then
+  begin
+    EnvValue := GetEnvironmentVariable(EnvVarName);
+    if EnvValue <> '' then
+    begin
+      Result := EnvValue;
+      Exit;
+    end;
+  end;
+  
+  // Priority 3: Default
+  Result := Default;
+end;
+
+class function TAppConfig.ReadInteger(const Section, Key: string; Default: Integer; const EnvVarName: string = ''): Integer;
+var
+  IniValue: Integer;
+  EnvValue: string;
+  EnvIntValue: Integer;
+begin
+  // Priority 1: INI file
+  if FConfigExists and Assigned(FIniFile) then
+  begin
+    if FIniFile.ValueExists(Section, Key) then
+    begin
+      IniValue := FIniFile.ReadInteger(Section, Key, Default);
+      Result := IniValue;
+      Exit;
+    end;
+  end;
+  
+  // Priority 2: Environment variable (if EnvVarName provided)
+  if EnvVarName <> '' then
+  begin
+    EnvValue := GetEnvironmentVariable(EnvVarName);
+    if EnvValue <> '' then
+    begin
+      EnvIntValue := StrToIntDef(EnvValue, Default);
+      Result := EnvIntValue;
+      Exit;
+    end;
+  end;
+  
+  // Priority 3: Default
+  Result := Default;
+end;
+
+class function TAppConfig.ReadBool(const Section, Key: string; Default: Boolean; const EnvVarName: string = ''): Boolean;
+var
+  IniValueStr: string;
+  EnvValue: string;
+begin
+  // Priority 1: INI file
+  if FConfigExists and Assigned(FIniFile) then
+  begin
+    if FIniFile.ValueExists(Section, Key) then
+    begin
+      // Use existing boolean parsing logic
+      IniValueStr := FIniFile.ReadString(Section, Key, '');
+      IniValueStr := Trim(LowerCase(IniValueStr));
+      
+      if (IniValueStr = 'true') or (IniValueStr = '1') or (IniValueStr = 'yes') or (IniValueStr = 'on') then
+        Result := True
+      else if (IniValueStr = 'false') or (IniValueStr = '0') or (IniValueStr = 'no') or (IniValueStr = 'off') then
+        Result := False
+      else
+        Result := FIniFile.ReadBool(Section, Key, Default);
+      Exit;
+    end;
+  end;
+  
+  // Priority 2: Environment variable (if EnvVarName provided)
+  if EnvVarName <> '' then
+  begin
+    EnvValue := GetEnvironmentVariable(EnvVarName);
+    if EnvValue <> '' then
+    begin
+      EnvValue := LowerCase(Trim(EnvValue));
+      if (EnvValue = 'true') or (EnvValue = '1') or (EnvValue = 'yes') or (EnvValue = 'on') then
+      begin
+        Result := True;
+        Exit;
+      end
+      else if (EnvValue = 'false') or (EnvValue = '0') or (EnvValue = 'no') or (EnvValue = 'off') then
+      begin
+        Result := False;
+        Exit;
+      end;
+      // Invalid value falls through to default
+    end;
+  end;
+  
+  // Priority 3: Default
+  Result := Default;
 end;
 
 class function TAppConfig.ConfigFileExists: Boolean;

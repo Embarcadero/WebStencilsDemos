@@ -68,6 +68,10 @@ __recovery/
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
 
+# Demo mode backup databases (auto-created at runtime when DEMO_MODE is enabled)
+**/backup.sqlite3
+**/backup/*.sqlite3
+
 #
 .DS_Store
 Android64/

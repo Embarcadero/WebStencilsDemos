@@ -164,79 +164,35 @@ end;
 procedure TMainWebModule.InitRequiredData;
 var
   BinaryPath: string;
-  EnvResourcesPath: string;
-  EnvDbPath: string;
-  EnvBackupDbPath: string;
+  DefaultResourcesPath: string;
+  DefaultDatabaseFile: string;
   DataDir: string;
-  BackupDbPath: string;
-  
-  // Helper function to resolve configuration values with consistent priority:
-  // 1. INI file (if exists)
-  // 2. Environment variable
-  // 3. Platform-specific default
-  function ResolveConfig(const IniSection, IniKey, EnvVarName, EnvValue: string; 
-    const DefaultValue: string; const ValueType: string): string;
-  var
-    IniValue: string;
-  begin
-    // Check INI file first
-    IniValue := TAppConfig.ReadString(IniSection, IniKey, '');
-    if IniValue <> '' then
-    begin
-      Result := IniValue;
-      Logger.Info(Format('%s from INI file (%s.%s): %s', [ValueType, IniSection, IniKey, Result]));
-      Exit;
-    end;
-    
-    // Check environment variable
-    if EnvValue <> '' then
-    begin
-      Result := EnvValue;
-      Logger.Info(Format('%s from environment (%s): %s', [ValueType, EnvVarName, Result]));
-      Exit;
-    end;
-    
-    // Use default
-    Result := DefaultValue;
-    Logger.Info(Format('%s (default): %s', [ValueType, Result]));
-  end;
-  
 begin
   Logger.Info('Initializing required data...');
   
-  // Get configuration values (INI file > Environment variables > Defaults)
+  // Determine platform-specific defaults
   BinaryPath := TPath.GetDirectoryName(ParamStr(0));
-  EnvResourcesPath := GetEnvironmentVariable('APP_RESOURCES_PATH');
-  EnvDbPath := GetEnvironmentVariable('APP_DB_PATH');
-  EnvBackupDbPath := GetEnvironmentVariable('APP_BACKUP_DB_PATH');
-
-  // Resolve all paths using unified configuration pattern
-  // Resources path: Windows uses relative path from binary, Linux uses binary directory
 {$IFDEF MSWINDOWS}
-  FResourcesPath := ResolveConfig('Paths', 'ResourcesPath', 'APP_RESOURCES_PATH', EnvResourcesPath,
-    TPath.Combine(BinaryPath, '../../../resources'), 'Resources path');
+  DefaultResourcesPath := TPath.Combine(BinaryPath, '../../../resources');
 {$ELSE}
-  FResourcesPath := ResolveConfig('Paths', 'ResourcesPath', 'APP_RESOURCES_PATH', EnvResourcesPath,
-    BinaryPath, 'Resources path');
+  DefaultResourcesPath := BinaryPath;
 {$ENDIF}
+  
+  // Resolve resources path (INI > Environment > Default)
+  FResourcesPath := TAppConfig.ReadString('Paths', 'ResourcesPath', 
+    DefaultResourcesPath, 'APP_RESOURCES_PATH');
+  Logger.Info(Format('Resources path: %s', [FResourcesPath]));
   
   WebStencilsEngine.RootDirectory := TPath.Combine(FResourcesPath, 'html');
   WebFileDispatcher.RootDirectory := WebStencilsEngine.RootDirectory;
 
-  // Database path: defaults to resources/data/database.sqlite3
-  Connection.Params.Database := ResolveConfig('Paths', 'DatabasePath', 'APP_DB_PATH', EnvDbPath,
-    TPath.Combine(FResourcesPath, 'data/database.sqlite3'), 'Database path');
+  // Resolve database file (INI > Environment > Default)
+  DefaultDatabaseFile := TPath.Combine(FResourcesPath, 'data/database.sqlite3');
+  Connection.Params.Database := TAppConfig.ReadString('Paths', 'DatabaseFile', 
+    DefaultDatabaseFile, 'APP_DB_FILE');
+  Logger.Info(Format('Database file: %s', [Connection.Params.Database]));
 
-  // Backup database path: Docker uses separate backup location, others use source database
-{$IFDEF CONTAINER}
-  BackupDbPath := ResolveConfig('Paths', 'BackupDbPath', 'APP_BACKUP_DB_PATH', EnvBackupDbPath,
-    '/app/backup/database.sqlite3', 'Backup database path');
-{$ELSE}
-  BackupDbPath := ResolveConfig('Paths', 'BackupDbPath', 'APP_BACKUP_DB_PATH', EnvBackupDbPath,
-    TPath.Combine(FResourcesPath, 'data/backup.sqlite3'), 'Backup database path');
-{$ENDIF}
-
-  // Initialize database if it doesn't exist
+  // Initialize database directory if it doesn't exist
   DataDir := ExtractFilePath(Connection.Params.Database);
   if not DirectoryExists(DataDir) then
   begin
@@ -244,22 +200,10 @@ begin
     ForceDirectories(DataDir);
   end;
 
-  if not FileExists(Connection.Params.Database) then
-  begin
-    if FileExists(BackupDbPath) then
-    begin
-      Logger.Info(Format('Initializing database from backup: %s', [BackupDbPath]));
-      TFile.Copy(BackupDbPath, Connection.Params.Database);
-      Logger.Info(Format('Database initialized at: %s', [Connection.Params.Database]));
-    end
-    else
-    begin
-      Logger.Warning(Format('Backup database not found at: %s', [BackupDbPath]));
-      Logger.Info('Database will be created on first use');
-    end;
-  end
+  if FileExists(Connection.Params.Database) then
+    Logger.Info(Format('Using existing database at: %s', [Connection.Params.Database]))
   else
-    Logger.Info(Format('Using existing database at: %s', [Connection.Params.Database]));
+    Logger.Info(Format('Database will be created on first use at: %s', [Connection.Params.Database]));
 
   try
     Connection.Connected := True;
@@ -277,7 +221,7 @@ begin
                               if APropName = 'app_name' then
                                 AValue := 'WebStencils demo'
                               else if APropName = 'version' then
-                                AValue := '1.5.3'
+                                AValue := '1.6.0'
                               else if APropName = 'edition' then
                                 AValue := 'WebBroker Delphi' {$IFDEF CONTAINER} + ' in Docker' {$ENDIF}
                               else if APropName = 'company' then
@@ -302,8 +246,8 @@ begin
   TWebStencilsProcessor.Whitelist.Configure(TField, ['DisplayText', 'Value', 'DisplayLabel', 'FieldName', 'Required', 'LookupDataSet', 'LookupKeyFields', 'Visible', 'DataType', 'Size', 'IsNull'], nil, False);
 
   // Initialize demo reset if enabled (only active when DEMO_MODE environment variable is set)
-  // BackupDbPath is set above, use it for demo reset initialization
-  TDemoReset.Initialize(BackupDbPath, Connection.Params.Database, Connection);
+  // Backup database will be auto-created if it doesn't exist
+  TDemoReset.Initialize(Connection.Params.Database, Connection);
 
   Logger.Info('Required data initialization complete');
 end;
@@ -365,7 +309,7 @@ begin
       "environment": "%s",
       "container": %s,
       "resources_path": "%s",
-      "database_path": "%s"
+      "database_file": "%s"
     }
   ''', [
     FormatDateTime('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', TTimeZone.Local.ToUniversalTime(Now)),
