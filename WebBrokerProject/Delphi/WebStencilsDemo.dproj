@@ -4,7 +4,7 @@
         <ProjectVersion>20.3</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>131</TargetedPlatforms>
         <AppType>Console</AppType>
@@ -187,6 +187,8 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="Controllers.Base.pas"/>
         <DCCReference Include="Utils.Search.pas"/>
         <DCCReference Include="Utils.FormSession.pas"/>
+        <DCCReference Include="Utils.DemoReset.pas"/>
+        <DCCReference Include="Utils.Config.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -250,6 +252,13 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Linux64\Docker\WebStencilsDemo" Configuration="Docker" Class="ProjectOutput">
+                    <Platform Name="Linux64">
+                        <Enabled>false</Enabled>
+                        <RemoteName>WebStencilsDemo</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Linux64\Release\WebStencilsDemo" Configuration="Docker" Class="ProjectOutput">
                     <Platform Name="Linux64">
                         <Enabled>false</Enabled>
                         <RemoteName>WebStencilsDemo</RemoteName>

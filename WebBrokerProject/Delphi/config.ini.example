@@ -1,0 +1,42 @@
+; WebStencils Demo Configuration File
+; 
+; This file is optional. If it doesn't exist, the application will use
+; environment variables and defaults.
+;
+; Copy this file to 'config.ini' in the same directory as the executable
+; and customize the values as needed.
+;
+; Configuration priority: INI file > Environment variables > Defaults
+
+[Paths]
+; Path to the resources directory (HTML templates, static files, etc.)
+; Leave empty to use environment variable APP_RESOURCES_PATH or default
+ResourcesPath=
+
+; Full path to the active database file (including filename)
+; Leave empty to use environment variable APP_DB_FILE or default
+DatabaseFile=
+
+; Full path to the backup database file (including filename, used for demo reset when DEMO_MODE is enabled)
+; If not specified, backup file path is auto-determined based on active database location
+; Leave empty to use environment variable APP_BACKUP_DB_FILE or auto-determined default
+BackupDatabaseFile=
+
+[Demo]
+; Enable demo mode with automatic data reset (true/false)
+; Leave empty to use environment variable DEMO_MODE or default (false)
+DemoMode=false
+
+; Reset interval in seconds (default: 900 = 15 minutes)
+; Leave empty to use environment variable DEMO_RESET_INTERVAL or default
+DemoResetInterval=900
+
+[Logging]
+; Number of days to keep log entries (default: 7 days)
+; Leave empty to use environment variable LOG_RETENTION_DAYS or default
+LogRetentionDays=7
+
+; Maximum log file size in MB before cleanup is triggered (default: 10 MB)
+; Leave empty to use environment variable LOG_MAX_SIZE_MB or default
+MaxLogSizeMB=10
+

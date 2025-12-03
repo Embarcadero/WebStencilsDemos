@@ -100,13 +100,11 @@ begin
 end;
 
 procedure TCustomersController.ApplySearchToQuery(ASearchParams: TSearchParams);
-var
-  SearchSQL: string;
 begin
   if not Assigned(ASearchParams) or not ASearchParams.HasSearch then
     Exit;
 
-  SearchSQL := ASearchParams.GetSearchSQL;
+  var SearchSQL := ASearchParams.GetSearchSQL;
   if SearchSQL <> '' then
   begin
     FCustomers.SQL.Add(SearchSQL);

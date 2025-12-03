@@ -29,7 +29,6 @@ type
     destructor Destroy; override;
     procedure AddError(const AFieldName, AMessage: string);
     procedure Clear;
-  published
     function GetError(const AFieldName: string): string;
     function HasError(const AFieldName: string): Boolean;
     property ErrorCount: integer read GetErrorCount;

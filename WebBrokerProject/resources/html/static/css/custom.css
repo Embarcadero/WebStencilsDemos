@@ -23,3 +23,27 @@
   -webkit-background-clip: text;
   color: transparent;
 }
+
+/* Demo mode warning banner - theme-aware styling for light and dark modes */
+.demo-mode-banner {
+  /* Use Bootstrap's warning color with opacity for background - adapts to theme */
+  background-color: rgba(var(--bs-warning-rgb), 0.15) !important;
+  border-bottom: 2px solid rgba(var(--bs-warning-rgb), 0.5) !important;
+  color: var(--bs-body-color);
+}
+
+/* Dark mode specific adjustments - darker background, brighter text */
+[data-bs-theme="dark"] .demo-mode-banner {
+  background-color: rgba(var(--bs-warning-rgb), 0.3) !important;
+  border-bottom-color: rgba(var(--bs-warning-rgb), 0.7) !important;
+  color: #ffc107;
+}
+
+/* Ensure close button is visible in both themes */
+.demo-mode-banner .btn-close {
+  opacity: 0.8;
+}
+
+[data-bs-theme="dark"] .demo-mode-banner .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}

@@ -51,7 +51,9 @@ uses
   Models.Tasks,
   Controllers.Customers,
   Services.CodeExamples,
-  Utils.Logger;
+  Utils.Logger,
+  Utils.DemoReset,
+  Utils.Config;
 
 type
 
@@ -100,6 +102,8 @@ type
     procedure WebFormsAuthenticatorAuthenticate(Sender: TCustomWebAuthenticator;
       Request: TWebRequest; const UserName, Password: string; var Roles: string;
       var Success: Boolean);
+    procedure WebModuleBeforeDispatch(Sender: TObject;
+      Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   private
     FTasksController: TTasksController;
     FCustomersController: TCustomersController;
@@ -141,6 +145,7 @@ destructor TMainWebModule.Destroy;
 begin
   Logger.Info('Shutting down WebStencils demo module...');
   Customers.Active := false;
+  TDemoReset.Finalize;
   FTasksController.Free;
   FCustomersController.Free;
   FCodeExamples.Free;
@@ -159,40 +164,35 @@ end;
 procedure TMainWebModule.InitRequiredData;
 var
   BinaryPath: string;
-  EnvResourcesPath: string;
-  EnvDbPath: string;
+  DefaultResourcesPath: string;
+  DefaultDatabaseFile: string;
   DataDir: string;
-  BackupDbPath: string;
 begin
   Logger.Info('Initializing required data...');
-  // Try to get paths from environment variables
-  EnvResourcesPath := GetEnvironmentVariable('APP_RESOURCES_PATH');
-  EnvDbPath := GetEnvironmentVariable('APP_DB_PATH');
-
-  // Set the path for resources based on the platform and build configuration
+  
+  // Determine platform-specific defaults
   BinaryPath := TPath.GetDirectoryName(ParamStr(0));
 {$IFDEF MSWINDOWS}
-  if EnvResourcesPath = '' then
-    FResourcesPath := TPath.Combine(BinaryPath, '../../../resources')
-  else
-    FResourcesPath := EnvResourcesPath;
+  DefaultResourcesPath := TPath.Combine(BinaryPath, '../../../resources');
 {$ELSE}
-  if EnvResourcesPath = '' then
-    FResourcesPath := BinaryPath
-  else
-    FResourcesPath := EnvResourcesPath;
+  DefaultResourcesPath := BinaryPath;
 {$ENDIF}
-  Logger.Info(Format('Resources path set to: %s', [FResourcesPath]));
+  
+  // Resolve resources path (INI > Environment > Default)
+  FResourcesPath := TAppConfig.ReadString('Paths', 'ResourcesPath', 
+    DefaultResourcesPath, 'APP_RESOURCES_PATH');
+  Logger.Info(Format('Resources path: %s', [FResourcesPath]));
+  
   WebStencilsEngine.RootDirectory := TPath.Combine(FResourcesPath, 'html');
   WebFileDispatcher.RootDirectory := WebStencilsEngine.RootDirectory;
 
-  // Set database path
-  if EnvDbPath = '' then
-    Connection.Params.Database := TPath.Combine(FResourcesPath, 'data/database.sqlite3')
-  else
-    Connection.Params.Database := EnvDbPath;
+  // Resolve database file (INI > Environment > Default)
+  DefaultDatabaseFile := TPath.Combine(FResourcesPath, 'data/database.sqlite3');
+  Connection.Params.Database := TAppConfig.ReadString('Paths', 'DatabaseFile', 
+    DefaultDatabaseFile, 'APP_DB_FILE');
+  Logger.Info(Format('Database file: %s', [Connection.Params.Database]));
 
-  // Check if database exists in data directory
+  // Initialize database directory if it doesn't exist
   DataDir := ExtractFilePath(Connection.Params.Database);
   if not DirectoryExists(DataDir) then
   begin
@@ -200,22 +200,10 @@ begin
     ForceDirectories(DataDir);
   end;
 
-  // If database doesn't exist in data directory, copy it from the backup location in the container
-  if not FileExists(Connection.Params.Database) then
-  begin
-    // The backup database is stored in /app/backup/database.sqlite3 in the container
-    BackupDbPath := '/app/backup/database.sqlite3';
-    if FileExists(BackupDbPath) then
-    begin
-      Logger.Info(Format('Initializing database from backup: %s', [BackupDbPath]));
-      TFile.Copy(BackupDbPath, Connection.Params.Database);
-      Logger.Info(Format('Database initialized at: %s', [Connection.Params.Database]));
-    end
-    else
-      Logger.Error(Format('Backup database not found at: %s', [BackupDbPath]));
-  end
+  if FileExists(Connection.Params.Database) then
+    Logger.Info(Format('Using existing database at: %s', [Connection.Params.Database]))
   else
-    Logger.Info(Format('Using existing database at: %s', [Connection.Params.Database]));
+    Logger.Info(Format('Database will be created on first use at: %s', [Connection.Params.Database]));
 
   try
     Connection.Connected := True;
@@ -233,7 +221,7 @@ begin
                               if APropName = 'app_name' then
                                 AValue := 'WebStencils demo'
                               else if APropName = 'version' then
-                                AValue := '1.5.2'
+                                AValue := '1.6.0'
                               else if APropName = 'edition' then
                                 AValue := 'WebBroker Delphi' {$IFDEF CONTAINER} + ' in Docker' {$ENDIF}
                               else if APropName = 'company' then
@@ -244,6 +232,8 @@ begin
                                 AValue := 'False'
                               else if APropName = 'debug' then
                                 Avalue := {$IFDEF DEBUG} 'True' {$ELSE} 'False' {$ENDIF}
+                              else if APropName = 'demo_mode' then
+                                AValue := TDemoReset.IsEnabled.ToString(TUseBoolStrs.True)
                               else
                               begin
                                 Result := False;
@@ -254,6 +244,10 @@ begin
 
 
   TWebStencilsProcessor.Whitelist.Configure(TField, ['DisplayText', 'Value', 'DisplayLabel', 'FieldName', 'Required', 'LookupDataSet', 'LookupKeyFields', 'Visible', 'DataType', 'Size', 'IsNull'], nil, False);
+
+  // Initialize demo reset if enabled (only active when DEMO_MODE environment variable is set)
+  // Backup database will be auto-created if it doesn't exist
+  TDemoReset.Initialize(Connection.Params.Database, Connection);
 
   Logger.Info('Required data initialization complete');
 end;
@@ -271,7 +265,7 @@ begin
       AReplaceText := FormatDateTime('yyyy', Now)
     else
       AReplaceText := Format('SYSTEM_%s_NOT_FOUND', [APropName.ToUpper]);
-    AHandled := True;      
+    AHandled := True;
   end;
 end;
 
@@ -315,7 +309,7 @@ begin
       "environment": "%s",
       "container": %s,
       "resources_path": "%s",
-      "database_path": "%s"
+      "database_file": "%s"
     }
   ''', [
     FormatDateTime('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', TTimeZone.Local.ToUniversalTime(Now)),
@@ -337,6 +331,15 @@ begin
   var IsRedirect := (Response.StatusCode >= 300) and (Response.StatusCode < 400);
   if not (IsRedirect) and Assigned(Request.Session) then
     TMessageManager.ClearMessages(Request.Session);
+  if Connection.Connected then
+    Connection.Connected := False;
+end;
+
+procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  if not(Connection.Connected) then
+    Connection.Connected := True;
 end;
 
 procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;
@@ -349,6 +352,8 @@ begin
   // Add session creation timestamp for demo purposes
   Session.DataVars.Values['created'] := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
   TMessageManager.EnsureMessageProvider(Session);
+  // Initialize Tasks for this session
+  TTasks.GetInstanceForSession(Session);
   if Assigned(Session.User) then
     Logger.Info(Format('Session created for authenticated user: %s', [Session.User.UserName]))
   else

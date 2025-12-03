@@ -1,6 +1,7 @@
 object MainWebModule: TMainWebModule
   OnCreate = WebModuleCreate
   Actions = <>
+  BeforeDispatch = WebModuleBeforeDispatch
   AfterDispatch = WebModuleAfterDispatch
   Height = 361
   Width = 429
@@ -181,6 +182,10 @@ object MainWebModule: TMainWebModule
       
         'Database=C:\Users\antonio\Documents\GitHub\WebStencilsDemos\reso' +
         'urces\data\database.sqlite3'
+      'SharedCache=False'
+      'JournalMode=WAL'
+      'LockingMode=Normal'
+      'Synchronous=Full'
       'DriverID=SQLite')
     LoginPrompt = False
     Left = 253
@@ -236,7 +241,7 @@ object MainWebModule: TMainWebModule
       end
       item
         PathInfo = '/health*'
-        Kind = zkFree
+        Kind = zkIgnore
       end
       item
         PathInfo = '/tasks*'
