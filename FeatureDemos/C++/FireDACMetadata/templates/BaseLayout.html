@@ -1,0 +1,27 @@
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@@picocss/pico@@2/css/pico.min.css"
+    >  
+  <meta name="color-scheme" content="light dark">  
+  <title>WebStencils demo</title>  
+  </head>
+<body>
+  <main class="container">
+    <h1>FireDAC metadata</h1>
+    <p>Editing properties in the FireDAC query (display label, visibility, etc.), modifies the form fields automatically.</p>
+    <article>
+      <form>
+        <fieldset>    
+        @forEach(var f in customers.fields) {
+            @import ../../templates/Input { @field = @f }
+          }
+        </fieldset>
+      </form>
+    </article>
+  </main>
+</body>
+</html>

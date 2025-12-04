@@ -1,0 +1,54 @@
+@LayoutPage baseLayout
+@ExtraHeader { 
+    <style>
+        .login-form {
+          max-width: 450px;
+          margin: 2rem auto;
+          padding: 2rem;
+          border: 1px solid #666;
+          border-radius: 8px;
+        }
+        
+        .demo-credentials {
+          margin-top: 2rem;
+          padding: 1rem;
+          border-radius: 4px;
+        }
+        
+        .demo-credentials h3 {
+          margin-top: 0;
+          color: #666;
+        }
+        
+        .demo-credentials small {
+          color: #666;
+          font-style: italic;
+        }
+      </style>
+}
+<div class="grid">
+    <article class="login-form">
+      <h2>Login</h2>
+      
+      <form action="/login" method="post">
+        <label for="username">
+          Username
+          <input type="text" id="username" name="username" required>
+        </label>
+        
+        <label for="password">
+          Password
+          <input type="password" id="password" name="password" required>
+        </label>
+        
+        <button type="submit">Sign In</button>
+      </form>
+      
+      <footer class="demo-credentials">
+        <h3>Demo Credentials</h3>
+        <p><strong>User Role:</strong> demo - demo123</p>
+        <p><strong>Admin Role:</strong> admin - admin123</p>
+        <small>Use these credentials to test the different user roles</small>
+      </footer>
+    </article>
+</div>

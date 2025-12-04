@@ -86,7 +86,7 @@ Simple demonstration of the `@switch` operator in WebStencils templates. Shows c
 
 Each demo is a standalone WebBroker console application:
 
-1. Open the project file (`.dpr`) in RAD Studio
+1. Open the project file in RAD Studio
 2. Compile and run the project
 3. The console will display server commands (start, stop, status, etc.)
 4. Type `start` to start the HTTP server (default port: 8080)
@@ -101,7 +101,7 @@ Each demo is a standalone WebBroker console application:
 ## Notes
 
 - These demos are minimal examples focused on specific features
-- They use standard WebBroker server infrastructure (see `ServerConst1.pas` and main program file)
+- They use standard WebBroker server infrastructure
 - Template paths are relative to the executable location
 - Some demos may require additional resources (database files, etc.) as noted in their descriptions
 
