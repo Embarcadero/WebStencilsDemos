@@ -32,32 +32,32 @@
 //---------------------------------------------------------------------------
 class TWebModuleMain : public TWebModule
 {
-__published:	// IDE-managed Components
-	TWebStencilsProcessor *WSProcessor;
-	TFDQuery *Customers;
-	TFDConnection *Connection;
-	TFDAutoIncField *CustomersID;
-	TStringField *CustomersCOMPANY;
-	TStringField *CustomersFIRST_NAME;
-	TStringField *CustomersLAST_NAME;
-	TStringField *CustomersGENDER;
-	TIntegerField *CustomersAGE;
-	TStringField *CustomersPOSTAL_CODE;
-	TStringField *CustomersADDRESS;
-	TStringField *CustomersCITY;
-	TStringField *CustomersCOUNTRY;
-	TStringField *CustomersPHONE;
-	TStringField *CustomersEMAIL;
-	TStringField *CustomersIP_ADDRESS;
-	TDateField *CustomersACTIVATION_DATE;
-	TBooleanField *CustomersACTIVE;
-	TWideMemoField *CustomersCOMMENTS;
-	void __fastcall WebModuleMainDefaultHandlerAction(TObject *Sender, TWebRequest *Request,
+__published:  // IDE-managed Components
+  TWebStencilsProcessor *WSProcessor;
+  TFDQuery *Customers;
+  TFDConnection *Connection;
+  TFDAutoIncField *CustomersID;
+  TStringField *CustomersCOMPANY;
+  TStringField *CustomersFIRST_NAME;
+  TStringField *CustomersLAST_NAME;
+  TStringField *CustomersGENDER;
+  TIntegerField *CustomersAGE;
+  TStringField *CustomersPOSTAL_CODE;
+  TStringField *CustomersADDRESS;
+  TStringField *CustomersCITY;
+  TStringField *CustomersCOUNTRY;
+  TStringField *CustomersPHONE;
+  TStringField *CustomersEMAIL;
+  TStringField *CustomersIP_ADDRESS;
+  TDateField *CustomersACTIVATION_DATE;
+  TBooleanField *CustomersACTIVE;
+  TWideMemoField *CustomersCOMMENTS;
+  void __fastcall WebModuleMainDefaultHandlerAction(TObject *Sender, TWebRequest *Request,
           TWebResponse *Response, bool &Handled);
-	void __fastcall WebModuleCreate(TObject *Sender);
-private:	// User declarations
-public:		// User declarations
-	__fastcall TWebModuleMain(TComponent* Owner);
+  void __fastcall WebModuleCreate(TObject *Sender);
+private:  // User declarations
+public:    // User declarations
+  __fastcall TWebModuleMain(TComponent* Owner);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TWebModuleMain *WebModuleMain;

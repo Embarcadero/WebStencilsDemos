@@ -11,17 +11,17 @@
 //---------------------------------------------------------------------------
 class TWebModuleMain : public TWebModule
 {
-__published:	// IDE-managed Components
-	TWebStencilsProcessor *WSProcessor;
-	void __fastcall WebModuleMainDefaultHandlerAction(TObject *Sender, TWebRequest *Request,
+__published:  // IDE-managed Components
+  TWebStencilsProcessor *WSProcessor;
+  void __fastcall WebModuleMainDefaultHandlerAction(TObject *Sender, TWebRequest *Request,
           TWebResponse *Response, bool &Handled);
-	void __fastcall WebModuleMainWebActionItem1Action(TObject *Sender, TWebRequest *Request,
+  void __fastcall WebModuleMainWebActionItem1Action(TObject *Sender, TWebRequest *Request,
           TWebResponse *Response, bool &Handled);
-	void __fastcall WebModuleMainWebActionItem2Action(TObject *Sender, TWebRequest *Request,
+  void __fastcall WebModuleMainWebActionItem2Action(TObject *Sender, TWebRequest *Request,
           TWebResponse *Response, bool &Handled);
-private:	// User declarations
-public:		// User declarations
-	__fastcall TWebModuleMain(TComponent* Owner);
+private:  // User declarations
+public:   // User declarations
+  __fastcall TWebModuleMain(TComponent* Owner);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TWebModuleMain *WebModuleMain;

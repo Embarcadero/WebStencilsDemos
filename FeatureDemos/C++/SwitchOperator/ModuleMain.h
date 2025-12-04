@@ -15,27 +15,27 @@
 class TStatusObject : public System::Classes::TPersistent
 {
 private:
-	System::UnicodeString RandomStatus();
+  System::UnicodeString RandomStatus();
 
 public:
-	__published:
-		__property System::UnicodeString Name = {read=RandomStatus};
+  __published:
+    __property System::UnicodeString Name = {read=RandomStatus};
 };
 
 //---------------------------------------------------------------------------
 class TWebModuleMain : public TWebModule
 {
-__published:	// IDE-managed Components
-	TWebStencilsProcessor *WSProcessor;
-	void __fastcall WebModuleMainDefaultHandlerAction(TObject *Sender, TWebRequest *Request,
+__published:  // IDE-managed Components
+  TWebStencilsProcessor *WSProcessor;
+  void __fastcall WebModuleMainDefaultHandlerAction(TObject *Sender, TWebRequest *Request,
           TWebResponse *Response, bool &Handled);
-	void __fastcall WebModuleCreate(TObject *Sender);
-	void __fastcall WebModuleDestroy(TObject *Sender);
-private:	// User declarations
-	std::unique_ptr<TStatusObject> FStatus;
-public:		// User declarations
-	__fastcall TWebModuleMain(TComponent* Owner);
-	__fastcall virtual ~TWebModuleMain();
+  void __fastcall WebModuleCreate(TObject *Sender);
+  void __fastcall WebModuleDestroy(TObject *Sender);
+private:  // User declarations
+  std::unique_ptr<TStatusObject> FStatus;
+public:    // User declarations
+  __fastcall TWebModuleMain(TComponent* Owner);
+  __fastcall virtual ~TWebModuleMain();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TWebModuleMain *WebModuleMain;
