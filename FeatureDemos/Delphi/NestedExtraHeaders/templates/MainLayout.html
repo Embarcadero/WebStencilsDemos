@@ -1,0 +1,18 @@
+@LayoutPage BaseLayout
+@ExtraHeader {
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@@picocss/pico@@2/css/pico.min.css"
+  >
+}
+<main class="container">
+    <nav>
+        <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/link1">Link 1</a></li>
+        <li><a href="/link2">Link 2</a></li>
+        </ul>
+    </nav>
+    <h1>@@ExtraHeader demo</h1>
+    @RenderBody
+</main>

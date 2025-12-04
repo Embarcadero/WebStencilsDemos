@@ -46,22 +46,22 @@
         There are several ways to use <code>AddVar</code>:</p>
     <ol>
         <li><strong>Direct object assignment</strong>:</li>
-				
+        
         @Import partials/codeBlock { @code = @codeDataObject }
-				
+        
         <li><strong>Using anonymous methods</strong>:</li>
-	
-				@Import partials/codeBlock { @code = @codeDataMethod }
-		
+  
+        @Import partials/codeBlock { @code = @codeDataMethod }
+    
         <li><strong>Using attributes</strong>: You can mark fields, properties, or methods in your classes with the
             <code>[WebStencilsVar]</code> attribute, then use <code>AddModule</code> to add all marked members as script
             variables:
         </li>
-				
-				@Import partials/codeBlock { @code = @codeDataAttribute }
-				
+        
+        @Import partials/codeBlock { @code = @codeDataAttribute }
+        
     </ol>
     <p>It’s important to keep in mind that only objects with the <code>GetEnumerator</code> method, where the enumerator
         returns an object value, can be used. Records can’t be used from WebStencils.</p>
-				
+        
 </div>

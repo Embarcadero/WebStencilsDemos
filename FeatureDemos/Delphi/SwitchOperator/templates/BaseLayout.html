@@ -1,0 +1,74 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@picocss/pico@@2/css/pico.min.css">
+  <meta name="color-scheme" content="light dark">
+  <title>WebStencils demo</title>
+  <style>
+    .badge {
+      padding: 2px 10px 6px 10px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .status-active {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .status-inactive {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .status-pending {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .status-suspended {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .status-maintenance {
+      background-color: #17a2b8;
+      color: white;
+    }
+
+    .status-unknown {
+      background-color: #6c757d;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Switch Operator</h1>
+    <article>
+      <strong>Status:</strong>
+      @switch(status.Name) {
+        @case "a" {
+        <span class="badge status-active">active</span>
+        }@case "i" {
+        <span class="badge status-inactive">inactive</span>
+        }@case "p" {
+        <span class="badge status-pending">pending</span>
+        }@case "s" {
+        <span class="badge status-suspended">suspended</span>
+        }@case "m" {
+        <span class="badge status-maintenance">maintenance</span>
+        } @default {
+        <span class="badge status-unknown">unknown</span>
+        }
+      }      
+    </article>
+    <p>Refresh the page multiple times to see the status change.</p>    
+  </main>
+</body>
+
+</html>

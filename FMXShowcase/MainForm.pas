@@ -69,8 +69,8 @@ begin
   MemoHTMLTemplate.Text := HTMLTemplate1;
   LPerson := TPerson.Create('Alba', 21);
   EdtName.Text := LPerson.Name;
-	EdtAge.Text := LPerson.Age.ToString;
-	WebStencilsProcessor.AddVar('person', LPerson, false);
+  EdtAge.Text := LPerson.Age.ToString;
+  WebStencilsProcessor.AddVar('person', LPerson, false);
 end;
 
 procedure TWebStencilsLabs.FormDestroy(Sender: TObject);
@@ -80,10 +80,10 @@ end;
 
 procedure TWebStencilsLabs.ActGenerateWSResultExecute(Sender: TObject);
 begin
-	var GeneratedPlainContent := WebStencilsProcessor.ContentFromString(MemoPlainTemplate.Text);
-	var GeneratedHTMLContent := WebStencilsProcessor.ContentFromString(MemoHTMLTemplate.Text);
-	MemoWSGenerated.Text := GeneratedPlainContent;
-	BrowserWSGenerated.LoadFromStrings(GeneratedHTMLContent, '');
+  var GeneratedPlainContent := WebStencilsProcessor.ContentFromString(MemoPlainTemplate.Text);
+  var GeneratedHTMLContent := WebStencilsProcessor.ContentFromString(MemoHTMLTemplate.Text);
+  MemoWSGenerated.Text := GeneratedPlainContent;
+  BrowserWSGenerated.LoadFromStrings(GeneratedHTMLContent, '');
 end;
 
 procedure TWebStencilsLabs.ActUpdateFieldsExecute(Sender: TObject);
