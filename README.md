@@ -27,6 +27,11 @@ This demo shows the core functionality of WebStencils in a FireMonkey (FMX) appl
 
 [More info](https://github.com/Embarcadero/WebStencilsDemos/tree/main/FMXShowcase)
 
+### Feature Demos
+A collection of small, focused code snippets demonstrating specific WebStencils features. Each demo is a minimal WebBroker application that showcases a particular aspect of the WebStencils template engine.
+
+[More info](https://github.com/Embarcadero/WebStencilsDemos/tree/main/FeatureDemos)
+
 ## Copyright
 This software is Copyright 2025 Embarcadero Technologies, Inc.
 
