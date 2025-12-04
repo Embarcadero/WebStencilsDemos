@@ -53,7 +53,7 @@ begin
       if APropName.ToUpper = 'APP_VERSION' then
         AValue := '1.0.0'
       else if APropName.ToUpper = 'DEBUG_MODE' then
-        Avalue := 'True'
+        AValue := 'True'
       else
       begin
         Result := False;

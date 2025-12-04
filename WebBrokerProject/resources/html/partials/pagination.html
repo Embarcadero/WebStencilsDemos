@@ -44,7 +44,7 @@
                 }
 
                 <!-- Current page if not first or last -->
-				@if ((pagination.PageNumber > 1) and (pagination.PageNumber < pagination.TotalPages)) {
+                @if ((pagination.PageNumber > 1) and (pagination.PageNumber < pagination.TotalPages)) {
                 <li class="page-item active">
                     <a class="page-link" href="@env.resource/@pagination.Uri?page=@pagination.PageNumber&pageSize=@pagination.PageSize">@pagination.PageNumber</a>
                 </li>

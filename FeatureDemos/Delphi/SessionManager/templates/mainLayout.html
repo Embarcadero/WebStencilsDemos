@@ -1,39 +1,39 @@
 @LayoutPage baseLayout
 <main class="container">
-    <nav>
-        <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/authenticated">Authenticated</a></li>
-        <li><a href="/admin">Only Admin</a></li>
-        </ul>
-		<ul>
-			@if (session.Authenticated) {
-				<li>Welcome, @session.UserName</li>
-				<form method="post" action="/logout">
-					<button type="submit">Log Out</button>
-				</form>
-			} @else {
-				<li><a href="/login" role="button">Login</a></li>
-			}	
-		</ul>
-    </nav>    
-    @RenderBody
-	<hr>
-	<footer>
-		<h4>Session Info</h4>
-		<small>
-			<div class="grid">						
-				<div>
-					<div>Authenticated: <kbd>@session.Authenticated</kbd></div>
-					<br />
-					<div>Session ID: <kbd>@session.Id</kbd></div>
-				</div>
-				<div>
-					<div>User: <kbd>@session.UserName</kbd></div>
-					<br />
-					<div>Role: <kbd>@session.UserRoles</kbd></div>				
-				</div>
-			</div>
-		</small>
-	</footer>
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/authenticated">Authenticated</a></li>
+      <li><a href="/admin">Only Admin</a></li>
+    </ul>
+    <ul>
+      @if (session.Authenticated) {
+        <li>Welcome, @session.UserName</li>
+        <form method="post" action="/logout">
+          <button type="submit">Log Out</button>
+        </form>
+      } @else {
+        <li><a href="/login" role="button">Login</a></li>
+      }  
+    </ul>
+  </nav>    
+  @RenderBody
+  <hr>
+  <footer>
+    <h4>Session Info</h4>
+    <small>
+      <div class="grid">            
+        <div>
+          <div>Authenticated: <kbd>@session.Authenticated</kbd></div>
+          <br />
+          <div>Session ID: <kbd>@session.Id</kbd></div>
+        </div>
+        <div>
+          <div>User: <kbd>@session.UserName</kbd></div>
+          <br />
+          <div>Role: <kbd>@session.UserRoles</kbd></div>        
+        </div>
+      </div>
+    </small>
+  </footer>
 </main>

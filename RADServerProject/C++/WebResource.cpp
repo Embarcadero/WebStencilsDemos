@@ -136,7 +136,7 @@ void TWebstencilsResource1::GetAllCustomersEndpoint(TEndpointContext* AContext, 
 
 static void Register()
 {
-	std::unique_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
+    std::unique_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
     attributes->ResourceName = "web";
 
     attributes->ResourceSuffix["html.Get"] = "/{filename}";

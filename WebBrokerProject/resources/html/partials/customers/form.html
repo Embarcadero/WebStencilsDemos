@@ -1,4 +1,4 @@
-<div class="row">	
+<div class="row">
     @forEach(var f in customers.fields) {        
         @if (f.fieldName = "COUNTRY") {
             @import partials/countrySelect { @field = @f }

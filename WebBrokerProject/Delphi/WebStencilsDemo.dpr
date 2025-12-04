@@ -99,7 +99,7 @@ end;
 
 function CheckPort(APort: Integer): Integer;
 begin
-	if BindPort(APort) then
+  if BindPort(APort) then
     Result := APort
   else
     Result := 0;

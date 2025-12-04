@@ -23,8 +23,8 @@ public:
 
 class TCodeExamples : public TObject {
 private:
-	TDictionary__2<String, TCodeExample>* FItems;
-//	std::map<String, std::unique_ptr<TCodeExample>> FItems;
+    TDictionary__2<String, TCodeExample>* FItems;
+//  std::map<String, std::unique_ptr<TCodeExample>> FItems;
     TWebStencilsEngine* FWebStencilsEngine;
     void InitValues();
 

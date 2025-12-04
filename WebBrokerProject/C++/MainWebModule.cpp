@@ -99,7 +99,7 @@ void TMainWebModule::InitRequiredData()
         WebStencilsEngine->AddVar("env", FEnvironmentSettings.get());
 
         // Controllers will handle providing data to templates.
-		WebStencilsEngine->AddVar("customers", Customers, false);
+        WebStencilsEngine->AddVar("customers", Customers, false);
         WebStencilsEngine->AddVar("countries", Countries, false);
         
         // Initialize Countries query
@@ -234,7 +234,7 @@ void __fastcall TMainWebModule::WebModule1ActHealthAction(TObject *Sender, TWebR
         "}",
         ARRAYOFCONST((
             FormatDateTime("yyyy-mm-dd\"T\"hh:nn:ss.zzz\"Z\"", TTimeZone::Local->ToUniversalTime(Now())),
-			TimeToStr(Now()),
+            TimeToStr(Now()),
 #ifdef _WIN64
             "Windows x64",
 #else

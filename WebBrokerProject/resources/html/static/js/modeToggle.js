@@ -20,21 +20,21 @@
     }
   }
 
-	const updateIcon = (theme) => {
-		const themeIcon = document.querySelector('#theme-icon')
-		const themeToggleBtn = document.querySelector('#theme-toggle-btn')
-		if (themeIcon && themeToggleBtn) {
-			if (theme === 'dark') {
-				themeIcon.classList.remove('bi-sun')
-				themeIcon.classList.add('bi-moon-stars')
-				themeToggleBtn.setAttribute('aria-label', 'Switch to light mode')
-			} else {
-				themeIcon.classList.remove('bi-moon-stars')
-				themeIcon.classList.add('bi-sun')
-				themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode')
-			}
-		}
-	}
+  const updateIcon = (theme) => {
+    const themeIcon = document.querySelector('#theme-icon')
+    const themeToggleBtn = document.querySelector('#theme-toggle-btn')
+    if (themeIcon && themeToggleBtn) {
+      if (theme === 'dark') {
+        themeIcon.classList.remove('bi-sun')
+        themeIcon.classList.add('bi-moon-stars')
+        themeToggleBtn.setAttribute('aria-label', 'Switch to light mode')
+      } else {
+        themeIcon.classList.remove('bi-moon-stars')
+        themeIcon.classList.add('bi-sun')
+        themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode')
+      }
+    }
+  }
 
   const toggleTheme = () => {
     const currentTheme = getStoredTheme() || getPreferredTheme()

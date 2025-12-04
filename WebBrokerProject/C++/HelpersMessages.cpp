@@ -145,7 +145,7 @@ void TMessagesList::Delete(int AIndex)
 __fastcall TMessageProvider::TMessageProvider()
     : TObject()
 {
-	FMessages = new TMessagesList();
+    FMessages = new TMessagesList();
     FHasMessages = false;
 }
 
