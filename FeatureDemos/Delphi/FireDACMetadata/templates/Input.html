@@ -1,0 +1,60 @@
+@if(field.visible) {
+	<fieldset>
+		<label for="@field.fieldName">
+			@field.displayLabel
+			@if(field.required) {
+			<span style="color: red;">*</span>
+			}		
+		</label>
+		@switch(field.dataType) {
+			@case "ftInteger" {
+				<!-- Number input for integer types -->
+				<input 
+				type="number" 
+				id="@field.fieldName" 
+				name="@field.fieldName"
+				@if not(field.IsNull) { value="@field.Value" }
+				@if (field.required) { required }
+				@if (field.size > 0) { maxlength="@field.size" }
+				step="1">
+			} @case "ftDate" {            
+				<!-- Date input for date types -->
+				<input 
+				type="date" 
+				id="@field.fieldName" 
+				name="@field.fieldName"
+				@if not(field.IsNull) { value="@field.DisplayText" }
+				@if (field.required) { required }>
+			} @case "ftBoolean" {
+				<!-- Checkbox for boolean types -->
+				<label>
+					<input 						
+					id="@field.fieldName" 
+					name="@field.fieldName" type="checkbox" role="switch" 
+					@if(field.Value) { checked }
+					@if(field.required) { required }>
+					@field.displayLabel
+				  </label>				
+			} @case "ftWideMemo" {
+				<!-- Textarea for wide memo types -->
+				<textarea 
+				id="@field.fieldName" 
+				name="@field.fieldName"
+				@if (field.required) { required }
+				@if (field.size > 0) { maxlength="@field.size" }
+				rows="3">@field.Value</textarea>
+			} @default {
+				<!-- Default text input for other types -->
+				<input 
+				type="text" 
+				id="@field.fieldName" 
+				name="@field.fieldName"
+				value="@field.Value"
+				@if (field.required) { required }
+				@if(field.size > 0) { maxlength="@field.size" }>
+			}
+		}    
+	</fieldset>
+} @else {
+	<input type="hidden" name="@field.fieldName" value="@field.Value">
+} 
