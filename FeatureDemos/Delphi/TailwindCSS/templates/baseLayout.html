@@ -1,0 +1,17 @@
+﻿<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  @if (env.debug) {
+    <script src="https://cdn.jsdelivr.net/npm/@@tailwindcss/browser@@4"></script>
+  } @else {
+    <link rel="stylesheet" href="/static/css/output.css">
+  }
+  <meta name="color-scheme" content="light dark">  
+  <title>Delphi + Tailwind CSS Demo</title>  
+  @RenderHeader
+  </head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors">  
+  @RenderBody
+</body>
+</html>

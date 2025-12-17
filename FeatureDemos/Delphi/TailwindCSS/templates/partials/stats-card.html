@@ -1,0 +1,31 @@
+﻿@switch (stat.Color) {
+  @case "blue" {
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow" style="border-left-color: #3b82f6;">
+  }
+  @case "green" {
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow" style="border-left-color: #10b981;">
+  }
+  @case "red" {
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow" style="border-left-color: #ef4444;">
+  }
+  @default {
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow" style="border-left-color: #a855f7;">
+  }
+}
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm font-medium text-gray-600 dark:text-gray-400">@stat.Title</p>
+      <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">@stat.Value</p>
+      <div class="flex items-center mt-2">
+        @if (stat.ChangeType = "increase") {
+          <span class="text-green-600 dark:text-green-400 text-sm font-medium">@stat.Change</span>
+        } @else {
+          <span class="text-red-600 dark:text-red-400 text-sm font-medium">@stat.Change</span>
+        }
+        <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">vs last month</span>
+      </div>
+    </div>
+    <div class="text-4xl">@stat.Icon</div>
+  </div>
+</div>
+

@@ -1,0 +1,39 @@
+﻿@LayoutPage mainLayout
+
+@Import partials/hero
+
+<div class="space-y-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+      <div class="text-4xl mb-4">⚡</div>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Powerful Backend</h3>
+      <p class="text-gray-600 dark:text-gray-400">
+        Built with Delphi, providing robust server-side logic and data management
+      </p>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+      <div class="text-4xl mb-4">🎨</div>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Modern UI</h3>
+      <p class="text-gray-600 dark:text-gray-400">
+        Styled with Tailwind CSS for beautiful, responsive, and accessible interfaces
+      </p>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-pink-500">
+      <div class="text-4xl mb-4">🔧</div>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Easy Development</h3>
+      <p class="text-gray-600 dark:text-gray-400">
+        WebStencils template engine makes building dynamic pages simple and intuitive
+      </p>
+    </div>
+  </div>
+  
+  <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
+    <p class="text-blue-800 dark:text-blue-200">
+      <strong>Welcome!</strong> This page is publicly accessible. Anyone can view this content without authentication.
+    </p>
+  </div>
+  
+  @Import partials/tech-badge
+</div>

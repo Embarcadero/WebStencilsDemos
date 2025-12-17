@@ -1,0 +1,28 @@
+﻿@LayoutPage mainLayout
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">Dashboard</h1>
+    <p class="text-gray-600 dark:text-gray-400">Welcome back, @session.UserName! Here's what's happening.</p>
+  </div>
+  
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    @ForEach (var stat in dashboardStats) {
+      @Import partials/stats-card { @stat }
+    }
+  </div>
+  
+  <!-- Recent Products -->
+  <div class="mt-8">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Recent Products</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @ForEach (var product in recentProducts) {
+        @Import partials/product-card { @product }
+      }
+    </div>
+  </div>
+  
+  @Import partials/tech-badge
+</div>
+

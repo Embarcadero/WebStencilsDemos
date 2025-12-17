@@ -1,0 +1,26 @@
+<!-- Footer -->
+<footer class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+  <h4 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Session Info</h4>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+    <div class="space-y-2">
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600 dark:text-gray-400">Authenticated:</span>
+        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded font-mono text-xs">@session.Authenticated</kbd>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600 dark:text-gray-400">Session ID:</span>
+        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded font-mono text-xs break-all">@session.Id</kbd>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600 dark:text-gray-400">User:</span>
+        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded font-mono text-xs">@session.UserName</kbd>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600 dark:text-gray-400">Role:</span>
+        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded font-mono text-xs">@session.UserRoles</kbd>
+      </div>
+    </div>
+  </div>
+</footer>

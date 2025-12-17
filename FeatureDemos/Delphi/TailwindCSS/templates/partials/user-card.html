@@ -1,0 +1,35 @@
+﻿<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+  <div class="flex items-center gap-4">
+    <div class="text-4xl">@user.AvatarUrl</div>
+    <div class="flex-1">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">@user.Name</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400">@user.Email</p>
+      <div class="flex items-center gap-2 mt-2">
+        <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
+          @user.Role
+        </span>
+        @switch (user.Status) {
+          @case "active" {
+            <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
+              Active
+            </span>
+          }
+          @case "inactive" {
+            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
+              Inactive
+            </span>
+          }
+          @default {
+            <span class="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded text-xs font-medium">
+              Pending
+            </span>
+          }
+        }
+      </div>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        Last login: @user.LastLogin
+      </p>
+    </div>
+  </div>
+</div>
+

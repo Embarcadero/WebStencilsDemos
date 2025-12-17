@@ -1,0 +1,30 @@
+<!-- Navigation -->
+<nav class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-8 p-4">
+  <div class="flex flex-wrap items-center justify-between">
+    <div class="flex items-center gap-6">
+      <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <img src="/static/img/logo.png" alt="Embarcadero Logo" class="h-8 w-8 object-contain">
+        <span class="text-xl font-bold text-gray-800 dark:text-gray-200">Embarcadero</span>
+      </a>
+      <div class="flex flex-wrap gap-2">
+        <a href="/" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'home') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Home</a>
+        <a href="/dashboard" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'dashboard') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Dashboard</a>
+        <a href="/products" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'products') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Products</a>
+        <a href="/authenticated" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'authenticated') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Profile</a>
+        <a href="/admin" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'admin') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Admin</a>
+        <a href="/users" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'users') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Users</a>
+        <a href="/analytics" class="px-4 py-2 rounded-md transition-colors font-medium @if (page.pagename = 'analytics') { bg-blue-600 text-white dark:bg-blue-500 } @else { text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 }">Analytics</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      @if (session.Authenticated) {
+        <span class="text-gray-700 dark:text-gray-300">Welcome, <span class="text-blue-600 dark:text-blue-400">@session.UserName</span></span>
+        <form method="post" action="/logout">
+          <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-medium">Log Out</button>
+        </form>
+      } @else {
+        <a href="/login" class="px-4 py-2 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white rounded-md transition-colors font-medium">Login</a>
+      }
+    </div>
+  </div>
+</nav>
