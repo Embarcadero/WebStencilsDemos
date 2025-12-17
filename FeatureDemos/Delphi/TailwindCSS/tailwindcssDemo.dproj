@@ -3,7 +3,7 @@
         <ProjectGuid>{E2C413F1-CC25-44B2-9637-D844D6D9744C}</ProjectGuid>
         <MainSource>tailwindcssDemo.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <ProjectName Condition="'$(ProjectName)'==''">tailwindcssDemo</ProjectName>
         <TargetedPlatforms>131</TargetedPlatforms>
         <AppType>Console</AppType>
