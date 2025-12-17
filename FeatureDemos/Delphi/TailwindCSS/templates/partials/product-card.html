@@ -1,0 +1,31 @@
+﻿<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow group">
+  <div class="h-48 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
+    <div class="text-6xl">@product.ImageUrl</div>
+  </div>
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase">@product.Category</span>
+      <div class="flex items-center">
+        <span class="text-yellow-400">★</span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">@product.Rating</span>
+      </div>
+    </div>
+    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      @product.Name
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">@product.Description</p>
+    <div class="flex items-center justify-between">
+      <span class="text-2xl font-bold text-gray-900 dark:text-gray-100">$@product.Price</span>
+      @if (product.Stock > 0) {
+        <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs font-medium">
+          In Stock
+        </span>
+      } @else {
+        <span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-xs font-medium">
+          Out of Stock
+        </span>
+      }
+    </div>
+  </div>
+</div>
+

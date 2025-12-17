@@ -1,0 +1,25 @@
+﻿@LayoutPage mainLayout
+<div class="space-y-4 text-center">
+  <div class="mb-6">
+    <h1 class="text-6xl font-bold text-red-600 dark:text-red-400 mb-4">403</h1>
+    <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">Forbidden</h2>
+  </div>
+  <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+    The user is not authenticated or does not have the required role to access this page
+  </p>
+  <div class="mt-8 p-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded max-w-2xl mx-auto">
+    <p class="text-red-800 dark:text-red-200">
+      <strong>Access Denied</strong> - You don't have permission to view this resource.
+    </p>
+  </div>
+  <div class="mt-6">
+    <a href="/" class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors">
+      Return to Home
+    </a>
+    @if (!session.Authenticated) {
+      <a href="/login" class="inline-block ml-4 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition-colors">
+        Login
+      </a>
+    }
+  </div>
+</div>

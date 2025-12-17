@@ -1,0 +1,23 @@
+﻿@LayoutPage mainLayout
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">Users</h1>
+      <p class="text-gray-600 dark:text-gray-400">Manage and view all system users</p>
+    </div>
+    <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
+      Add User
+    </button>
+  </div>
+  
+  <!-- Users Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @ForEach (var user in users) {
+      @Import partials/user-card { @user }
+    }
+  </div>
+  
+  @Import partials/tech-badge
+</div>
+
