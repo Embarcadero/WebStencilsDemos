@@ -8,7 +8,7 @@ A demonstration project showing how to integrate **Tailwind CSS** with **Delphi*
 
 The application includes a basic mock authentication mechanism (`demo/demo123` for user role, `admin/admin123` for admin role).
 
-## What Makes This Unique?
+## What Makes This Interesting?
 
 This project uses a hybrid approach that switches between CDN and local CSS based on build configuration:
 
@@ -19,8 +19,8 @@ This project uses a hybrid approach that switches between CDN and local CSS base
 
 ## Prerequisites
 
-- **Delphi** (any recent version with WebBroker support)
-- **WebStencils** library (for template rendering)
+- **Delphi 13+**
+- **WebStencils** library
 - **Tailwind CSS Standalone CLI** (download separately)
 
 ## Quick Start
@@ -30,7 +30,7 @@ This project uses a hybrid approach that switches between CDN and local CSS base
 The Tailwind CLI binary is not included in this repository. Download it separately:
 
 1. Visit [Tailwind CSS Releases](https://github.com/tailwindlabs/tailwindcss/releases/latest)
-2. Download `tailwindcss-windows-x64.exe` (or appropriate for your platform)
+2. Download `tailwindcss-windows-x64.exe`
 3. Rename to `tailwindcss.exe` and place in the `tools/` directory
 
 ### 2. Build and Run
@@ -125,4 +125,4 @@ tools\tailwindcss.exe -i src\input.css -o templates\static\css\output.css --mini
 
 ---
 
-This technique demonstrates that Delphi can be used with modern CSS frameworks without Node.js or complex JavaScript tooling. The hybrid CDN/local approach provides fast development iteration and optimized production builds.
+This PoC demonstrates that Delphi can be used with modern CSS frameworks without Node.js or complex JavaScript tooling. The hybrid CDN/local approach provides fast development iteration and optimized production builds.
