@@ -24,7 +24,6 @@ USER appuser
 
 # Environment variables
 ENV APP_LOG_PATH=/app/logs/app.log \
-    APP_DB_FILE=/app/data/database.sqlite3 \
     APP_RESOURCES_PATH=/app/resources \
     DOCKER_CONTAINER=1 \
     DEMO_MODE=true \

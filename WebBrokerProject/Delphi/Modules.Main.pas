@@ -338,8 +338,24 @@ end;
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject;
   Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
-  if not(Connection.Connected) then
-    Connection.Connected := True;
+  if not Connection.Connected then
+  begin
+    try      
+      Connection.Connected := True;
+      if Connection.Connected then
+        Logger.Info('Database connection established successfully')
+      else
+        Logger.Warning('Database connection attempt returned false');
+    except
+      on E: Exception do
+      begin
+        Logger.Error(Format('Failed to connect to database in BeforeDispatch: %s', [E.Message]));
+        Logger.Error(Format('Database file path: %s', [Connection.Params.Database]));
+        Logger.Error(Format('Database file exists: %s', [BoolToStr(FileExists(Connection.Params.Database), True)]));
+        // Don't break the request - let it continue, connection will be retried
+      end;
+    end;
+  end;
 end;
 
 procedure TMainWebModule.WebSessionManagerCreated(Sender: TCustomWebSessionManager;

@@ -185,8 +185,9 @@ begin
   // Normalize path separators for comparison
   NormalizedDir := StringReplace(NormalizedDir, '\', '/', [rfReplaceAll]);
   
-  // If database is in /app/data, use /app/backup (Docker convention)
-  if (Pos('/app/data', NormalizedDir) > 0) or (Pos('\app\data', ActiveDbDir) > 0) then
+  // If database is in /app/data or /app/resources/data, use /app/backup (Docker convention)
+  if (Pos('/app/data', NormalizedDir) > 0) or (Pos('/app/resources/data', NormalizedDir) > 0) or 
+     (Pos('\app\data', ActiveDbDir) > 0) or (Pos('\app\resources\data', ActiveDbDir) > 0) then
     DefaultBackupFile := TPath.Combine('/app/backup', ExtractFileName(AActiveDatabaseFile))
   else
     // Otherwise, use same directory with backup prefix
