@@ -35,9 +35,6 @@ type
 
 implementation
 
-uses
-  System.NetEncoding;
-
 { TTasksController }
 
 function TTasksController.RenderTemplate(ATemplate: string; ARequest: TWebRequest; ATask: TTaskItem = nil): string;
@@ -88,7 +85,6 @@ begin
     var LTasks := TTasks.GetInstanceForSession(Request.Session);
     var lTask := Request.ContentFields.Values['task'];
     Logger.Info(Format('Creating task: %s', [lTask]));
-    lTask := TNetEncoding.HTML.Encode(lTask);
     LTasks.AddTask(lTask);
     Response.Content := RenderTemplate('card', Request);
     Handled := True;

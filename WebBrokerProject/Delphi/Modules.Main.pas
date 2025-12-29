@@ -221,7 +221,7 @@ begin
                               if APropName = 'app_name' then
                                 AValue := 'WebStencils demo'
                               else if APropName = 'version' then
-                                AValue := '1.6.0'
+                                AValue := '1.6.1'
                               else if APropName = 'edition' then
                                 AValue := 'WebBroker Delphi' {$IFDEF CONTAINER} + ' in Docker' {$ENDIF}
                               else if APropName = 'company' then
