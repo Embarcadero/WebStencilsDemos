@@ -1,4 +1,4 @@
-unit Utils.Logger;
+﻿unit Utils.Logger;
 
 interface
 

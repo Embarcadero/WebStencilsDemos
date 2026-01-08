@@ -68,24 +68,24 @@ type
     WebFormsAuthenticator: TWebFormsAuthenticator;
     WebAuthorizer: TWebAuthorizer;
     CustomersID: TFDAutoIncField;
-    CustomersCOMPANY: TStringField;
-    CustomersFIRST_NAME: TStringField;
-    CustomersLAST_NAME: TStringField;
-    CustomersGENDER: TStringField;
-    CustomersEMAIL: TStringField;
-    CustomersPHONE: TStringField;
-    CustomersADDRESS: TStringField;
-    CustomersPOSTAL_CODE: TStringField;
-    CustomersCITY: TStringField;
-    CustomersCOUNTRY: TStringField;
-    CustomersIP_ADDRESS: TStringField;
+    CustomersCOMPANY: TWideStringField;
+    CustomersFIRST_NAME: TWideStringField;
+    CustomersLAST_NAME: TWideStringField;
+    CustomersGENDER: TWideStringField;
+    CustomersEMAIL: TWideStringField;
+    CustomersPHONE: TWideStringField;
+    CustomersADDRESS: TWideStringField;
+    CustomersPOSTAL_CODE: TWideStringField;
+    CustomersCITY: TWideStringField;
+    CustomersCOUNTRY: TWideStringField;
+    CustomersIP_ADDRESS: TWideStringField;
     [WebStencilsVar('countries', false)]
     Countries: TFDQuery;
     CustomersAGE: TIntegerField;
     CustomersACTIVATION_DATE: TDateField;
     CustomersACTIVE: TBooleanField;
     CustomersCOMMENTS: TWideMemoField;
-    CountriesCOUNTRY: TStringField;
+    CountriesCOUNTRY: TWideStringField;
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -340,19 +340,14 @@ procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject;
 begin
   if not Connection.Connected then
   begin
-    try      
+    try
       Connection.Connected := True;
-      if Connection.Connected then
-        Logger.Info('Database connection established successfully')
-      else
-        Logger.Warning('Database connection attempt returned false');
     except
       on E: Exception do
       begin
         Logger.Error(Format('Failed to connect to database in BeforeDispatch: %s', [E.Message]));
         Logger.Error(Format('Database file path: %s', [Connection.Params.Database]));
-        Logger.Error(Format('Database file exists: %s', [BoolToStr(FileExists(Connection.Params.Database), True)]));
-        // Don't break the request - let it continue, connection will be retried
+        Logger.Error(Format('Database file exists: %s', [BoolToStr(FileExists(Connection.Params.Database), True)]));        
       end;
     end;
   end;

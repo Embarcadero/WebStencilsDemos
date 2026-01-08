@@ -108,7 +108,7 @@ begin
   if SearchSQL <> '' then
   begin
     FCustomers.SQL.Add(SearchSQL);
-    FCustomers.ParamByName('search').AsString := '%' + ASearchParams.SearchTerm + '%';
+    FCustomers.ParamByName('search').AsWideString := '%' + ASearchParams.SearchTerm + '%';
   end;
 end;
 

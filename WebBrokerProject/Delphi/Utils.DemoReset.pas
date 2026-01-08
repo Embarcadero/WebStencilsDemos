@@ -1,4 +1,4 @@
-{
+﻿{
   Demo Reset Utility
   
   This unit provides auto-reset functionality for public demo deployments.

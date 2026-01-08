@@ -1,4 +1,4 @@
-{
+﻿{
   Configuration Utility
   
   Provides optional INI file support for application configuration.

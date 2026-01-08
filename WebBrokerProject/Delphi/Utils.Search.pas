@@ -83,7 +83,7 @@ begin
     begin
       if WhereClause <> '' then
         WhereClause := WhereClause + ' OR ';
-      WhereClause := WhereClause + Format('UPPER(%s) LIKE UPPER(:search)', [Field]);
+      WhereClause := WhereClause + Format('%s LIKE :search COLLATE NOCASE', [Field]);
     end;
     
     Result := 'WHERE (' + WhereClause + ')';

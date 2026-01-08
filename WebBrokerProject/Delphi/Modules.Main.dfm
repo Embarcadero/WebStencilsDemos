@@ -82,28 +82,28 @@ object MainWebModule: TMainWebModule
       Required = True
       Visible = False
     end
-    object CustomersCOMPANY: TStringField
+    object CustomersCOMPANY: TWideStringField
       DisplayLabel = 'Company'
       FieldName = 'COMPANY'
       Origin = 'COMPANY'
       Required = True
       Size = 13
     end
-    object CustomersFIRST_NAME: TStringField
+    object CustomersFIRST_NAME: TWideStringField
       DisplayLabel = 'First Name'
       FieldName = 'FIRST_NAME'
       Origin = 'FIRST_NAME'
       Required = True
       Size = 12
     end
-    object CustomersLAST_NAME: TStringField
+    object CustomersLAST_NAME: TWideStringField
       DisplayLabel = 'Last Name'
       FieldName = 'LAST_NAME'
       Origin = 'LAST_NAME'
       Required = True
       Size = 15
     end
-    object CustomersGENDER: TStringField
+    object CustomersGENDER: TWideStringField
       DisplayLabel = 'Gender'
       FieldName = 'GENDER'
       Origin = 'GENDER'
@@ -115,25 +115,25 @@ object MainWebModule: TMainWebModule
       FieldName = 'AGE'
       Origin = 'AGE'
     end
-    object CustomersPOSTAL_CODE: TStringField
+    object CustomersPOSTAL_CODE: TWideStringField
       DisplayLabel = 'Postal Code'
       FieldName = 'POSTAL_CODE'
       Origin = 'POSTAL_CODE'
       Size = 14
     end
-    object CustomersADDRESS: TStringField
+    object CustomersADDRESS: TWideStringField
       DisplayLabel = 'Address'
       FieldName = 'ADDRESS'
       Origin = 'ADDRESS'
       Size = 27
     end
-    object CustomersCITY: TStringField
+    object CustomersCITY: TWideStringField
       DisplayLabel = 'City'
       FieldName = 'CITY'
       Origin = 'CITY'
       Size = 40
     end
-    object CustomersCOUNTRY: TStringField
+    object CustomersCOUNTRY: TWideStringField
       DisplayLabel = 'Country'
       FieldName = 'COUNTRY'
       LookupDataSet = Countries
@@ -141,19 +141,19 @@ object MainWebModule: TMainWebModule
       Origin = 'COUNTRY'
       Size = 34
     end
-    object CustomersPHONE: TStringField
+    object CustomersPHONE: TWideStringField
       DisplayLabel = 'Phone'
       FieldName = 'PHONE'
       Origin = 'PHONE'
       Size = 17
     end
-    object CustomersEMAIL: TStringField
+    object CustomersEMAIL: TWideStringField
       DisplayLabel = 'e-mail'
       FieldName = 'EMAIL'
       Origin = 'EMAIL'
       Size = 34
     end
-    object CustomersIP_ADDRESS: TStringField
+    object CustomersIP_ADDRESS: TWideStringField
       DisplayLabel = 'IP Address'
       FieldName = 'IP_ADDRESS'
       Origin = 'IP_ADDRESS'
@@ -186,6 +186,7 @@ object MainWebModule: TMainWebModule
       'JournalMode=WAL'
       'LockingMode=Normal'
       'Synchronous=Full'
+      'StringFormat=Unicode'
       'DriverID=SQLite')
     LoginPrompt = False
     Left = 253
@@ -268,7 +269,7 @@ object MainWebModule: TMainWebModule
       'FROM countries')
     Left = 341
     Top = 88
-    object CountriesCOUNTRY: TStringField
+    object CountriesCOUNTRY: TWideStringField
       DisplayLabel = 'country'
       FieldName = 'COUNTRY'
       Origin = 'COUNTRY'
